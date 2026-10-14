@@ -450,3 +450,249 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+/* DIRECTORIO VISUAL DE EQUIPOS */
+
+.rejilla-equipos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.tarjeta-equipo {
+  --color-equipo: #087c50;
+  position: relative;
+  isolation: isolate;
+  min-height: 245px;
+  padding: 27px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  overflow: hidden;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e4ebe6;
+  border-radius: 18px;
+  box-shadow: 0 5px 18px rgb(20 50 35 / 4%);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.tarjeta-equipo::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 7px;
+  background: var(--color-equipo);
+  z-index: -1;
+}
+
+.tarjeta-equipo::after {
+  content: "";
+  position: absolute;
+  top: 34px;
+  width: 155px;
+  height: 155px;
+  border-radius: 50%;
+  background: var(--color-equipo);
+  opacity: .055;
+  z-index: -1;
+}
+
+.tarjeta-equipo:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 18px 35px rgb(20 50 35 / 11%);
+}
+
+.tarjeta-equipo img,
+.escudo-pendiente {
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  object-fit: contain;
+  transition: transform .25s ease;
+}
+
+.tarjeta-equipo:hover img,
+.tarjeta-equipo:hover .escudo-pendiente {
+  transform: scale(1.08);
+}
+
+.escudo-pendiente {
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--color-equipo), white 91%);
+  color: var(--color-equipo);
+  font-size: 45px;
+}
+
+.tarjeta-equipo h3 {
+  margin: 3px 0 0;
+  color: #17251f;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.tarjeta-equipo p {
+  margin: -6px 0 0;
+  color: #718078;
+  font-size: 12px;
+}
+
+.tarjeta-equipo:nth-child(8n + 1) { --color-equipo: #e32219; }
+.tarjeta-equipo:nth-child(8n + 2) { --color-equipo: #e9a323; }
+.tarjeta-equipo:nth-child(8n + 3) { --color-equipo: #d71920; }
+.tarjeta-equipo:nth-child(8n + 4) { --color-equipo: #70a8d7; }
+.tarjeta-equipo:nth-child(8n + 5) { --color-equipo: #174a91; }
+.tarjeta-equipo:nth-child(8n + 6) { --color-equipo: #f0b323; }
+.tarjeta-equipo:nth-child(8n + 7) { --color-equipo: #164c9c; }
+.tarjeta-equipo:nth-child(8n + 8) { --color-equipo: #087c50; }
+
+@media (max-width: 1000px) {
+  .rejilla-equipos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 700px) {
+  .rejilla-equipos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .tarjeta-equipo {
+    min-height: 215px;
+    padding: 24px 12px 18px;
+  }
+
+  .tarjeta-equipo img,
+  .escudo-pendiente {
+    width: 76px;
+    height: 76px;
+  }
+
+  .tarjeta-equipo h3 {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  .rejilla-equipos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Página de jugadores */
+
+.pagina-jugadores {
+  min-height: 55vh;
+}
+
+.filtros-jugadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+.filtros-jugadores input,
+.filtros-jugadores select {
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d9e1dc;
+  border-radius: 10px;
+  background: #fff;
+  color: #183b2b;
+  font: inherit;
+}
+
+.filtros-jugadores input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.filtros-jugadores select {
+  min-width: 210px;
+  cursor: pointer;
+}
+
+.filtros-jugadores input:focus,
+.filtros-jugadores select:focus {
+  outline: 2px solid #23834c;
+  outline-offset: 2px;
+}
+
+.rejilla-jugadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.tarjeta-jugador {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid #e3eae5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgb(20 55 35 / 5%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-jugador:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgb(20 55 35 / 10%);
+}
+
+.jugador-dorsal {
+  display: grid;
+  flex-shrink: 0;
+  width: 58px;
+  height: 68px;
+  place-items: center;
+  border-radius: 12px;
+  background: #eaf5ed;
+  color: #17633a;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.jugador-informacion {
+  min-width: 0;
+}
+
+.jugador-equipo {
+  color: #23834c;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tarjeta-jugador h3 {
+  margin: 6px 0;
+  color: #183b2b;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-jugador p {
+  margin: 4px 0;
+  color: #69776f;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .filtros-jugadores {
+    flex-direction: column;
+  }
+
+  .filtros-jugadores input,
+  .filtros-jugadores select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
