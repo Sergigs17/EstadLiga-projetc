@@ -1,121 +1,109 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
+const secciones = [
+  { nombre: 'Equipos', descripcion: 'Consulta los clubes de Primera División.', icono: '🛡️' },
+  { nombre: 'Jugadores', descripcion: 'Descubre jugadores y sus estadísticas.', icono: '⚽' },
+  { nombre: 'Clasificación', descripcion: 'Sigue la clasificación de LaLiga.', icono: '📊' },
+  { nombre: 'Partidos', descripcion: 'Consulta resultados y próximos encuentros.', icono: '📅' },
+]
+
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <div className="estadliga">
+      <header className="cabecera">
+        <a className="logo" href="#inicio">
+          <span className="logo-icono">E</span>
+          <span>Estad<span className="logo-destacado">Liga</span></span>
+        </a>
+
+        <nav className="navegacion">
+          <a className="activo" href="#inicio">Inicio</a>
+          <a href="#equipos">Equipos</a>
+          <a href="#jugadores">Jugadores</a>
+          <a href="#clasificacion">Clasificación</a>
+          <a href="#partidos">Partidos</a>
+        </nav>
+
+        <button className="boton-login" type="button">
+          Iniciar sesión
         </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      <main id="inicio">
+        <section className="presentacion">
+          <div className="presentacion-contenido">
+            <span className="etiqueta">TU FÚTBOL, EN DATOS</span>
+            <h1>Vive LaLiga.<br /><span>Entiende el juego.</span></h1>
+            <p>
+              Estadísticas, equipos, jugadores y resultados de Primera División
+              en un solo lugar.
+            </p>
+            <a className="boton-principal" href="#equipos">
+              Explorar LaLiga <span>→</span>
+            </a>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div className="presentacion-visual" aria-hidden="true">
+            <div className="circulo circulo-externo"></div>
+            <div className="circulo circulo-interior"></div>
+            <div className="balon">⚽</div>
+            <div className="dato-flotante">
+              <span>ESTADÍSTICAS</span>
+              <strong>Todo el fútbol</strong>
+              <small>En tiempo real, cuando haya datos disponibles</small>
+            </div>
+          </div>
+        </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <section className="seccion-contenido" id="secciones">
+          <div className="titulo-seccion">
+            <div>
+              <span className="subtitulo">DESCUBRE ESTADLIGA</span>
+              <h2>Todo lo que necesitas</h2>
+            </div>
+            <p>Explora la competición desde todos los ángulos.</p>
+          </div>
+
+          <div className="rejilla-secciones" id="equipos">
+            {secciones.map((seccion) => (
+              <a
+                className="tarjeta"
+                href={`#${seccion.nombre.toLowerCase()}`}
+                id={seccion.nombre.toLowerCase()}
+                key={seccion.nombre}
+              >
+                <span className="tarjeta-icono">{seccion.icono}</span>
+                <h3>{seccion.nombre}</h3>
+                <p>{seccion.descripcion}</p>
+                <span className="tarjeta-enlace">Explorar <span>→</span></span>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section className="bloque-informativo">
+          <div>
+            <span className="subtitulo">MÁS QUE RESULTADOS</span>
+            <h2>Los datos también cuentan historias.</h2>
+            <p>
+              Sigue la evolución de los equipos, compara estadísticas y
+              descubre todos los detalles de la competición.
+            </p>
+          </div>
+          <a href="#clasificacion" className="boton-secundario">
+            Ver clasificación →
+          </a>
+        </section>
+      </main>
+
+      <footer className="pie">
+        <a className="logo" href="#inicio">
+          <span className="logo-icono">E</span>
+          <span>Estad<span className="logo-destacado">Liga</span></span>
+        </a>
+        <p>Proyecto educativo · Fútbol y estadísticas</p>
+      </footer>
+    </div>
   )
 }
 
