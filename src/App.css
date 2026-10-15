@@ -362,6 +362,7 @@ button {
   0%, 100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -450,6 +451,7 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
 /* DIRECTORIO VISUAL DE EQUIPOS */
 
 .rejilla-equipos {
@@ -694,5 +696,96 @@ button {
   .filtros-jugadores select {
     width: 100%;
     box-sizing: border-box;
+  }
+}
+
+/* Navegación a las plantillas */
+
+.tarjeta-equipo {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.enlace-plantilla {
+  margin-top: auto;
+  padding-top: 5px;
+  color: #087c50;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tarjeta-equipo:focus-visible {
+  outline: 3px solid #087c50;
+  outline-offset: 3px;
+}
+
+.volver-enlace {
+  display: inline-block;
+  margin-bottom: 28px;
+  color: #087c50;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cabecera-plantilla {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 45px;
+  padding: 30px;
+  border: 1px solid #e2ebe5;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.cabecera-plantilla img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.cabecera-plantilla h1 {
+  margin: 8px 0;
+  font-size: clamp(25px, 4vw, 36px);
+}
+
+.cabecera-plantilla p {
+  margin: 5px 0;
+  color: #718078;
+  font-size: 13px;
+}
+
+.mensaje-vacio {
+  padding: 45px 20px;
+  text-align: center;
+  border: 1px dashed #cbdcd1;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.mensaje-vacio > span {
+  font-size: 38px;
+}
+
+.mensaje-vacio h3 {
+  margin-bottom: 8px;
+}
+
+.mensaje-vacio p {
+  color: #718078;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .cabecera-plantilla {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 22px;
+  }
+
+  .cabecera-plantilla img {
+    width: 78px;
+    height: 78px;
   }
 }

@@ -1,0 +1,11 @@
+
+/* Estilos propios de la ficha de equipo.
+   Los estilos generales de la plantilla siguen en App.css. */
+
+.pagina-plantilla .cabecera-plantilla img {
+  object-fit: contain;
+}
+
+.pagina-plantilla .equipo-no-encontrado {
+  margin: 24px 0;
+}
