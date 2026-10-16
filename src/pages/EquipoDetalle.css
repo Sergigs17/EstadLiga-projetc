@@ -1,61 +1,121 @@
-/* Estilos propios de la ficha de equipo.
-   Los estilos generales siguen en App.css. */
+/* ───────── FICHA DE CLUB ─────────
+   Capas, de atrás hacia delante:
+   1. ::before → foto del estadio, FIJA a la pantalla.
+   2. ::after  → degradado con los colores del club. Mide lo que mide la
+      página: transparente arriba y cada vez más opaco hacia abajo, así
+      que al hacer scroll el color va cubriendo la foto.
+   3. El contenido, en tarjetas blancas.
+   Las variables --club-a, --club-b, --club-acento y --foto-estadio
+   las pone EquipoDetalle.tsx. */
 
 .pagina-plantilla {
-  padding-bottom: 48px;
+  position: relative;
+  min-height: calc(100svh - 81px);
+  padding-top: 28px;
+  padding-bottom: 72px;
+  overflow-x: clip;
 }
 
-/* Enlace para volver al directorio */
+.pagina-plantilla::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--foto-estadio, none) center / cover no-repeat,
+    var(--club-a);
+  pointer-events: none;
+}
+
+.pagina-plantilla::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent min(30%, 45vh),
+    color-mix(in srgb, var(--club-a) 80%, transparent) min(55%, 95vh),
+    var(--club-a) min(85%, 150vh),
+    var(--club-b) 100%
+  );
+}
+
+/* ───────── Enlace para volver ───────── */
 
 .pagina-plantilla .volver-enlace {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 28px;
-  color: #087c50;
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.2s ease, transform 0.2s ease;
+  margin-bottom: 0;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 38%);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .pagina-plantilla .volver-enlace:hover {
-  color: #055c3b;
+  background: var(--club-acento);
   transform: translateX(-3px);
 }
 
-/* Cabecera del club */
+/* ───────── Cabecera del club, sobre la foto ───────── */
 
 .pagina-plantilla .cabecera-plantilla {
   position: relative;
+  min-height: clamp(300px, 50vh, 500px);
+  margin-bottom: 28px;
+  padding: 0 0 44px;
   display: flex;
-  align-items: center;
-  gap: 28px;
-  margin-bottom: 42px;
-  padding: 36px;
-  overflow: hidden;
-  border: 1px solid #e2eae5;
-  border-radius: 20px;
-  background: linear-gradient(120deg, #f0f8f3 0%, #ffffff 75%);
-  box-shadow: 0 8px 24px rgb(15 45 30 / 5%);
+  align-items: flex-end;
+  gap: 32px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
 }
 
-.pagina-plantilla .cabecera-plantilla::after {
-  position: absolute;
-  top: -70px;
-  right: -45px;
-  width: 230px;
-  height: 230px;
-  border: 32px solid rgb(8 124 80 / 5%);
-  border-radius: 50%;
+/* Sombra oscura a todo el ancho para que el texto se lea sobre cualquier foto */
+.pagina-plantilla .cabecera-plantilla::before {
   content: '';
+  position: absolute;
+  inset: 0 calc(var(--margen) * -1);
+  z-index: 0;
+  background: linear-gradient(
+    0deg,
+    rgb(10 8 8 / 78%) 0%,
+    rgb(10 8 8 / 45%) 55%,
+    transparent 100%
+  );
   pointer-events: none;
 }
 
-.pagina-plantilla .cabecera-plantilla > img {
-  z-index: 1;
-  flex-shrink: 0;
-  width: 120px;
-  height: 120px;
+/* El círculo del centro del campo, otra vez */
+.pagina-plantilla .cabecera-plantilla::after {
+  top: -20px;
+  right: -70px;
+  width: 340px;
+  height: 340px;
+  border: 2px solid rgb(255 255 255 / 40%);
+  border-radius: 50%;
+}
+
+.pagina-plantilla .cabecera-plantilla > img,
+.pagina-plantilla .cabecera-plantilla > .escudo-pendiente {
+  width: 150px;
+  height: 150px;
+  padding: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--sombra-fuerte);
   object-fit: contain;
 }
 
@@ -64,120 +124,154 @@
   min-width: 0;
 }
 
-.pagina-plantilla .cabecera-plantilla .subtitulo {
-  display: inline-block;
-  margin-bottom: 8px;
-  color: #087c50;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-}
-
 .pagina-plantilla .cabecera-plantilla h1 {
   margin: 0 0 14px;
-  color: #17251d;
-  font-size: clamp(1.8rem, 4vw, 2.7rem);
-  font-weight: 800;
-  line-height: 1.15;
+  color: #fff;
+  font-size: clamp(2.3rem, 6.5vw, 5rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 40%);
 }
 
 .pagina-plantilla .cabecera-plantilla p {
-  margin: 5px 0;
-  color: #59665e;
-  font-size: 0.95rem;
+  margin: 4px 0;
+  color: rgb(255 255 255 / 92%);
+  font-size: 0.98rem;
+  font-weight: 500;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 45%);
 }
 
-/* Equipo inexistente */
+/* ───────── Club no encontrado ───────── */
 
 .pagina-plantilla .equipo-no-encontrado {
   margin: 24px 0 40px;
   padding: 32px;
-  border: 1px solid #e2eae5;
-  border-radius: 16px;
-  background: #f8faf9;
+  border: 0;
+  border-radius: var(--radio-grande);
+  background: var(--papel);
+  box-shadow: var(--sombra-suave);
 }
 
 .pagina-plantilla .equipo-no-encontrado h1 {
-  margin-top: 0;
-  color: #17251d;
+  margin: 0 0 10px;
+  color: var(--tinta);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
 }
 
 .pagina-plantilla .equipo-no-encontrado p {
-  color: #647067;
+  color: var(--tinta-suave);
 }
 
-/* Título de la plantilla */
+/* ───────── Menú de secciones: píldora blanca ───────── */
+
+.pagina-plantilla .menu-secciones-equipo {
+  margin: 0 0 22px;
+  padding: 6px;
+  gap: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--papel);
+  box-shadow: var(--sombra-suave);
+}
+
+.pagina-plantilla .menu-secciones-equipo button {
+  min-height: 44px;
+  padding: 10px 24px;
+  border-radius: 999px;
+  color: var(--tinta-suave);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pagina-plantilla .menu-secciones-equipo button:hover {
+  background: color-mix(in srgb, var(--club-acento) 10%, #fff);
+  color: var(--club-acento);
+}
+
+.pagina-plantilla .menu-secciones-equipo button.activo {
+  background: var(--club-acento);
+  color: #fff;
+}
+
+.pagina-plantilla .menu-secciones-equipo button:focus-visible {
+  outline: 3px solid var(--club-acento);
+  outline-offset: 2px;
+}
+
+/* ───────── Contenido: tarjeta blanca sobre el degradado ───────── */
+
+.pagina-plantilla .contenido-seccion-equipo {
+  padding: clamp(20px, 3.2vw, 40px);
+  border-radius: var(--radio-grande);
+  background: var(--papel);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.pagina-plantilla .contenido-seccion-equipo .subtitulo {
+  color: var(--club-acento);
+}
 
 .pagina-plantilla .titulo-seccion {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--linea);
 }
 
-.pagina-plantilla .titulo-seccion h2 {
-  margin: 4px 0 0;
-  color: #17251d;
-  font-size: clamp(1.4rem, 3vw, 1.9rem);
+.pagina-plantilla .titulo-seccion > p,
+.pagina-plantilla .seccion-plantilla-equipo .titulo-seccion > p {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--club-acento) 12%, #fff);
+  color: var(--club-acento);
+  font-size: 0.8rem;
   font-weight: 800;
 }
 
-.pagina-plantilla .titulo-seccion > p {
-  flex-shrink: 0;
-  margin: 0 0 4px;
-  padding: 8px 13px;
-  border-radius: 999px;
-  background: #e8f5ed;
-  color: #087c50;
-  font-size: 0.85rem;
-  font-weight: 700;
+.pagina-plantilla .bloque-estadisticas-equipo {
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  box-shadow: none;
 }
 
-/* Tarjetas de jugadores */
+/* ───────── Jugadores dentro del club (con el color del equipo) ───────── */
 
 .pagina-plantilla .rejilla-jugadores {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 
 .pagina-plantilla .tarjeta-jugador {
-  display: flex;
-  align-items: center;
-  gap: 17px;
-  min-width: 0;
-  padding: 20px;
-  border: 1px solid #e5ebe7;
-  border-radius: 15px;
-  background: #ffffff;
-  box-shadow: 0 3px 12px rgb(20 40 28 / 3%);
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  padding: 18px 20px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--papel);
+  box-shadow: none;
 }
 
 .pagina-plantilla .tarjeta-jugador:hover {
   transform: translateY(-3px);
-  border-color: #a8d5ba;
-  box-shadow: 0 9px 22px rgb(20 40 28 / 8%);
+  border-color: var(--club-acento);
+  box-shadow: var(--sombra-suave);
 }
 
 .pagina-plantilla .jugador-dorsal {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 54px;
-  height: 60px;
-  border: 1px solid #d5eade;
-  border-radius: 12px;
-  background: #edf7f0;
-  color: #087c50;
-  font-size: 1.45rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--club-acento) 12%, #fff);
+  color: var(--club-acento);
+  font-family: var(--fuente-titulo);
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.pagina-plantilla .tarjeta-jugador:hover .jugador-dorsal {
+  background: var(--club-acento);
+  color: #fff;
 }
 
 .pagina-plantilla .jugador-informacion {
@@ -185,109 +279,24 @@
 }
 
 .pagina-plantilla .jugador-equipo {
-  display: block;
-  margin-bottom: 5px;
-  color: #087c50;
+  color: var(--club-acento);
   font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .pagina-plantilla .jugador-informacion h3 {
-  margin: 0 0 8px;
-  overflow-wrap: anywhere;
-  color: #1b2820;
+  margin: 5px 0;
   font-size: 1.05rem;
-  font-weight: 750;
-  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .pagina-plantilla .jugador-informacion p {
-  margin: 4px 0;
-  color: #68746c;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  margin: 3px 0;
+  color: var(--tinta-suave);
+  font-size: 0.86rem;
 }
-
-/* Estados de carga y plantilla vacía */
-
-.pagina-plantilla .mensaje-vacio {
-  padding: 40px 20px;
-  border: 1px dashed #cbdcd1;
-  border-radius: 16px;
-  background: #f8fbf9;
-  text-align: center;
-}
-
-.pagina-plantilla .mensaje-vacio > span {
-  font-size: 2rem;
-}
-
-.pagina-plantilla .mensaje-vacio h3 {
-  margin-bottom: 8px;
-  color: #24372b;
-}
-
-.pagina-plantilla .mensaje-vacio p {
-  margin-bottom: 0;
-  color: #68746c;
-}
-
-/* Adaptación a móviles */
-
-@media (max-width: 600px) {
-  .pagina-plantilla .volver-enlace {
-    margin-bottom: 20px;
-  }
-
-  .pagina-plantilla .cabecera-plantilla {
-    align-items: flex-start;
-    gap: 18px;
-    margin-bottom: 32px;
-    padding: 23px 18px;
-    border-radius: 16px;
-  }
-
-  .pagina-plantilla .cabecera-plantilla > img {
-    width: 76px;
-    height: 76px;
-  }
-
-  .pagina-plantilla .cabecera-plantilla::after {
-    top: -100px;
-    right: -110px;
-  }
-
-  .pagina-plantilla .titulo-seccion {
-    align-items: flex-start;
-  }
-
-  .pagina-plantilla .tarjeta-jugador {
-    gap: 13px;
-    padding: 16px;
-  }
-
-  .pagina-plantilla .jugador-dorsal {
-    width: 47px;
-    height: 53px;
-    font-size: 1.25rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pagina-plantilla .volver-enlace,
-  .pagina-plantilla .tarjeta-jugador {
-    transition: none;
-  }
-
-  .pagina-plantilla .volver-enlace:hover,
-  .pagina-plantilla .tarjeta-jugador:hover {
-    transform: none;
-  }
-}
-
-/* Las tarjetas de la plantilla enlazan con la ficha del jugador. */
 
 .pagina-plantilla a.tarjeta-jugador {
   color: inherit;
@@ -295,14 +304,76 @@
 }
 
 .pagina-plantilla a.tarjeta-jugador:focus-visible {
-  outline: 3px solid #78c69a;
+  outline: 3px solid var(--club-acento);
   outline-offset: 4px;
 }
 
 .pagina-plantilla .enlace-estadisticas-jugador {
   display: inline-block;
   margin-top: 8px;
-  color: #087c50;
-  font-size: 0.85rem;
+  color: var(--club-acento);
+  font-size: 0.74rem;
   font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pagina-plantilla .mensaje-vacio {
+  border-color: var(--linea);
+  background: var(--papel-calido);
+}
+
+.pagina-plantilla .mensaje-vacio > span {
+  font-size: 2.4rem;
+}
+
+.pagina-plantilla .mensaje-vacio h3 {
+  margin-bottom: 8px;
+}
+
+.pagina-plantilla .mensaje-vacio p {
+  color: var(--tinta-suave);
+  font-size: 0.92rem;
+}
+
+/* ───────── Móvil ───────── */
+
+@media (max-width: 700px) {
+  .pagina-plantilla .cabecera-plantilla {
+    min-height: 360px;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 18px;
+    padding-bottom: 32px;
+  }
+
+  .pagina-plantilla .cabecera-plantilla > img,
+  .pagina-plantilla .cabecera-plantilla > .escudo-pendiente {
+    width: 100px;
+    height: 100px;
+    padding: 15px;
+  }
+
+  .pagina-plantilla .cabecera-plantilla::after {
+    width: 220px;
+    height: 220px;
+    top: 0;
+    right: -60px;
+  }
+
+  .pagina-plantilla .menu-secciones-equipo button {
+    padding: 10px 18px;
+  }
+
+  .pagina-plantilla .rejilla-jugadores {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagina-plantilla .tarjeta-jugador:hover,
+  .pagina-plantilla .volver-enlace:hover {
+    transform: none;
+  }
 }

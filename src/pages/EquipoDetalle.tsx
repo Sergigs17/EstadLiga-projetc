@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import './EquipoDetalle.css'
 import '../components/equipos/EquipoComponentes.css'
@@ -8,6 +7,7 @@ import CabeceraEquipo from '../components/equipos/CabeceraEquipo'
 import HistoriaEquipo from '../components/equipos/HistoriaEquipo'
 import PalmaresEquipo from '../components/equipos/PalmaresEquipo'
 import PlantillaEquipo from '../components/equipos/PlantillaEquipo'
+import { estilosClub } from '../utils/clubes'
 
 export interface Jugador {
   id: number
@@ -50,7 +50,10 @@ function EquipoDetalle({
   }, [equipo?.id])
 
   return (
-    <section className="seccion-contenido pagina-plantilla">
+    <section
+      className="seccion-contenido pagina-plantilla"
+      style={estilosClub(equipo?.nombre)}
+    >
       <a className="volver-enlace" href="#/equipos">
         ← Volver a los equipos
       </a>

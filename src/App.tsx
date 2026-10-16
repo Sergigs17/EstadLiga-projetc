@@ -169,10 +169,11 @@ function App() {
     <div className="estadliga">
       <header className="cabecera">
         <a className="logo" href="#/inicio">
-          <span className="logo-icono">E</span>
-          <span>
-            Estad<span className="logo-destacado">Liga</span>
-          </span>
+          <img
+            className="logo-imagen"
+            src="/logo/Logo.png"
+            alt="EstadLiga"
+          />
         </a>
 
         <nav className="navegacion">
@@ -290,10 +291,11 @@ function App() {
 
       <footer className="pie">
         <a className="logo" href="#/inicio">
-          <span className="logo-icono">E</span>
-          <span>
-            Estad<span className="logo-destacado">Liga</span>
-          </span>
+          <img
+            className="logo-imagen"
+            src="/logo/Logo.png"
+            alt="EstadLiga"
+          />
         </a>
 
         <p>Proyecto educativo · Fútbol y estadísticas</p>
