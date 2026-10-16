@@ -1,11 +1,308 @@
-
 /* Estilos propios de la ficha de equipo.
-   Los estilos generales de la plantilla siguen en App.css. */
+   Los estilos generales siguen en App.css. */
 
-.pagina-plantilla .cabecera-plantilla img {
+.pagina-plantilla {
+  padding-bottom: 48px;
+}
+
+/* Enlace para volver al directorio */
+
+.pagina-plantilla .volver-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  color: #087c50;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.pagina-plantilla .volver-enlace:hover {
+  color: #055c3b;
+  transform: translateX(-3px);
+}
+
+/* Cabecera del club */
+
+.pagina-plantilla .cabecera-plantilla {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 42px;
+  padding: 36px;
+  overflow: hidden;
+  border: 1px solid #e2eae5;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #f0f8f3 0%, #ffffff 75%);
+  box-shadow: 0 8px 24px rgb(15 45 30 / 5%);
+}
+
+.pagina-plantilla .cabecera-plantilla::after {
+  position: absolute;
+  top: -70px;
+  right: -45px;
+  width: 230px;
+  height: 230px;
+  border: 32px solid rgb(8 124 80 / 5%);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.pagina-plantilla .cabecera-plantilla > img {
+  z-index: 1;
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
   object-fit: contain;
 }
 
+.pagina-plantilla .cabecera-plantilla > div {
+  z-index: 1;
+  min-width: 0;
+}
+
+.pagina-plantilla .cabecera-plantilla .subtitulo {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #087c50;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.pagina-plantilla .cabecera-plantilla h1 {
+  margin: 0 0 14px;
+  color: #17251d;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.pagina-plantilla .cabecera-plantilla p {
+  margin: 5px 0;
+  color: #59665e;
+  font-size: 0.95rem;
+}
+
+/* Equipo inexistente */
+
 .pagina-plantilla .equipo-no-encontrado {
-  margin: 24px 0;
+  margin: 24px 0 40px;
+  padding: 32px;
+  border: 1px solid #e2eae5;
+  border-radius: 16px;
+  background: #f8faf9;
+}
+
+.pagina-plantilla .equipo-no-encontrado h1 {
+  margin-top: 0;
+  color: #17251d;
+}
+
+.pagina-plantilla .equipo-no-encontrado p {
+  color: #647067;
+}
+
+/* Título de la plantilla */
+
+.pagina-plantilla .titulo-seccion {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.pagina-plantilla .titulo-seccion h2 {
+  margin: 4px 0 0;
+  color: #17251d;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 800;
+}
+
+.pagina-plantilla .titulo-seccion > p {
+  flex-shrink: 0;
+  margin: 0 0 4px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: #e8f5ed;
+  color: #087c50;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Tarjetas de jugadores */
+
+.pagina-plantilla .rejilla-jugadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+
+.pagina-plantilla .tarjeta-jugador {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e5ebe7;
+  border-radius: 15px;
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgb(20 40 28 / 3%);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pagina-plantilla .tarjeta-jugador:hover {
+  transform: translateY(-3px);
+  border-color: #a8d5ba;
+  box-shadow: 0 9px 22px rgb(20 40 28 / 8%);
+}
+
+.pagina-plantilla .jugador-dorsal {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 60px;
+  border: 1px solid #d5eade;
+  border-radius: 12px;
+  background: #edf7f0;
+  color: #087c50;
+  font-size: 1.45rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.pagina-plantilla .jugador-informacion {
+  min-width: 0;
+}
+
+.pagina-plantilla .jugador-equipo {
+  display: block;
+  margin-bottom: 5px;
+  color: #087c50;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.pagina-plantilla .jugador-informacion h3 {
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+  color: #1b2820;
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.pagina-plantilla .jugador-informacion p {
+  margin: 4px 0;
+  color: #68746c;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Estados de carga y plantilla vacía */
+
+.pagina-plantilla .mensaje-vacio {
+  padding: 40px 20px;
+  border: 1px dashed #cbdcd1;
+  border-radius: 16px;
+  background: #f8fbf9;
+  text-align: center;
+}
+
+.pagina-plantilla .mensaje-vacio > span {
+  font-size: 2rem;
+}
+
+.pagina-plantilla .mensaje-vacio h3 {
+  margin-bottom: 8px;
+  color: #24372b;
+}
+
+.pagina-plantilla .mensaje-vacio p {
+  margin-bottom: 0;
+  color: #68746c;
+}
+
+/* Adaptación a móviles */
+
+@media (max-width: 600px) {
+  .pagina-plantilla .volver-enlace {
+    margin-bottom: 20px;
+  }
+
+  .pagina-plantilla .cabecera-plantilla {
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 32px;
+    padding: 23px 18px;
+    border-radius: 16px;
+  }
+
+  .pagina-plantilla .cabecera-plantilla > img {
+    width: 76px;
+    height: 76px;
+  }
+
+  .pagina-plantilla .cabecera-plantilla::after {
+    top: -100px;
+    right: -110px;
+  }
+
+  .pagina-plantilla .titulo-seccion {
+    align-items: flex-start;
+  }
+
+  .pagina-plantilla .tarjeta-jugador {
+    gap: 13px;
+    padding: 16px;
+  }
+
+  .pagina-plantilla .jugador-dorsal {
+    width: 47px;
+    height: 53px;
+    font-size: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagina-plantilla .volver-enlace,
+  .pagina-plantilla .tarjeta-jugador {
+    transition: none;
+  }
+
+  .pagina-plantilla .volver-enlace:hover,
+  .pagina-plantilla .tarjeta-jugador:hover {
+    transform: none;
+  }
+}
+
+/* Las tarjetas de la plantilla enlazan con la ficha del jugador. */
+
+.pagina-plantilla a.tarjeta-jugador {
+  color: inherit;
+  text-decoration: none;
+}
+
+.pagina-plantilla a.tarjeta-jugador:focus-visible {
+  outline: 3px solid #78c69a;
+  outline-offset: 4px;
+}
+
+.pagina-plantilla .enlace-estadisticas-jugador {
+  display: inline-block;
+  margin-top: 8px;
+  color: #087c50;
+  font-size: 0.85rem;
+  font-weight: 800;
 }

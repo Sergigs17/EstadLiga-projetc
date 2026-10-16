@@ -16,5 +16,12 @@
 			"database_name": "estadliga-db",
 			"database_id": "bda15ce8-9259-43cb-aa05-2276a4dadb8c"
 		}
+	],
+	"r2_buckets": [
+		{
+			"bucket_name": "estadliga-imagenes",
+			"binding": "estadliga_imagenes",
+			"remote": true
+		}
 	]
 }

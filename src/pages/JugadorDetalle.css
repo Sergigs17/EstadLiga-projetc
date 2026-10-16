@@ -1,0 +1,459 @@
+
+/* =====================================================
+   FICHA INDIVIDUAL DEL JUGADOR
+   ===================================================== */
+
+.pagina-jugador-detalle {
+  padding-bottom: 56px;
+}
+
+.pagina-jugador-detalle .volver-enlace {
+  display: inline-flex;
+  margin-bottom: 26px;
+  color: #087c50;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pagina-jugador-detalle .volver-enlace:hover {
+  color: #065d3c;
+}
+
+/* Cabecera */
+
+.cabecera-jugador-detalle {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) minmax(190px, 240px);
+  align-items: center;
+  gap: 26px;
+  padding: 30px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  border: 1px solid #e1e9e4;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #f0f8f3, #ffffff 70%);
+  box-shadow: 0 8px 24px rgb(15 45 30 / 5%);
+}
+
+/* Foto del jugador */
+
+.jugador-detalle-foto {
+  display: flex;
+  width: 150px;
+  height: 170px;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #e8f5ed, #d6eadd);
+}
+
+.jugador-detalle-foto > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.jugador-detalle-foto .jugador-foto-pendiente {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: #087c50;
+}
+
+.jugador-detalle-foto .jugador-foto-pendiente span {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 1px solid rgb(8 124 80 / 12%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 65%);
+  font-size: 2.5rem;
+}
+
+/* Identidad */
+
+.jugador-detalle-identidad {
+  min-width: 0;
+}
+
+.jugador-detalle-identidad .subtitulo {
+  display: inline-block;
+  color: #087c50;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.jugador-detalle-identidad h1 {
+  margin: 8px 0;
+  color: #17251d;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.jugador-detalle-identidad > p {
+  margin: 0 0 14px;
+  color: #087c50;
+  font-weight: 700;
+}
+
+.jugador-detalle-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jugador-detalle-etiquetas span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e3eee7;
+  color: #405448;
+  font-size: 0.8rem;
+}
+
+/* Selector de temporada */
+
+.selector-temporada {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.selector-temporada label {
+  color: #42554a;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.selector-temporada select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd9cf;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #17251d;
+  font: inherit;
+}
+
+.selector-temporada select:focus-visible {
+  outline: 3px solid #78c69a;
+  outline-offset: 2px;
+}
+
+.selector-temporada select:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+/* =====================================================
+   RESUMEN DE ESTADÍSTICAS
+   ===================================================== */
+
+.resumen-estadisticas-jugador {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.resumen-estadistica {
+  display: flex;
+  min-width: 0;
+  min-height: 110px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid #e0e9e3;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgb(15 45 30 / 3%);
+}
+
+.resumen-estadistica span {
+  color: #617167;
+  font-size: 0.9rem;
+}
+
+.resumen-estadistica strong {
+  color: #087c50;
+  font-size: 2rem;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =====================================================
+   CATEGORÍAS DE ESTADÍSTICAS
+   ===================================================== */
+
+.categoria-estadisticas {
+  margin-bottom: 38px;
+}
+
+.categoria-estadisticas .titulo-seccion {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.categoria-estadisticas .titulo-seccion .subtitulo {
+  color: #087c50;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.categoria-estadisticas .titulo-seccion h2 {
+  margin-top: 6px;
+  margin-bottom: 0;
+  color: #17251d;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+}
+
+.contador-metricas {
+  flex-shrink: 0;
+  color: #68786e;
+  font-size: 0.85rem;
+}
+
+/* Tarjetas de métricas */
+
+.rejilla-metricas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tarjeta-metrica {
+  display: flex;
+  min-width: 0;
+  min-height: 88px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e1e9e4;
+  border-radius: 12px;
+  background: #ffffff;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.tarjeta-metrica:hover {
+  transform: translateY(-2px);
+  border-color: #a6d6b9;
+  box-shadow: 0 5px 14px rgb(15 45 30 / 5%);
+}
+
+.tarjeta-metrica span {
+  color: #64746a;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-metrica strong {
+  color: #1c3024;
+  font-size: 1.35rem;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =====================================================
+   ESTADOS DE CARGA Y ERROR
+   ===================================================== */
+
+.estado-estadisticas {
+  padding: 28px 0;
+  color: #64746a;
+}
+
+.mensaje-error-estadisticas {
+  padding: 24px;
+  border: 1px solid #f0d2d2;
+  border-radius: 14px;
+  background: #fff8f8;
+}
+
+.mensaje-error-estadisticas h2 {
+  margin-top: 0;
+  color: #922f2f;
+}
+
+.mensaje-error-estadisticas p {
+  color: #694848;
+  overflow-wrap: anywhere;
+}
+
+.mensaje-error-estadisticas button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #087c50;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.mensaje-error-estadisticas button:hover {
+  background: #066640;
+}
+
+.mensaje-error-estadisticas button:focus-visible {
+  outline: 3px solid #78c69a;
+  outline-offset: 3px;
+}
+
+/* Nota de procedencia */
+
+.nota-estadisticas {
+  margin-top: 28px;
+  color: #78867d;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* =====================================================
+   TABLETS
+   ===================================================== */
+
+@media (max-width: 1000px) {
+  .cabecera-jugador-detalle {
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .jugador-detalle-foto {
+    width: 120px;
+    height: 145px;
+  }
+
+  .selector-temporada {
+    grid-column: 1 / -1;
+  }
+
+  .resumen-estadisticas-jugador {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rejilla-metricas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* =====================================================
+   MÓVILES
+   ===================================================== */
+
+@media (max-width: 650px) {
+  .pagina-jugador-detalle {
+    padding-bottom: 36px;
+  }
+
+  .pagina-jugador-detalle .volver-enlace {
+    margin-bottom: 20px;
+  }
+
+  .cabecera-jugador-detalle {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border-radius: 16px;
+  }
+
+  .jugador-detalle-foto {
+    width: 112px;
+    height: 125px;
+  }
+
+  .jugador-detalle-identidad h1 {
+    font-size: clamp(1.7rem, 7vw, 2.3rem);
+  }
+
+  .selector-temporada {
+    grid-column: auto;
+  }
+
+  .resumen-estadisticas-jugador {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+
+  .resumen-estadistica {
+    min-height: 90px;
+    padding: 14px;
+  }
+
+  .resumen-estadistica span {
+    font-size: 0.82rem;
+  }
+
+  .resumen-estadistica strong {
+    font-size: 1.7rem;
+  }
+
+  .categoria-estadisticas {
+    margin-bottom: 30px;
+  }
+
+  .categoria-estadisticas .titulo-seccion {
+    align-items: flex-start;
+  }
+
+  .categoria-estadisticas .titulo-seccion h2 {
+    font-size: 1.3rem;
+  }
+
+  .contador-metricas {
+    padding-top: 4px;
+    font-size: 0.75rem;
+  }
+
+  .rejilla-metricas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .tarjeta-metrica {
+    min-height: 84px;
+    padding: 12px;
+  }
+
+  .tarjeta-metrica span {
+    font-size: 0.78rem;
+  }
+
+  .tarjeta-metrica strong {
+    font-size: 1.15rem;
+  }
+
+  .mensaje-error-estadisticas {
+    padding: 18px;
+  }
+}
+
+/* Accesibilidad */
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-metrica {
+    transition: none;
+  }
+
+  .tarjeta-metrica:hover {
+    transform: none;
+  }
+}

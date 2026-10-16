@@ -1,6 +1,13 @@
 
+import { useEffect, useState } from 'react'
 import './EquipoDetalle.css'
+import '../components/equipos/EquipoComponentes.css'
+
 import type { Equipo } from './Equipos'
+import CabeceraEquipo from '../components/equipos/CabeceraEquipo'
+import HistoriaEquipo from '../components/equipos/HistoriaEquipo'
+import PalmaresEquipo from '../components/equipos/PalmaresEquipo'
+import PlantillaEquipo from '../components/equipos/PlantillaEquipo'
 
 export interface Jugador {
   id: number
@@ -12,6 +19,7 @@ export interface Jugador {
   dorsal: number | null
   equipo_id: number
   equipo: string
+  api_id: number | null
 }
 
 interface EquipoDetalleProps {
@@ -21,83 +29,122 @@ interface EquipoDetalleProps {
   error: boolean
 }
 
+type SeccionEquipo =
+  | 'historia'
+  | 'palmares'
+  | 'jugadores'
+  | 'estadisticas'
+
 function EquipoDetalle({
   equipo,
   jugadores,
   cargando,
   error,
 }: EquipoDetalleProps) {
+  const [seccionActiva, setSeccionActiva] =
+    useState<SeccionEquipo>('historia')
+
+  // Al cambiar de equipo, volvemos a mostrar su historia.
+  useEffect(() => {
+    setSeccionActiva('historia')
+  }, [equipo?.id])
+
   return (
     <section className="seccion-contenido pagina-plantilla">
       <a className="volver-enlace" href="#/equipos">
         ← Volver a los equipos
       </a>
 
-      {equipo ? (
-        <div className="cabecera-plantilla">
-          {equipo.escudo && (
-            <img
-              src={equipo.escudo}
-              alt={`Escudo del ${equipo.nombre}`}
-            />
-          )}
+      <CabeceraEquipo equipo={equipo} />
 
-          <div>
-            <span className="subtitulo">PLANTILLA DEL CLUB</span>
-            <h1>{equipo.nombre}</h1>
+      {equipo && (
+        <>
+          <nav
+            className="menu-secciones-equipo"
+            aria-label="Secciones del equipo"
+          >
+            <button
+              type="button"
+              className={
+                seccionActiva === 'historia' ? 'activo' : ''
+              }
+              aria-current={
+                seccionActiva === 'historia' ? 'page' : undefined
+              }
+              onClick={() => setSeccionActiva('historia')}
+            >
+              Historia
+            </button>
 
-            {equipo.estadio && <p>Estadio: {equipo.estadio}</p>}
-            {equipo.ciudad && <p>Ciudad: {equipo.ciudad}</p>}
-          </div>
-        </div>
-      ) : (
-        <div className="equipo-no-encontrado">
-          <h1>Equipo no encontrado</h1>
-          <p>No hemos encontrado este equipo en nuestra base de datos.</p>
-        </div>
-      )}
+            <button
+              type="button"
+              className={
+                seccionActiva === 'palmares' ? 'activo' : ''
+              }
+              aria-current={
+                seccionActiva === 'palmares' ? 'page' : undefined
+              }
+              onClick={() => setSeccionActiva('palmares')}
+            >
+              Palmarés
+            </button>
 
-      <div className="titulo-seccion">
-        <div>
-          <span className="subtitulo">JUGADORES</span>
-          <h2>Primera plantilla</h2>
-        </div>
-        <p>{jugadores.length} jugadores</p>
-      </div>
+            <button
+              type="button"
+              className={
+                seccionActiva === 'jugadores' ? 'activo' : ''
+              }
+              aria-current={
+                seccionActiva === 'jugadores' ? 'page' : undefined
+              }
+              onClick={() => setSeccionActiva('jugadores')}
+            >
+              Jugadores
+            </button>
 
-      {cargando && <p>Cargando plantilla...</p>}
+            <button
+              type="button"
+              className={
+                seccionActiva === 'estadisticas' ? 'activo' : ''
+              }
+              aria-current={
+                seccionActiva === 'estadisticas' ? 'page' : undefined
+              }
+              onClick={() => setSeccionActiva('estadisticas')}
+            >
+              Estadísticas
+            </button>
+          </nav>
 
-      {error && <p>No se ha podido cargar esta plantilla.</p>}
+          <div className="contenido-seccion-equipo">
+            {seccionActiva === 'historia' && (
+              <HistoriaEquipo equipo={equipo} />
+            )}
 
-      {!cargando && !error && jugadores.length === 0 && (
-        <div className="mensaje-vacio">
-          <span>⚽</span>
-          <h3>Plantilla todavía no disponible</h3>
-          <p>Aún no tenemos jugadores guardados para este equipo.</p>
-        </div>
-      )}
+            {seccionActiva === 'palmares' && (
+              <PalmaresEquipo equipo={equipo} />
+            )}
 
-      {!cargando && !error && jugadores.length > 0 && (
-        <div className="rejilla-jugadores">
-          {jugadores.map((jugador) => (
-            <article className="tarjeta-jugador" key={jugador.id}>
-              <div className="jugador-dorsal">
-                {jugador.dorsal ?? '—'}
-              </div>
+            {seccionActiva === 'jugadores' && (
+              <PlantillaEquipo
+                jugadores={jugadores}
+                cargando={cargando}
+                error={error}
+              />
+            )}
 
-              <div className="jugador-informacion">
-                <span className="jugador-equipo">{jugador.equipo}</span>
-                <h3>
-                  {jugador.nombre} {jugador.apellido ?? ''}
-                </h3>
-                <p>{jugador.posicion ?? 'Posición desconocida'}</p>
+            {seccionActiva === 'estadisticas' && (
+              <section className="bloque-estadisticas-equipo">
+                <span className="subtitulo">DATOS DEL EQUIPO</span>
+                <h2>Estadísticas del equipo</h2>
                 <p>
-                  {jugador.nacionalidad ?? 'Nacionalidad desconocida'}
+                  Próximamente incorporaremos las estadísticas del club
+                  mediante una API de datos futbolísticos.
                 </p>
-              </div>
-            </article>
-          ))}
-        </div>
+              </section>
+            )}
+          </div>
+        </>
       )}
     </section>
   )
