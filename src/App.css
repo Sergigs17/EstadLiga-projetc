@@ -770,6 +770,15 @@ button {
 }
 
 @media (max-width: 700px) {
+  /* Cabecera: logo y botón en la misma fila */
+  .cabecera {
+    gap: 12px;
+  }
+
+  .boton-login {
+    padding: 9px 16px;
+  }
+
   .titulo-seccion {
     align-items: flex-start;
     flex-direction: column;

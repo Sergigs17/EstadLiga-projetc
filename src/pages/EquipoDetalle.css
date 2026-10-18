@@ -110,6 +110,8 @@
 
 .pagina-plantilla .cabecera-plantilla > img,
 .pagina-plantilla .cabecera-plantilla > .escudo-pendiente {
+  position: relative;
+  z-index: 1;
   width: 150px;
   height: 150px;
   padding: 22px;

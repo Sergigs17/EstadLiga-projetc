@@ -80,6 +80,6 @@ export function estilosClub(nombre?: string | null): CSSProperties {
     '--club-a': colores.a,
     '--club-b': colores.b,
     '--club-acento': colores.acento,
-    '--foto-estadio': slug ? `url('/estadios/${slug}.jpg')` : 'none',
+    '--foto-estadio': slug ? `url('/estadios/${slug}.png')` : 'none',
   } as CSSProperties
 }

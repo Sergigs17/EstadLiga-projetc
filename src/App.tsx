@@ -9,6 +9,7 @@ import Jugadores from './pages/Jugadores'
 import JugadorDetalle from './pages/JugadorDetalle'
 import Clasificacion from './pages/Clasificacion'
 import Partidos from './pages/Partidos'
+import Quiniela from './pages/Quiniela'
 
 function leerRuta() {
   return window.location.hash.replace(/^#\/?/, '') || 'inicio'
@@ -164,6 +165,7 @@ function App() {
   const esJugadores = pagina === 'jugadores'
   const esClasificacion = pagina === 'clasificacion'
   const esPartidos = pagina === 'partidos'
+  const esQuiniela = pagina === 'quiniela'
 
   return (
     <div className="estadliga">
@@ -210,6 +212,13 @@ function App() {
             href="#/partidos"
           >
             Partidos
+          </a>
+
+          <a
+            className={esQuiniela ? 'activo' : ''}
+            href="#/quiniela"
+          >
+            Quiniela
           </a>
         </nav>
 
@@ -273,13 +282,16 @@ function App() {
 
         {esPartidos && <Partidos />}
 
+        {esQuiniela && <Quiniela />}
+
         {!esInicio &&
           !esEquipos &&
           !esFichaEquipo &&
           !esJugadores &&
           !esFichaJugador &&
           !esClasificacion &&
-          !esPartidos && (
+          !esPartidos &&
+          !esQuiniela && (
             <section className="seccion-contenido">
               <h2>Página no encontrada</h2>
               <a className="boton-principal" href="#/inicio">
