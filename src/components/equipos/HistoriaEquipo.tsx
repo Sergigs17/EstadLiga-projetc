@@ -637,6 +637,7 @@ const aliasEquipos: Record<string, string> = {
   malaga: 'malaga cf',
   'racing club': 'racing de santander',
   'racing de santander': 'racing de santander',
+  'r. racing club': 'racing de santander',
   'real racing club': 'racing de santander',
   deportivo: 'rc deportivo',
   'deportivo de la coruna': 'rc deportivo',
