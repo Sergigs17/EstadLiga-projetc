@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import './EquipoDetalle.css'
 import '../components/equipos/EquipoComponentes.css'
@@ -7,6 +8,7 @@ import CabeceraEquipo from '../components/equipos/CabeceraEquipo'
 import HistoriaEquipo from '../components/equipos/HistoriaEquipo'
 import PalmaresEquipo from '../components/equipos/PalmaresEquipo'
 import PlantillaEquipo from '../components/equipos/PlantillaEquipo'
+import EstadisticasEquipo from '../components/equipos/EstadisticasEquipo'
 import { estilosClub } from '../utils/clubes'
 
 export interface Jugador {
@@ -68,9 +70,7 @@ function EquipoDetalle({
           >
             <button
               type="button"
-              className={
-                seccionActiva === 'historia' ? 'activo' : ''
-              }
+              className={seccionActiva === 'historia' ? 'activo' : ''}
               aria-current={
                 seccionActiva === 'historia' ? 'page' : undefined
               }
@@ -81,9 +81,7 @@ function EquipoDetalle({
 
             <button
               type="button"
-              className={
-                seccionActiva === 'palmares' ? 'activo' : ''
-              }
+              className={seccionActiva === 'palmares' ? 'activo' : ''}
               aria-current={
                 seccionActiva === 'palmares' ? 'page' : undefined
               }
@@ -94,9 +92,7 @@ function EquipoDetalle({
 
             <button
               type="button"
-              className={
-                seccionActiva === 'jugadores' ? 'activo' : ''
-              }
+              className={seccionActiva === 'jugadores' ? 'activo' : ''}
               aria-current={
                 seccionActiva === 'jugadores' ? 'page' : undefined
               }
@@ -107,9 +103,7 @@ function EquipoDetalle({
 
             <button
               type="button"
-              className={
-                seccionActiva === 'estadisticas' ? 'activo' : ''
-              }
+              className={seccionActiva === 'estadisticas' ? 'activo' : ''}
               aria-current={
                 seccionActiva === 'estadisticas' ? 'page' : undefined
               }
@@ -137,14 +131,7 @@ function EquipoDetalle({
             )}
 
             {seccionActiva === 'estadisticas' && (
-              <section className="bloque-estadisticas-equipo">
-                <span className="subtitulo">DATOS DEL EQUIPO</span>
-                <h2>Estadísticas del equipo</h2>
-                <p>
-                  Próximamente incorporaremos las estadísticas del club
-                  mediante una API de datos futbolísticos.
-                </p>
-              </section>
+              <EstadisticasEquipo equipo={equipo} />
             )}
           </div>
         </>

@@ -26,5 +26,10 @@
       "binding": "estadliga_imagenes",
       "remote": true
     }
+  ],
+  "triggers": {
+  "crons": [
+    "59 22 * * 1"
   ]
+}
 }

@@ -6,6 +6,7 @@ interface Env {
   estadliga_db: D1Database
   estadliga_imagenes: R2Bucket
   APIFY_TOKEN: string
+  FOOTBALL_DATA_API_TOKEN: string
 }
 
 interface JugadorSofaScore {
@@ -29,6 +30,72 @@ interface JugadorBD {
   nombre: string
   apellido: string | null
   api_id: number | null
+}
+
+interface EquipoBD {
+  id: number
+  nombre: string
+  api_id: number | null
+}
+
+const URL_ESTADISTICAS_EQUIPOS =
+  'https://superapis--sofascore.apify.actor/v1/team/statistics'
+
+async function obtenerEstadisticasEquipo(
+  equipoSofaScoreId: number,
+  torneoId: number,
+  temporadaId: number,
+  token: string,
+): Promise<{ ok: boolean; status: number; datos?: unknown }> {
+  const apiUrl = new URL(URL_ESTADISTICAS_EQUIPOS)
+
+  apiUrl.searchParams.set('team_id', String(equipoSofaScoreId))
+  apiUrl.searchParams.set('unique_tournament_id', String(torneoId))
+  apiUrl.searchParams.set('season_id', String(temporadaId))
+  apiUrl.searchParams.set('token', token)
+
+  try {
+    const response = await fetch(apiUrl.toString())
+
+    if (!response.ok) {
+      return { ok: false, status: response.status }
+    }
+
+    return {
+      ok: true,
+      status: response.status,
+      datos: await response.json(),
+    }
+  } catch {
+    return { ok: false, status: 502 }
+  }
+}
+
+async function guardarEstadisticasEquipo(
+  env: Env,
+  equipoId: number,
+  torneoId: number,
+  temporadaId: number,
+  datos: unknown,
+): Promise<void> {
+  await env.estadliga_db
+    .prepare(
+      `INSERT INTO estadisticas_equipos
+        (equipo_id, unique_tournament_id, season_id,
+         estadisticas_json, actualizado_en)
+       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+       ON CONFLICT(equipo_id, unique_tournament_id, season_id)
+       DO UPDATE SET
+         estadisticas_json = excluded.estadisticas_json,
+         actualizado_en = CURRENT_TIMESTAMP`,
+    )
+    .bind(
+      equipoId,
+      torneoId,
+      temporadaId,
+      JSON.stringify(datos),
+    )
+    .run()
 }
 
 const URL_ESTADISTICAS =
@@ -114,6 +181,197 @@ function respuestaError(
   })
 }
 
+const TORNEO_LALIGA = 8
+const TEMPORADA_LALIGA = 97268
+const JUGADORES_ESTADISTICAS_POR_DIA = 25
+
+/** Actualiza la plantilla de un equipo sin borrar jugadores históricos. */
+async function actualizarPlantillaProgramada(
+  env: Env,
+  equipo: EquipoBD,
+  token: string,
+): Promise<number> {
+  if (!equipo.api_id || !Number.isInteger(equipo.api_id) || equipo.api_id <= 0) {
+    throw new Error(`El equipo ${equipo.nombre} no tiene un api_id válido`)
+  }
+
+  const apiUrl = new URL(
+    'https://superapis--sofascore.apify.actor/v1/team/players',
+  )
+  apiUrl.searchParams.set('team_id', String(equipo.api_id))
+  apiUrl.searchParams.set('token', token)
+
+  const response = await fetch(apiUrl.toString())
+  if (!response.ok) {
+    throw new Error(`SofaScore respondió ${response.status} al consultar ${equipo.nombre}`)
+  }
+
+  const data = (await response.json()) as RespuestaJugadores
+  const jugadores = (data.players ?? []).filter(
+    (jugador) =>
+      Number.isInteger(jugador.id) &&
+      jugador.id > 0 &&
+      typeof jugador.name === 'string' &&
+      jugador.name.trim().length > 0,
+  )
+
+  // No modificar la base de datos si SofaScore devuelve una respuesta vacía.
+  if (jugadores.length === 0) {
+    throw new Error(`SofaScore no devolvió jugadores válidos para ${equipo.nombre}`)
+  }
+
+  const posiciones: Record<string, string> = {
+    G: 'Portero',
+    D: 'Defensa',
+    M: 'Centrocampista',
+    F: 'Delantero',
+  }
+
+  const consultas = jugadores.map((jugador) => {
+    const partes = jugador.name.trim().split(/\s+/)
+    const nombre = partes.shift() || jugador.name
+    const apellido = partes.join(' ') || null
+    const fechaNacimiento =
+      jugador.dateOfBirthTimestamp && Number.isFinite(jugador.dateOfBirthTimestamp)
+        ? new Date(jugador.dateOfBirthTimestamp * 1000).toISOString().slice(0, 10)
+        : null
+    const dorsal = jugador.shirtNumber ??
+      (jugador.jerseyNumber ? Number.parseInt(jugador.jerseyNumber, 10) : null)
+
+    return env.estadliga_db.prepare(
+      `INSERT INTO jugadores
+        (nombre, apellido, posicion, nacionalidad, fecha_nacimiento, dorsal, equipo_id, api_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(api_id) DO UPDATE SET
+         nombre = excluded.nombre,
+         apellido = excluded.apellido,
+         posicion = excluded.posicion,
+         nacionalidad = excluded.nacionalidad,
+         fecha_nacimiento = excluded.fecha_nacimiento,
+         dorsal = excluded.dorsal,
+         equipo_id = excluded.equipo_id`,
+    ).bind(
+      nombre,
+      apellido,
+      posiciones[jugador.position ?? ''] ?? jugador.position ?? null,
+      jugador.country?.name ?? null,
+      fechaNacimiento,
+      dorsal !== null && Number.isFinite(dorsal) ? dorsal : null,
+      equipo.id,
+      jugador.id,
+    )
+  })
+
+  for (let i = 0; i < consultas.length; i += 50) {
+    await env.estadliga_db.batch(consultas.slice(i, i + 50))
+  }
+  return jugadores.length
+}
+
+async function ejecutarActualizacionDiaria(env: Env): Promise<void> {
+  if (!env.APIFY_TOKEN) {
+    console.error('[EstadLiga cron] Falta APIFY_TOKEN; se cancela la actualización.')
+    return
+  }
+
+  const equiposResult = await env.estadliga_db
+    .prepare('SELECT id, nombre, api_id FROM equipos WHERE api_id IS NOT NULL ORDER BY id')
+    .all<EquipoBD>()
+  const equipos = equiposResult.results
+
+  let plantillasOk = 0
+  let erroresPlantillas = 0
+  let estadisticasEquiposOk = 0
+  let erroresEstadisticasEquipos = 0
+  let estadisticasJugadoresOk = 0
+  let erroresEstadisticasJugadores = 0
+
+  // Actualizar plantillas en grupos de dos para limitar las llamadas simultáneas.
+  for (let i = 0; i < equipos.length; i += 2) {
+    const grupo = equipos.slice(i, i + 2)
+    await Promise.all(grupo.map(async (equipo) => {
+      try {
+        const total = await actualizarPlantillaProgramada(env, equipo, env.APIFY_TOKEN)
+        plantillasOk++
+        console.log(`[EstadLiga cron] Plantilla actualizada: ${equipo.nombre} (${total} jugadores)`)
+      } catch (error) {
+        erroresPlantillas++
+        console.error(`[EstadLiga cron] Error de plantilla en ${equipo.nombre}:`, error)
+      }
+    }))
+  }
+
+  // Actualizar las estadísticas de los equipos para LaLiga y la temporada configurada.
+  for (let i = 0; i < equipos.length; i += 2) {
+    const grupo = equipos.slice(i, i + 2)
+    await Promise.all(grupo.map(async (equipo) => {
+      if (!equipo.api_id) return
+      try {
+        const respuesta = await obtenerEstadisticasEquipo(
+          equipo.api_id, TORNEO_LALIGA, TEMPORADA_LALIGA, env.APIFY_TOKEN,
+        )
+        if (!respuesta.ok) throw new Error(`SofaScore respondió ${respuesta.status}`)
+        await guardarEstadisticasEquipo(
+          env, equipo.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
+        )
+        estadisticasEquiposOk++
+      } catch (error) {
+        erroresEstadisticasEquipos++
+        console.error(`[EstadLiga cron] Error de estadísticas del equipo ${equipo.nombre}:`, error)
+      }
+    }))
+  }
+
+  // Refrescar un lote de jugadores cada día, priorizando los que llevan más tiempo sin actualizar.
+  const jugadoresResult = await env.estadliga_db.prepare(
+    `SELECT j.id, j.nombre, j.apellido, j.api_id
+     FROM jugadores j
+     LEFT JOIN estadisticas_jugadores e
+       ON e.jugador_id = j.id
+       AND e.unique_tournament_id = ?
+       AND e.season_id = ?
+     WHERE j.api_id IS NOT NULL
+     ORDER BY CASE WHEN e.actualizado_en IS NULL THEN 0 ELSE 1 END,
+              e.actualizado_en ASC, j.id ASC
+     LIMIT ?`,
+  ).bind(TORNEO_LALIGA, TEMPORADA_LALIGA, JUGADORES_ESTADISTICAS_POR_DIA)
+    .all<JugadorBD>()
+  const jugadores = jugadoresResult.results
+
+  for (let i = 0; i < jugadores.length; i += 2) {
+    const grupo = jugadores.slice(i, i + 2)
+    await Promise.all(grupo.map(async (jugador) => {
+      if (!jugador.api_id) return
+      try {
+        const respuesta = await obtenerEstadisticas(
+          jugador.api_id, TORNEO_LALIGA, TEMPORADA_LALIGA, env.APIFY_TOKEN,
+        )
+        if (!respuesta.ok) throw new Error(`SofaScore respondió ${respuesta.status}`)
+        await guardarEstadisticas(
+          env, jugador.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
+        )
+        estadisticasJugadoresOk++
+      } catch (error) {
+        erroresEstadisticasJugadores++
+        console.error(`[EstadLiga cron] Error de estadísticas del jugador ${jugador.id}:`, error)
+      }
+    }))
+  }
+
+  console.log('[EstadLiga cron] Resumen diario', {
+    equipos: equipos.length,
+    plantillasOk,
+    erroresPlantillas,
+    estadisticasEquiposOk,
+    erroresEstadisticasEquipos,
+    jugadoresProcesados: jugadores.length,
+    estadisticasJugadoresOk,
+    erroresEstadisticasJugadores,
+    torneo: TORNEO_LALIGA,
+    temporada: TEMPORADA_LALIGA,
+  })
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
@@ -126,6 +384,56 @@ export default {
         database: 'connected',
         message: 'El servidor funciona correctamente',
       })
+    }
+
+    // Consultar la clasificación actual de LaLiga mediante football-data.org.
+    // GET /api/clasificacion
+    if (
+      url.pathname === '/api/clasificacion' &&
+      request.method === 'GET'
+    ) {
+      if (!env.FOOTBALL_DATA_API_TOKEN) {
+        return Response.json(
+          { error: 'Falta configurar FOOTBALL_DATA_API_TOKEN' },
+          { status: 500 },
+        )
+      }
+
+      try {
+        const respuesta = await fetch(
+          'https://api.football-data.org/v4/competitions/PD/standings',
+          {
+            method: 'GET',
+            headers: {
+              'X-Auth-Token': env.FOOTBALL_DATA_API_TOKEN,
+              Accept: 'application/json',
+            },
+          },
+        )
+
+        if (!respuesta.ok) {
+          return Response.json(
+            {
+              error: 'No se ha podido consultar la clasificación de LaLiga',
+              status: respuesta.status,
+            },
+            { status: 502 },
+          )
+        }
+
+        const datos: unknown = await respuesta.json()
+        return Response.json(datos, {
+          headers: { 'Cache-Control': 'public, max-age=300' },
+        })
+      } catch (error) {
+        return Response.json(
+          {
+            error: 'Error al conectar con football-data.org',
+            detalle: error instanceof Error ? error.message : String(error),
+          },
+          { status: 502 },
+        )
+      }
     }
 
     // Obtener la imagen de un jugador.
@@ -517,6 +825,277 @@ export default {
         return Response.json(
           {
             error: 'No se ha podido procesar el lote',
+            detalle:
+              error instanceof Error
+                ? error.message
+                : String(error),
+          },
+          { status: 500 },
+        )
+      }
+    }
+
+    // Consultar las estadísticas de un equipo guardadas en D1.
+    // GET /api/equipos/ID/estadisticas?unique_tournament_id=8&season_id=97268
+    const rutaEstadisticasEquipo = url.pathname.match(
+      /^\/api\/equipos\/(\d+)\/estadisticas$/,
+    )
+
+    if (
+      rutaEstadisticasEquipo &&
+      request.method === 'GET'
+    ) {
+      const equipoId = Number(rutaEstadisticasEquipo[1])
+      const torneoId = Number(
+        url.searchParams.get('unique_tournament_id'),
+      )
+      const temporadaId = Number(
+        url.searchParams.get('season_id'),
+      )
+
+      if (
+        !Number.isInteger(equipoId) ||
+        equipoId <= 0 ||
+        !Number.isInteger(torneoId) ||
+        torneoId <= 0 ||
+        !Number.isInteger(temporadaId) ||
+        temporadaId <= 0
+      ) {
+        return Response.json(
+          {
+            error:
+              'Debes indicar un ID de equipo, unique_tournament_id y season_id válidos',
+          },
+          { status: 400 },
+        )
+      }
+
+      try {
+        const equipo = await env.estadliga_db
+          .prepare(
+            'SELECT id, nombre, api_id FROM equipos WHERE id = ?',
+          )
+          .bind(equipoId)
+          .first<EquipoBD>()
+
+        if (!equipo) {
+          return Response.json(
+            { error: 'No existe ese equipo en EstadLiga' },
+            { status: 404 },
+          )
+        }
+
+        const guardadas = await env.estadliga_db
+          .prepare(
+            `SELECT estadisticas_json, actualizado_en
+             FROM estadisticas_equipos
+             WHERE equipo_id = ?
+               AND unique_tournament_id = ?
+               AND season_id = ?`,
+          )
+          .bind(equipoId, torneoId, temporadaId)
+          .first<{
+            estadisticas_json: string
+            actualizado_en: string
+          }>()
+
+        if (!guardadas) {
+          return Response.json(
+            {
+              error:
+                'No hay estadísticas guardadas para este equipo y temporada',
+              equipo_id: equipoId,
+              unique_tournament_id: torneoId,
+              season_id: temporadaId,
+            },
+            { status: 404 },
+          )
+        }
+
+        return Response.json({
+          equipo: {
+            id: equipo.id,
+            nombre: equipo.nombre,
+            sofascore_id: equipo.api_id,
+          },
+          unique_tournament_id: torneoId,
+          season_id: temporadaId,
+          origen: 'D1',
+          actualizado_en: guardadas.actualizado_en,
+          datos: JSON.parse(guardadas.estadisticas_json),
+        })
+      } catch (error) {
+        return Response.json(
+          {
+            error: 'No se han podido consultar las estadísticas del equipo',
+            detalle:
+              error instanceof Error
+                ? error.message
+                : String(error),
+          },
+          { status: 500 },
+        )
+      }
+    }
+
+    // Importación masiva de estadísticas de equipos por lotes.
+    // POST /api/estadisticas-equipos/importar?unique_tournament_id=8&season_id=97268&offset=0&limite=5
+    if (
+      url.pathname === '/api/estadisticas-equipos/importar' &&
+      request.method === 'POST'
+    ) {
+      const torneoId = Number(
+        url.searchParams.get('unique_tournament_id'),
+      )
+      const temporadaId = Number(
+        url.searchParams.get('season_id'),
+      )
+      const offset = Number(url.searchParams.get('offset') ?? 0)
+      const limite = Number(url.searchParams.get('limite') ?? 5)
+
+      if (
+        !Number.isInteger(torneoId) ||
+        torneoId <= 0 ||
+        !Number.isInteger(temporadaId) ||
+        temporadaId <= 0 ||
+        !Number.isInteger(offset) ||
+        offset < 0 ||
+        !Number.isInteger(limite) ||
+        limite < 1 ||
+        limite > 10
+      ) {
+        return Response.json(
+          {
+            error:
+              'Parámetros no válidos. Usa unique_tournament_id, season_id, offset >= 0 y limite entre 1 y 10.',
+          },
+          { status: 400 },
+        )
+      }
+
+      if (!env.APIFY_TOKEN) {
+        return Response.json(
+          { error: 'Falta configurar APIFY_TOKEN' },
+          { status: 500 },
+        )
+      }
+
+      try {
+        const resultado = await env.estadliga_db
+          .prepare(
+            `SELECT id, nombre, api_id
+             FROM equipos
+             WHERE api_id IS NOT NULL
+             ORDER BY id
+             LIMIT ? OFFSET ?`,
+          )
+          .bind(limite, offset)
+          .all<EquipoBD>()
+
+        const equipos = resultado.results
+        const procesados: Array<{
+          id: number
+          equipo: string
+          resultado: string
+          estado?: number
+        }> = []
+
+        // Dos peticiones simultáneas para no disparar el consumo de Apify.
+        for (let i = 0; i < equipos.length; i += 2) {
+          const grupo = equipos.slice(i, i + 2)
+          const respuestas = await Promise.all(
+            grupo.map(async (equipo) => {
+              if (
+                equipo.api_id === null ||
+                !Number.isInteger(Number(equipo.api_id)) ||
+                Number(equipo.api_id) <= 0
+              ) {
+                return {
+                  equipo,
+                  ok: false,
+                  status: 400,
+                  datos: undefined,
+                }
+              }
+
+              const respuesta = await obtenerEstadisticasEquipo(
+                Number(equipo.api_id),
+                torneoId,
+                temporadaId,
+                env.APIFY_TOKEN,
+              )
+
+              return { equipo, ...respuesta }
+            }),
+          )
+
+          for (const respuesta of respuestas) {
+            if (!respuesta.ok) {
+              procesados.push({
+                id: respuesta.equipo.id,
+                equipo: respuesta.equipo.nombre,
+                resultado: 'error',
+                estado: respuesta.status,
+              })
+              continue
+            }
+
+            try {
+              await guardarEstadisticasEquipo(
+                env,
+                respuesta.equipo.id,
+                torneoId,
+                temporadaId,
+                respuesta.datos,
+              )
+
+              procesados.push({
+                id: respuesta.equipo.id,
+                equipo: respuesta.equipo.nombre,
+                resultado: 'guardado',
+              })
+            } catch {
+              procesados.push({
+                id: respuesta.equipo.id,
+                equipo: respuesta.equipo.nombre,
+                resultado: 'error_al_guardar',
+              })
+            }
+          }
+        }
+
+        const total = await env.estadliga_db
+          .prepare(
+            'SELECT COUNT(*) AS total FROM equipos WHERE api_id IS NOT NULL',
+          )
+          .first<{ total: number }>()
+
+        const siguienteOffset = offset + equipos.length
+
+        return Response.json({
+          mensaje: 'Lote de estadísticas de equipos procesado',
+          torneo_id: torneoId,
+          temporada_id: temporadaId,
+          offset,
+          limite,
+          equiposProcesados: equipos.length,
+          guardados: procesados.filter(
+            (p) => p.resultado === 'guardado',
+          ).length,
+          errores: procesados.filter(
+            (p) => p.resultado !== 'guardado',
+          ).length,
+          totalEquiposConApiId: total?.total ?? 0,
+          siguienteOffset:
+            siguienteOffset < (total?.total ?? 0)
+              ? siguienteOffset
+              : null,
+          resultados: procesados,
+        })
+      } catch (error) {
+        return Response.json(
+          {
+            error: 'No se ha podido procesar el lote de equipos',
             detalle:
               error instanceof Error
                 ? error.message
@@ -990,5 +1569,13 @@ export default {
 
     // El resto de las peticiones se sirven desde los assets de Vite.
     return env.ASSETS.fetch(request)
+  },
+
+  async scheduled(
+    _controller: ScheduledController,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<void> {
+    ctx.waitUntil(ejecutarActualizacionDiaria(env))
   },
 }
