@@ -1,0 +1,445 @@
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ CLASIFICACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.pagina-clasificacion {
+  min-height: 60vh;
+}
+
+.clasificacion-contenido,
+.clasificacion-evolucion {
+  padding: clamp(18px, 3vw, 32px);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-grande);
+  background: var(--papel);
+  box-shadow: var(--sombra-suave);
+}
+
+.clasificacion-evolucion {
+  margin-top: 32px;
+}
+
+.clasificacion-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.clasificacion-cabecera h3 {
+  font-size: 1.3rem;
+}
+
+.clasificacion-cabecera p {
+  margin-top: 4px;
+  color: var(--tinta-suave);
+  font-size: 0.92rem;
+}
+
+.etiqueta-jornada {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--rojo);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.clasificacion-mensaje,
+.clasificacion-error {
+  padding: 36px 20px;
+  border: 2px dashed var(--linea);
+  border-radius: var(--radio);
+  background: var(--papel-calido);
+  color: var(--tinta-suave);
+  text-align: center;
+}
+
+.clasificacion-error button {
+  margin-top: 14px;
+  padding: 10px 22px;
+  border: 2px solid var(--rojo);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--rojo);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.clasificacion-error button:hover {
+  background: var(--rojo);
+  color: #fff;
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Leyenda de zonas â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.zonas-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.zonas-leyenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--zona) 30%, var(--linea));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--zona) 8%, #fff);
+  font-size: 0.8rem;
+}
+
+.zonas-leyenda strong {
+  color: var(--tinta);
+  font-weight: 800;
+}
+
+.zonas-leyenda li > span:last-child {
+  color: var(--tinta-suave);
+  font-weight: 600;
+}
+
+.zona-punto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--zona);
+}
+
+.zonas-nota {
+  margin-top: 14px;
+  color: var(--tinta-suave);
+  font-size: 0.78rem;
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Tabla â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.tabla-clasificacion-contenedor {
+  overflow-x: auto;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+}
+
+.tabla-clasificacion {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.tabla-clasificacion th {
+  padding: 12px 10px;
+  background: var(--papel-calido);
+  border-bottom: 1px solid var(--linea);
+  color: var(--tinta-suave);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.tabla-clasificacion th:nth-child(2) {
+  text-align: left;
+}
+
+.tabla-clasificacion td {
+  padding: 10px;
+  border-bottom: 1px solid var(--linea);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla-clasificacion tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabla-clasificacion tbody tr:hover {
+  background: color-mix(in srgb, var(--zona, var(--tinta)) 5%, #fff);
+}
+
+/* La franja de color de cada zona */
+.tabla-clasificacion td:first-child {
+  box-shadow: inset 5px 0 0 var(--zona, transparent);
+}
+
+.tabla-clasificacion tr.con-zona {
+  background: color-mix(in srgb, var(--zona) 4%, #fff);
+}
+
+.posicion-equipo {
+  width: 62px;
+}
+
+.insignia-posicion {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--papel-calido);
+  color: var(--tinta);
+  font-family: var(--fuente-titulo);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.con-zona .insignia-posicion {
+  background: var(--zona);
+  color: #fff;
+}
+
+.equipo-clasificacion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font-weight: 700;
+}
+
+.escudo-clasificacion {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.dg-positiva {
+  color: #118a4a;
+  font-weight: 700;
+}
+
+.dg-negativa {
+  color: var(--rojo);
+  font-weight: 700;
+}
+
+.puntos-equipo {
+  min-width: 96px;
+}
+
+.puntos-equipo strong {
+  display: block;
+  font-family: var(--fuente-titulo);
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.barra-puntos {
+  display: block;
+  height: 5px;
+  margin: 5px auto 0;
+  max-width: 72px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--linea);
+}
+
+.barra-puntos i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--zona, var(--tinta-suave));
+}
+
+/* Forma: Ãºltimos cinco partidos */
+.forma-equipo {
+  display: inline-flex;
+  gap: 4px;
+  color: var(--tinta-suave);
+}
+
+.forma-equipo i {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.64rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.forma-V {
+  background: #16a34a;
+}
+
+.forma-E {
+  background: #9a948f;
+}
+
+.forma-D {
+  background: var(--rojo);
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ EvoluciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.evolucion-controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.evolucion-pestanas {
+  display: inline-flex;
+  padding: 5px;
+  gap: 4px;
+  border-radius: 999px;
+  background: var(--papel-calido);
+}
+
+.evolucion-pestanas button {
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tinta-suave);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.evolucion-pestanas button.activo {
+  background: var(--rojo);
+  color: #fff;
+}
+
+.evolucion-atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.evolucion-atajos button {
+  padding: 8px 14px;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  background: var(--papel);
+  color: var(--tinta-suave);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.evolucion-atajos button:hover {
+  border-color: var(--rojo);
+  color: var(--rojo);
+}
+
+.evolucion-lienzo {
+  overflow-x: auto;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: #fff;
+}
+
+.evolucion-lienzo svg {
+  display: block;
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+}
+
+.evolucion-guia {
+  stroke: var(--linea);
+  stroke-width: 1;
+}
+
+.evolucion-eje {
+  fill: var(--tinta-suave);
+  font-family: var(--fuente-texto);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.evolucion-etiqueta {
+  fill: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.evolucion-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evolucion-leyenda button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  background: var(--papel);
+  color: var(--tinta);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.evolucion-leyenda button:hover {
+  border-color: var(--tinta);
+}
+
+.evolucion-leyenda button.oculto {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.evolucion-leyenda img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.leyenda-color {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--linea);
+}
+
+.evolucion-nota {
+  margin-top: 14px;
+  color: var(--tinta-suave);
+  font-size: 0.78rem;
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ MÃ³vil â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+@media (max-width: 700px) {
+  .clasificacion-cabecera {
+    flex-direction: column;
+  }
+
+  .evolucion-pestanas {
+    width: 100%;
+  }
+
+  .evolucion-pestanas button {
+    flex: 1;
+    padding-inline: 8px;
+  }
+}

@@ -1,0 +1,570 @@
+
+/* =====================================================
+   ESTADLIGA - ESTILOS DE LOS COMPONENTES DE EQUIPO
+   ===================================================== */
+
+/* CABECERA DEL EQUIPO */
+
+.cabecera-plantilla {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 42px;
+  padding: 36px;
+  overflow: hidden;
+  border: 1px solid #e2eae5;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #f0f8f3 0%, #ffffff 75%);
+  box-shadow: 0 8px 24px rgb(15 45 30 / 5%);
+}
+
+.cabecera-plantilla::after {
+  position: absolute;
+  top: -70px;
+  right: -45px;
+  width: 230px;
+  height: 230px;
+  border: 32px solid rgb(8 124 80 / 5%);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.cabecera-plantilla > img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.cabecera-plantilla > .escudo-pendiente {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  place-items: center;
+  border-radius: 16px;
+  background: #e8f5ed;
+  font-size: 3rem;
+}
+
+.cabecera-plantilla > div {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.cabecera-plantilla .subtitulo {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #087c50;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.cabecera-plantilla h1 {
+  margin: 0 0 14px;
+  color: #17251d;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.cabecera-plantilla p {
+  margin: 5px 0;
+  color: #59665e;
+  font-size: 0.95rem;
+}
+
+/* EQUIPO NO ENCONTRADO */
+
+.equipo-no-encontrado {
+  margin: 24px 0 40px;
+  padding: 32px;
+  border: 1px solid #e2eae5;
+  border-radius: 16px;
+  background: #f8faf9;
+}
+
+.equipo-no-encontrado h1 {
+  margin-top: 0;
+  color: #17251d;
+}
+
+.equipo-no-encontrado p {
+  color: #647067;
+}
+
+/* =====================================================
+   PLANTILLA DE JUGADORES
+   ===================================================== */
+
+.seccion-plantilla-equipo .titulo-seccion {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.seccion-plantilla-equipo .titulo-seccion h2 {
+  margin: 4px 0 0;
+  color: #17251d;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 800;
+}
+
+.seccion-plantilla-equipo .titulo-seccion > p {
+  flex-shrink: 0;
+  margin: 0 0 4px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: #e8f5ed;
+  color: #087c50;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Grupos: porteros, defensas, centrocampistas y delanteros */
+
+.grupos-plantilla {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.grupo-posicion {
+  min-width: 0;
+}
+
+.titulo-grupo-posicion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.titulo-grupo-posicion h3 {
+  margin: 0;
+  color: #17251d;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.titulo-grupo-posicion > span {
+  display: grid;
+  min-width: 27px;
+  height: 27px;
+  padding: 0 7px;
+  place-items: center;
+  border-radius: 999px;
+  background: #e8f5ed;
+  color: #087c50;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+/* Rejilla de tarjetas */
+
+.grupo-posicion .rejilla-jugadores {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.grupo-posicion .tarjeta-jugador {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e2eae5;
+  border-radius: 16px;
+  background: #ffffff;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.grupo-posicion .tarjeta-jugador:hover {
+  transform: translateY(-4px);
+  border-color: #a6d6b9;
+  box-shadow: 0 10px 24px rgb(15 45 30 / 8%);
+}
+
+/* Fotografía del jugador: sin dorsal */
+
+.jugador-foto {
+  display: flex;
+  height: 220px;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(180deg, #edf7f0 0%, #dceee2 100%);
+}
+
+.jugador-foto > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* Imagen alternativa si no hay foto disponible */
+
+.jugador-foto-pendiente {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: #087c50;
+}
+
+.jugador-foto-pendiente span {
+  display: grid;
+  width: 82px;
+  height: 82px;
+  place-items: center;
+  border: 1px solid rgb(8 124 80 / 12%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 65%);
+  font-size: 2.6rem;
+}
+
+/* Información del jugador */
+
+.grupo-posicion .jugador-informacion {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px;
+}
+
+.grupo-posicion .jugador-equipo {
+  margin-bottom: 7px;
+  color: #087c50;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.grupo-posicion .jugador-informacion h3 {
+  margin: 0 0 8px;
+  color: #17251d;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.grupo-posicion .jugador-informacion p {
+  margin: 3px 0;
+  color: #647067;
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
+.grupo-posicion .enlace-estadisticas-jugador {
+  margin-top: 14px;
+  color: #087c50;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.grupo-posicion .tarjeta-jugador:focus-visible {
+  outline: 3px solid #78c69a;
+  outline-offset: 3px;
+}
+
+/* =====================================================
+   PALMARÉS
+   Imágenes en public/trofeos/
+   ===================================================== */
+
+.imagen-trofeo {
+  display: block;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.tarjeta-palmares {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e2eae5;
+  border-radius: 14px;
+  background: #f8faf9;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tarjeta-palmares:hover {
+  transform: translateY(-3px);
+  border-color: #a6d6b9;
+}
+
+.icono-palmares {
+  display: grid;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border-radius: 12px;
+  background: #e8f5ed;
+  font-size: 1.8rem;
+}
+
+.informacion-trofeo {
+  min-width: 0;
+}
+
+.informacion-trofeo h3 {
+  margin: 0 0 6px;
+  color: #17251d;
+  font-size: 1rem;
+}
+
+.informacion-trofeo p {
+  margin: 0;
+  color: #647067;
+  font-size: 0.85rem;
+}
+
+/* =====================================================
+   MENÚ DE SECCIONES DEL EQUIPO
+   ===================================================== */
+
+.menu-secciones-equipo {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin: 0 0 28px;
+  padding: 8px;
+  overflow-x: auto;
+  border: 1px solid #e2eae5;
+  border-radius: 14px;
+  background: #f8faf9;
+}
+
+.menu-secciones-equipo button {
+  position: relative;
+  flex: 1 0 auto;
+  min-height: 46px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #59665e;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.menu-secciones-equipo button:hover {
+  background: #e8f5ed;
+  color: #087c50;
+}
+
+.menu-secciones-equipo button.activo {
+  background: #087c50;
+  color: #ffffff;
+}
+
+.menu-secciones-equipo button:focus-visible {
+  outline: 3px solid #78c69a;
+  outline-offset: 3px;
+}
+
+/* Contenido de cada sección */
+
+.contenido-seccion-equipo {
+  min-width: 0;
+  animation: aparecer-seccion-equipo 0.2s ease;
+}
+
+.bloque-estadisticas-equipo {
+  margin-top: 0;
+  padding: 30px;
+  border: 1px solid #e2eae5;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgb(15 45 30 / 4%);
+}
+
+.bloque-estadisticas-equipo .subtitulo {
+  color: #087c50;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.bloque-estadisticas-equipo h2 {
+  margin: 8px 0 12px;
+  color: #17251d;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 800;
+}
+
+.bloque-estadisticas-equipo p {
+  margin-bottom: 0;
+  color: #59665e;
+  line-height: 1.8;
+}
+
+/* Animación de cambio de sección */
+
+@keyframes aparecer-seccion-equipo {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================================
+   TABLETS
+   ===================================================== */
+
+@media (max-width: 900px) {
+  .grupo-posicion .rejilla-jugadores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jugador-foto {
+    height: 210px;
+  }
+}
+
+/* =====================================================
+   MÓVILES
+   ===================================================== */
+
+@media (max-width: 600px) {
+  .cabecera-plantilla {
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 32px;
+    padding: 23px 18px;
+    border-radius: 16px;
+  }
+
+  .cabecera-plantilla > img,
+  .cabecera-plantilla > .escudo-pendiente {
+    width: 76px;
+    height: 76px;
+  }
+
+  .cabecera-plantilla > .escudo-pendiente {
+    font-size: 2rem;
+  }
+
+  .cabecera-plantilla::after {
+    top: -100px;
+    right: -110px;
+  }
+
+  .seccion-plantilla-equipo .titulo-seccion {
+    align-items: flex-start;
+  }
+
+  .tarjeta-palmares {
+    padding: 16px;
+  }
+
+  .imagen-trofeo,
+  .icono-palmares {
+    width: 52px;
+    height: 52px;
+  }
+
+  .menu-secciones-equipo {
+    gap: 4px;
+    margin-bottom: 22px;
+    padding: 5px;
+    border-radius: 12px;
+  }
+
+  .menu-secciones-equipo button {
+    min-height: 42px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+  }
+
+  .bloque-estadisticas-equipo {
+    padding: 22px 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .grupo-posicion .rejilla-jugadores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .jugador-foto {
+    height: 160px;
+  }
+
+  .grupo-posicion .jugador-informacion {
+    padding: 12px;
+  }
+
+  .grupo-posicion .jugador-informacion h3 {
+    font-size: 0.9rem;
+  }
+
+  .grupo-posicion .jugador-informacion p {
+    font-size: 0.78rem;
+  }
+
+  .grupo-posicion .jugador-equipo {
+    font-size: 0.65rem;
+  }
+}
+
+/* =====================================================
+   ACCESIBILIDAD: MOVIMIENTO REDUCIDO
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-palmares,
+  .menu-secciones-equipo button,
+  .grupo-posicion .tarjeta-jugador {
+    transition: none;
+  }
+
+  .tarjeta-palmares:hover,
+  .grupo-posicion .tarjeta-jugador:hover {
+    transform: none;
+  }
+
+  .contenido-seccion-equipo {
+    animation: none;
+  }
+}

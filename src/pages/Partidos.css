@@ -1,0 +1,51 @@
+.pagina-partidos {
+  min-height: 55vh;
+}
+
+.partidos-pendientes {
+  padding: 35px;
+  text-align: center;
+  border: 1px solid #e2ebe5;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgb(20 55 35 / 4%);
+}
+
+.partidos-icono {
+  display: grid;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 18px;
+  place-items: center;
+  border-radius: 16px;
+  background: #eaf7ef;
+  font-size: 30px;
+}
+
+.partidos-pendientes h3 {
+  margin: 10px 0;
+  font-size: 20px;
+}
+
+.partidos-pendientes > p {
+  color: #718078;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.partidos-pendientes > span {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 9px 13px;
+  border-radius: 8px;
+  background: #eaf5ed;
+  color: #087c50;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .partidos-pendientes {
+    padding: 22px;
+  }
+}
