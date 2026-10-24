@@ -83,3 +83,9 @@ export function estilosClub(nombre?: string | null): CSSProperties {
     '--foto-estadio': slug ? `url('/estadios/${slug}.png')` : 'none',
   } as CSSProperties
 }
+
+// Colores de un club a partir de su nombre (para gráficos y detalles).
+export function coloresClub(nombre: string): ColoresClub | null {
+  const slug = obtenerSlugClub(nombre)
+  return slug ? CLUBES[slug] : null
+}

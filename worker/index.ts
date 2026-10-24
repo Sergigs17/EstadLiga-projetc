@@ -371,6 +371,122 @@ async function ejecutarActualizacionDiaria(env: Env): Promise<void> {
     temporada: TEMPORADA_LALIGA,
   })
 }
+async function actualizarCachesFootballData(env: Env): Promise<void> {
+  const ahora = new Date();
+
+  const partes = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Madrid",
+    weekday: "short",
+    hour: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(ahora);
+
+  const dia = partes.find((p) => p.type === "weekday")?.value;
+  const hora = Number(
+    partes.find((p) => p.type === "hour")?.value,
+  );
+
+  const diasPermitidos = ["Fri", "Sat", "Sun", "Mon"];
+
+  // Solo viernes, sábado, domingo y lunes, de 12:00 a 23:00.
+  if (!diasPermitidos.includes(dia ?? "") || hora < 12 || hora > 23) {
+    return;
+  }
+
+  const token = env.FOOTBALL_DATA_API_TOKEN;
+
+  if (!token) {
+    console.error("Falta FOOTBALL_DATA_API_TOKEN.");
+    return;
+  }
+
+  const actualizadoEn = new Date().toISOString();
+  const cabeceras = { "X-Auth-Token": token };
+
+  // 1. Actualizar clasificación.
+  try {
+    const respuesta = await fetch(
+      "https://api.football-data.org/v4/competitions/PD/standings",
+      { headers: cabeceras },
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(`HTTP ${respuesta.status}`);
+    }
+
+    const datos = await respuesta.json();
+
+    await env.estadliga_db
+      .prepare(`
+        INSERT INTO clasificacion_cache (id, datos_json, actualizado_en)
+        VALUES (1, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          datos_json = excluded.datos_json,
+          actualizado_en = excluded.actualizado_en
+      `)
+      .bind(JSON.stringify(datos), actualizadoEn)
+      .run();
+
+    console.log("Clasificación actualizada correctamente.");
+  } catch (error) {
+    console.error("Error actualizando la clasificación:", error);
+  }
+
+  // 2. Actualizar calendario de partidos.
+  try {
+    const respuesta = await fetch(
+      "https://api.football-data.org/v4/competitions/PD/matches",
+      { headers: cabeceras },
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(`HTTP ${respuesta.status}`);
+    }
+
+    const datos = (await respuesta.json()) as {
+      matches?: Array<{
+        matchday?: number | null;
+        status?: string;
+        utcDate?: string;
+        homeTeam?: { name?: string };
+        awayTeam?: { name?: string };
+        score?: {
+          fullTime?: {
+            home?: number | null;
+            away?: number | null;
+          };
+        };
+      }>;
+    };
+
+    const partidos = {
+      partidos: (datos.matches ?? []).map((partido) => ({
+        jornada: partido.matchday ?? null,
+        estado: partido.status ?? "",
+        fecha: partido.utcDate ?? "",
+        local: partido.homeTeam?.name ?? "",
+        visitante: partido.awayTeam?.name ?? "",
+        golesLocal: partido.score?.fullTime?.home ?? null,
+        golesVisitante: partido.score?.fullTime?.away ?? null,
+      })),
+    };
+
+    await env.estadliga_db
+      .prepare(`
+        INSERT INTO partidos_cache (id, datos_json, actualizado_en)
+        VALUES (1, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          datos_json = excluded.datos_json,
+          actualizado_en = excluded.actualizado_en
+      `)
+      .bind(JSON.stringify(partidos), actualizadoEn)
+      .run();
+
+    console.log("Partidos actualizados correctamente.");
+  } catch (error) {
+    console.error("Error actualizando los partidos:", error);
+  }
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -386,20 +502,37 @@ export default {
       })
     }
 
-    // Consultar la clasificación actual de LaLiga mediante football-data.org.
+    // Consultar la clasificación de LaLiga.
     // GET /api/clasificacion
     if (
       url.pathname === '/api/clasificacion' &&
       request.method === 'GET'
     ) {
-      if (!env.FOOTBALL_DATA_API_TOKEN) {
-        return Response.json(
-          { error: 'Falta configurar FOOTBALL_DATA_API_TOKEN' },
-          { status: 500 },
-        )
-      }
-
       try {
+        // Primero, consultar la clasificación guardada en D1.
+        const guardada = await env.estadliga_db
+          .prepare(
+            'SELECT datos_json FROM clasificacion_cache WHERE id = 1',
+          )
+          .first<{ datos_json: string }>()
+
+        if (guardada) {
+          return new Response(guardada.datos_json, {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Cache-Control': 'public, max-age=300',
+            },
+          })
+        }
+
+        // Solo consultar la API externa si todavía no hay datos guardados.
+        if (!env.FOOTBALL_DATA_API_TOKEN) {
+          return Response.json(
+            { error: 'Falta configurar FOOTBALL_DATA_API_TOKEN' },
+            { status: 500 },
+          )
+        }
+
         const respuesta = await fetch(
           'https://api.football-data.org/v4/competitions/PD/standings',
           {
@@ -422,13 +555,135 @@ export default {
         }
 
         const datos: unknown = await respuesta.json()
-        return Response.json(datos, {
-          headers: { 'Cache-Control': 'public, max-age=300' },
+        const datosJson = JSON.stringify(datos)
+
+        // Guardar la respuesta completa en D1.
+        await env.estadliga_db
+          .prepare(
+            `INSERT OR REPLACE INTO clasificacion_cache
+             (id, datos_json, actualizado_en)
+             VALUES (1, ?, ?)`,
+          )
+          .bind(datosJson, new Date().toISOString())
+          .run()
+
+        return new Response(datosJson, {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Cache-Control': 'public, max-age=300',
+          },
         })
       } catch (error) {
         return Response.json(
           {
-            error: 'Error al conectar con football-data.org',
+            error: 'Error al cargar o guardar la clasificación',
+            detalle: error instanceof Error ? error.message : String(error),
+          },
+          { status: 502 },
+        )
+      }
+    }
+
+     // Consultar los partidos de LaLiga (resultados y calendario).
+    // Primero se consultan los datos guardados en D1.
+    // GET /api/partidos
+    if (url.pathname === '/api/partidos' && request.method === 'GET') {
+      try {
+        // 1. Comprobar si ya tenemos los partidos guardados.
+        const guardados = await env.estadliga_db
+          .prepare(
+            'SELECT datos_json FROM partidos_cache WHERE id = 1',
+          )
+          .first<{ datos_json: string }>()
+
+        if (guardados) {
+          return new Response(guardados.datos_json, {
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Cache-Control': 'public, max-age=300',
+            },
+          })
+        }
+
+        // 2. Si no hay datos guardados, consultar Football-Data.org.
+        if (!env.FOOTBALL_DATA_API_TOKEN) {
+          return Response.json(
+            { error: 'Falta configurar FOOTBALL_DATA_API_TOKEN' },
+            { status: 500 },
+          )
+        }
+
+        const respuesta = await fetch(
+          'https://api.football-data.org/v4/competitions/PD/matches',
+          {
+            method: 'GET',
+            headers: {
+              'X-Auth-Token': env.FOOTBALL_DATA_API_TOKEN,
+              Accept: 'application/json',
+            },
+          },
+        )
+
+        if (!respuesta.ok) {
+          return Response.json(
+            {
+              error: 'No se han podido consultar los partidos de LaLiga',
+              status: respuesta.status,
+            },
+            { status: 502 },
+          )
+        }
+
+        const datos = (await respuesta.json()) as {
+          matches?: Array<{
+            matchday: number | null
+            status: string
+            utcDate: string
+            homeTeam: { id: number }
+            awayTeam: { id: number }
+            score?: {
+              fullTime?: {
+                home: number | null
+                away: number | null
+              }
+            }
+          }>
+        }
+
+        // 3. Preparar los datos que utiliza EstadLiga.
+        const partidos = (datos.matches ?? []).map((partido) => ({
+          jornada: partido.matchday,
+          estado: partido.status,
+          fecha: partido.utcDate,
+          local: partido.homeTeam.id,
+          visitante: partido.awayTeam.id,
+          golesLocal: partido.score?.fullTime?.home ?? null,
+          golesVisitante: partido.score?.fullTime?.away ?? null,
+        }))
+
+        const datosJson = JSON.stringify({ partidos })
+
+        // 4. Guardar la respuesta preparada en D1.
+        await env.estadliga_db
+          .prepare(
+            `INSERT OR REPLACE INTO partidos_cache
+             (id, datos_json, actualizado_en)
+             VALUES (1, ?, ?)`,
+          )
+          .bind(datosJson, new Date().toISOString())
+          .run()
+
+        // 5. Devolver los partidos al navegador.
+        return new Response(datosJson, {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Cache-Control': 'public, max-age=300',
+          },
+        })
+      } catch (error) {
+        return Response.json(
+          {
+            error: 'Error al cargar o guardar los partidos',
             detalle: error instanceof Error ? error.message : String(error),
           },
           { status: 502 },
@@ -1571,11 +1826,18 @@ export default {
     return env.ASSETS.fetch(request)
   },
 
-  async scheduled(
-    _controller: ScheduledController,
+   async scheduled(
+    controller: ScheduledController,
     env: Env,
     ctx: ExecutionContext,
   ): Promise<void> {
-    ctx.waitUntil(ejecutarActualizacionDiaria(env))
+    if (controller.cron === "0 21 * * 1") {
+      ctx.waitUntil(ejecutarActualizacionDiaria(env));
+      return;
+    }
+
+    if (controller.cron === "0 * * * *") {
+      ctx.waitUntil(actualizarCachesFootballData(env));
+    }
   },
 }
