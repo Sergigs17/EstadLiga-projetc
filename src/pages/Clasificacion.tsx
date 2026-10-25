@@ -63,8 +63,49 @@ interface PartidoJugado extends Partido {
   golesVisitante: number
 }
 
+/* La API puede devolver los equipos del partido como id numérico o,
+   en los datos guardados por el cron, como nombre del equipo. */
+interface PartidoCrudo extends Omit<Partido, 'local' | 'visitante'> {
+  local: number | string
+  visitante: number | string
+}
+
 interface RespuestaPartidos {
-  partidos?: Partido[]
+  partidos?: PartidoCrudo[]
+}
+
+function normalizarNombreEquipo(nombre: string): string {
+  return nombre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/** Convierte cada partido a ids de equipo, venga como venga de la API. */
+function unificarPartidos(
+  crudos: PartidoCrudo[],
+  equipos: { id: number; nombre: string }[],
+): Partido[] {
+  const porNombre = new Map(
+    equipos.map((e) => [normalizarNombreEquipo(e.nombre), e.id]),
+  )
+
+  const aId = (valor: number | string): number | null => {
+    if (typeof valor === 'number') return valor
+    if (/^\d+$/.test(valor)) return Number(valor)
+    return porNombre.get(normalizarNombreEquipo(valor)) ?? null
+  }
+
+  return crudos.flatMap((p) => {
+    const local = aId(p.local)
+    const visitante = aId(p.visitante)
+    return local === null || visitante === null
+      ? []
+      : [{ ...p, local, visitante }]
+  })
 }
 
 type Resultado = 'V' | 'E' | 'D'
@@ -690,7 +731,7 @@ function GraficoEvolucion({ equipos, evolucion }: GraficoEvolucionProps) {
 
 function Clasificacion() {
   const [equipos, setEquipos] = useState<EquipoClasificacion[]>([])
-  const [partidos, setPartidos] = useState<Partido[] | null>(null)
+  const [partidosCrudos, setPartidos] = useState<PartidoCrudo[] | null>(null)
   const [jornada, setJornada] = useState<number | null>(null)
   const [cargando, setCargando] = useState(true)
   const [errorPartidos, setErrorPartidos] = useState(false)
@@ -793,6 +834,17 @@ function Clasificacion() {
 
   const total = equipos.length
   const maximoPuntos = Math.max(1, ...equipos.map((e) => e.puntos))
+
+  // Los partidos solo se pueden unir a los equipos cuando ya se conocen ambos.
+  const partidos = useMemo(
+    () =>
+      partidosCrudos && equipos.length > 0
+        ? unificarPartidos(partidosCrudos, equipos)
+        : partidosCrudos
+          ? []
+          : null,
+    [partidosCrudos, equipos],
+  )
 
   const forma = useMemo(
     () => (partidos ? calcularForma(partidos, equipos) : null),

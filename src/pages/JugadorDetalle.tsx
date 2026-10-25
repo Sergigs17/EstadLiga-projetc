@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import './JugadorDetalle.css'
 import type { Jugador } from './EquipoDetalle'
+import GraficosJugador from '../components/jugadores/GraficosJugador'
+import { estilosClub } from '../utils/clubes'
 
 interface JugadorDetalleProps {
   jugador: Jugador
@@ -327,6 +329,37 @@ function formatearValor(clave: string, valor: unknown): string {
   return valor.toLocaleString('es-ES', { maximumFractionDigits: 1 })
 }
 
+function calcularEdad(fecha: string | null | undefined): number | null {
+  if (!fecha) return null
+
+  const nacimiento = new Date(fecha)
+  if (Number.isNaN(nacimiento.getTime())) return null
+
+  const hoy = new Date()
+  let edad = hoy.getFullYear() - nacimiento.getFullYear()
+  const yaCumplidos =
+    hoy.getMonth() > nacimiento.getMonth() ||
+    (hoy.getMonth() === nacimiento.getMonth() &&
+      hoy.getDate() >= nacimiento.getDate())
+
+  if (!yaCumplidos) edad -= 1
+
+  return edad >= 0 && edad < 80 ? edad : null
+}
+
+function formatearFechaNacimiento(fecha: string | null | undefined): string | null {
+  if (!fecha) return null
+
+  const nacimiento = new Date(fecha)
+  if (Number.isNaN(nacimiento.getTime())) return null
+
+  return nacimiento.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
 function esPortero(posicion: string | null | undefined): boolean {
   const texto = (posicion ?? '')
     .normalize('NFD')
@@ -549,15 +582,29 @@ function JugadorDetalle({ jugador }: JugadorDetalleProps) {
 
   const valoraciones = estadisticas?.datos.seasonRatingBreakdown
   const equipoNombre = estadisticas?.datos.team?.name ?? jugador.equipo
+  const edad = calcularEdad(jugador.fecha_nacimiento)
+  const fechaNacimiento = formatearFechaNacimiento(jugador.fecha_nacimiento)
 
   return (
-    <section className="seccion-contenido pagina-jugador-detalle">
-      <a
-        className="volver-enlace"
-        href={`#/equipos/${jugador.equipo_id}`}
+    <section
+      className="seccion-contenido pagina-jugador-detalle"
+      style={estilosClub(jugador.equipo)}
+    >
+      <nav
+        className="navegacion-ficha-jugador"
+        aria-label="Volver"
       >
-        ← Volver al equipo
-      </a>
+        <a
+          className="principal"
+          href={`#/equipos/${jugador.equipo_id}/jugadores`}
+        >
+          ← Volver a los jugadores del equipo
+        </a>
+
+        <a href={`#/equipos/${jugador.equipo_id}`}>
+          Ver ficha del equipo
+        </a>
+      </nav>
 
       <header className="cabecera-jugador-detalle">
         <div className="jugador-detalle-foto">
@@ -587,10 +634,17 @@ function JugadorDetalle({ jugador }: JugadorDetalleProps) {
           <p>{equipoNombre}</p>
 
           <div className="jugador-detalle-etiquetas">
+            {edad !== null && (
+              <span className="etiqueta-edad">{edad} años</span>
+            )}
+            {jugador.dorsal !== null && (
+              <span className="etiqueta-dorsal">Dorsal {jugador.dorsal}</span>
+            )}
             <span>{jugador.posicion ?? 'Posición desconocida'}</span>
             <span>
               {jugador.nacionalidad ?? 'Nacionalidad desconocida'}
             </span>
+            {fechaNacimiento && <span>Nació el {fechaNacimiento}</span>}
           </div>
         </div>
 
@@ -660,6 +714,15 @@ function JugadorDetalle({ jugador }: JugadorDetalleProps) {
               })}
           </div>
 
+          <GraficosJugador
+            estadisticas={estadisticas.datos.statistics ?? {}}
+            portero={portero}
+          />
+
+          <details className="todas-las-metricas">
+            <summary>Ver todas las métricas en detalle</summary>
+
+            <div className="contenido-metricas">
           {datosPorCategoria.map((categoria) => (
             <section
               className="categoria-estadisticas"
@@ -689,6 +752,8 @@ function JugadorDetalle({ jugador }: JugadorDetalleProps) {
               </div>
             </section>
           ))}
+            </div>
+          </details>
 
           {valoraciones && Object.keys(valoraciones).length > 0 && (
             <section className="categoria-estadisticas">

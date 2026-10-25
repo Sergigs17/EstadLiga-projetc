@@ -10,6 +10,7 @@ import JugadorDetalle from './pages/JugadorDetalle'
 import Clasificacion from './pages/Clasificacion'
 import Partidos from './pages/Partidos'
 import Quiniela from './pages/Quiniela'
+import Tienda from './pages/Tienda'
 
 function leerRuta() {
   return window.location.hash.replace(/^#\/?/, '') || 'inicio'
@@ -54,8 +55,16 @@ function App() {
 
   const partesRuta = pagina.split('/')
 
+  // #/equipos/5  →  ficha del equipo
+  // #/equipos/5/jugadores  →  ficha del equipo abierta en la pestaña de jugadores
+  const SECCIONES_EQUIPO = ['historia', 'palmares', 'jugadores', 'estadisticas']
+
   const esFichaEquipo =
-    partesRuta[0] === 'equipos' && partesRuta.length === 2
+    partesRuta[0] === 'equipos' &&
+    (partesRuta.length === 2 ||
+      (partesRuta.length === 3 && SECCIONES_EQUIPO.includes(partesRuta[2])))
+
+  const seccionEquipo = partesRuta.length === 3 ? partesRuta[2] : undefined
 
   const equipoId = esFichaEquipo ? Number(partesRuta[1]) : null
 
@@ -166,6 +175,7 @@ function App() {
   const esClasificacion = pagina === 'clasificacion'
   const esPartidos = pagina === 'partidos'
   const esQuiniela = pagina === 'quiniela'
+  const esTienda = pagina === 'tienda'
 
   return (
     <div className="estadliga">
@@ -220,6 +230,13 @@ function App() {
           >
             Quiniela
           </a>
+
+          <a
+            className={esTienda ? 'activo' : ''}
+            href="#/tienda"
+          >
+            Tienda
+          </a>
         </nav>
 
         <button className="boton-login" type="button">
@@ -241,6 +258,7 @@ function App() {
         {esFichaEquipo && (
           <EquipoDetalle
             equipo={equipoSeleccionado}
+            seccionInicial={seccionEquipo}
             jugadores={jugadores}
             cargando={cargandoPlantilla}
             error={errorPlantilla}
@@ -284,6 +302,8 @@ function App() {
 
         {esQuiniela && <Quiniela />}
 
+        {esTienda && <Tienda />}
+
         {!esInicio &&
           !esEquipos &&
           !esFichaEquipo &&
@@ -291,7 +311,8 @@ function App() {
           !esFichaJugador &&
           !esClasificacion &&
           !esPartidos &&
-          !esQuiniela && (
+          !esQuiniela &&
+          !esTienda && (
             <section className="seccion-contenido">
               <h2>Página no encontrada</h2>
               <a className="boton-principal" href="#/inicio">

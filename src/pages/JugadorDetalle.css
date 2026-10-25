@@ -7,16 +7,49 @@
   padding-bottom: 56px;
 }
 
-.pagina-jugador-detalle .volver-enlace {
-  display: inline-flex;
+.navegacion-ficha-jugador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 26px;
-  color: #087c50;
-  font-weight: 700;
-  text-decoration: none;
 }
 
-.pagina-jugador-detalle .volver-enlace:hover {
-  color: #065d3c;
+.navegacion-ficha-jugador a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid color-mix(in srgb, var(--club-acento, #d4202c) 30%, var(--linea));
+  border-radius: 999px;
+  background: #fff;
+  color: var(--club-acento, #d4202c);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.navegacion-ficha-jugador a.principal {
+  border-color: transparent;
+  background: var(--club-acento, #d4202c);
+  color: #fff;
+}
+
+.navegacion-ficha-jugador a:hover {
+  transform: translateX(-3px);
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 14%, #fff);
+}
+
+.navegacion-ficha-jugador a.principal:hover {
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 80%, #000);
+  color: #fff;
+}
+
+.navegacion-ficha-jugador a:focus-visible {
+  outline: 3px solid var(--club-acento, #d4202c);
+  outline-offset: 3px;
 }
 
 /* Cabecera */
@@ -29,10 +62,10 @@
   padding: 30px;
   margin-bottom: 32px;
   overflow: hidden;
-  border: 1px solid #e1e9e4;
+  border: 1px solid var(--linea);
   border-radius: 20px;
-  background: linear-gradient(120deg, #f0f8f3, #ffffff 70%);
-  box-shadow: 0 8px 24px rgb(15 45 30 / 5%);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--club-acento, #d4202c) 7%, #fff), #ffffff 70%);
+  box-shadow: 0 8px 24px rgb(22 17 15 / 6%);
 }
 
 /* Foto del jugador */
@@ -45,7 +78,7 @@
   justify-content: center;
   overflow: hidden;
   border-radius: 16px;
-  background: linear-gradient(180deg, #e8f5ed, #d6eadd);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--club-acento, #d4202c) 9%, #fff), color-mix(in srgb, var(--club-acento, #d4202c) 20%, #fff));
 }
 
 .jugador-detalle-foto > img {
@@ -61,7 +94,7 @@
   width: 100%;
   height: 100%;
   place-items: center;
-  color: #087c50;
+  color: var(--club-acento, #d4202c);
 }
 
 .jugador-detalle-foto .jugador-foto-pendiente span {
@@ -69,7 +102,7 @@
   width: 76px;
   height: 76px;
   place-items: center;
-  border: 1px solid rgb(8 124 80 / 12%);
+  border: 1px solid color-mix(in srgb, var(--club-acento, #d4202c) 18%, #fff);
   border-radius: 50%;
   background: rgb(255 255 255 / 65%);
   font-size: 2.5rem;
@@ -83,7 +116,7 @@
 
 .jugador-detalle-identidad .subtitulo {
   display: inline-block;
-  color: #087c50;
+  color: var(--club-acento, #d4202c);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -91,7 +124,7 @@
 
 .jugador-detalle-identidad h1 {
   margin: 8px 0;
-  color: #17251d;
+  color: var(--tinta);
   font-size: clamp(1.8rem, 4vw, 2.7rem);
   line-height: 1.1;
   overflow-wrap: anywhere;
@@ -99,7 +132,7 @@
 
 .jugador-detalle-identidad > p {
   margin: 0 0 14px;
-  color: #087c50;
+  color: var(--club-acento, #d4202c);
   font-weight: 700;
 }
 
@@ -112,8 +145,8 @@
 .jugador-detalle-etiquetas span {
   padding: 6px 10px;
   border-radius: 999px;
-  background: #e3eee7;
-  color: #405448;
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 12%, #fff);
+  color: var(--tinta-suave);
   font-size: 0.8rem;
 }
 
@@ -126,7 +159,7 @@
 }
 
 .selector-temporada label {
-  color: #42554a;
+  color: var(--tinta-suave);
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -134,15 +167,15 @@
 .selector-temporada select {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #cbd9cf;
+  border: 1px solid var(--linea);
   border-radius: 10px;
   background: #ffffff;
-  color: #17251d;
+  color: var(--tinta);
   font: inherit;
 }
 
 .selector-temporada select:focus-visible {
-  outline: 3px solid #78c69a;
+  outline: 3px solid color-mix(in srgb, var(--club-acento, #d4202c) 55%, #fff);
   outline-offset: 2px;
 }
 
@@ -170,19 +203,19 @@
   justify-content: center;
   gap: 10px;
   padding: 18px;
-  border: 1px solid #e0e9e3;
+  border: 1px solid var(--linea);
   border-radius: 14px;
   background: #ffffff;
-  box-shadow: 0 4px 14px rgb(15 45 30 / 3%);
+  box-shadow: 0 4px 14px rgb(22 17 15 / 4%);
 }
 
 .resumen-estadistica span {
-  color: #617167;
+  color: var(--tinta-suave);
   font-size: 0.9rem;
 }
 
 .resumen-estadistica strong {
-  color: #087c50;
+  color: var(--club-acento, #d4202c);
   font-size: 2rem;
   line-height: 1;
   overflow-wrap: anywhere;
@@ -206,7 +239,7 @@
 }
 
 .categoria-estadisticas .titulo-seccion .subtitulo {
-  color: #087c50;
+  color: var(--club-acento, #d4202c);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -215,13 +248,13 @@
 .categoria-estadisticas .titulo-seccion h2 {
   margin-top: 6px;
   margin-bottom: 0;
-  color: #17251d;
+  color: var(--tinta);
   font-size: clamp(1.3rem, 3vw, 1.8rem);
 }
 
 .contador-metricas {
   flex-shrink: 0;
-  color: #68786e;
+  color: var(--tinta-suave);
   font-size: 0.85rem;
 }
 
@@ -241,7 +274,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 16px;
-  border: 1px solid #e1e9e4;
+  border: 1px solid var(--linea);
   border-radius: 12px;
   background: #ffffff;
   transition:
@@ -252,19 +285,19 @@
 
 .tarjeta-metrica:hover {
   transform: translateY(-2px);
-  border-color: #a6d6b9;
-  box-shadow: 0 5px 14px rgb(15 45 30 / 5%);
+  border-color: color-mix(in srgb, var(--club-acento, #d4202c) 45%, #fff);
+  box-shadow: 0 5px 14px rgb(22 17 15 / 6%);
 }
 
 .tarjeta-metrica span {
-  color: #64746a;
+  color: var(--tinta-suave);
   font-size: 0.84rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
 
 .tarjeta-metrica strong {
-  color: #1c3024;
+  color: var(--tinta);
   font-size: 1.35rem;
   overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
@@ -276,7 +309,7 @@
 
 .estado-estadisticas {
   padding: 28px 0;
-  color: #64746a;
+  color: var(--tinta-suave);
 }
 
 .mensaje-error-estadisticas {
@@ -300,7 +333,7 @@
   padding: 10px 16px;
   border: 0;
   border-radius: 9px;
-  background: #087c50;
+  background: var(--club-acento, #d4202c);
   color: #ffffff;
   cursor: pointer;
   font: inherit;
@@ -308,11 +341,11 @@
 }
 
 .mensaje-error-estadisticas button:hover {
-  background: #066640;
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 70%, #000);
 }
 
 .mensaje-error-estadisticas button:focus-visible {
-  outline: 3px solid #78c69a;
+  outline: 3px solid color-mix(in srgb, var(--club-acento, #d4202c) 55%, #fff);
   outline-offset: 3px;
 }
 
@@ -320,7 +353,7 @@
 
 .nota-estadisticas {
   margin-top: 28px;
-  color: #78867d;
+  color: var(--tinta-suave);
   font-size: 0.82rem;
   line-height: 1.6;
 }
@@ -456,4 +489,70 @@
   .tarjeta-metrica:hover {
     transform: none;
   }
+}
+
+
+/* =====================================================
+   DATOS PERSONALES Y TODAS LAS MÉTRICAS
+   ===================================================== */
+
+.jugador-detalle-etiquetas .etiqueta-edad {
+  background: var(--club-acento, #d4202c);
+  color: #fff;
+  font-weight: 800;
+}
+
+.jugador-detalle-etiquetas .etiqueta-dorsal {
+  background: #17110f;
+  color: #fff;
+  font-weight: 800;
+}
+
+.todas-las-metricas {
+  margin-top: 8px;
+  border: 1px solid var(--linea);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.todas-las-metricas > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+  color: var(--tinta);
+  font-weight: 900;
+  list-style: none;
+  cursor: pointer;
+}
+
+.todas-las-metricas > summary::-webkit-details-marker {
+  display: none;
+}
+
+.todas-las-metricas > summary::after {
+  content: '＋';
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 12%, #fff);
+  color: var(--club-acento, #d4202c);
+  font-weight: 900;
+}
+
+.todas-las-metricas[open] > summary::after {
+  content: '－';
+}
+
+.todas-las-metricas > summary:focus-visible {
+  outline: 3px solid var(--club-acento, #d4202c);
+  outline-offset: 2px;
+  border-radius: 16px;
+}
+
+.todas-las-metricas > .contenido-metricas {
+  padding: 4px 22px 10px;
 }

@@ -26,6 +26,7 @@ export interface Jugador {
 
 interface EquipoDetalleProps {
   equipo: Equipo | undefined
+  seccionInicial?: string
   jugadores: Jugador[]
   cargando: boolean
   error: boolean
@@ -37,8 +38,16 @@ type SeccionEquipo =
   | 'jugadores'
   | 'estadisticas'
 
+const SECCIONES: SeccionEquipo[] = [
+  'historia',
+  'palmares',
+  'jugadores',
+  'estadisticas',
+]
+
 function EquipoDetalle({
   equipo,
+  seccionInicial,
   jugadores,
   cargando,
   error,
@@ -46,10 +55,12 @@ function EquipoDetalle({
   const [seccionActiva, setSeccionActiva] =
     useState<SeccionEquipo>('historia')
 
-  // Al cambiar de equipo, volvemos a mostrar su historia.
+  // Al cambiar de equipo, abrimos la sección que pide la dirección
+  // (por ejemplo #/equipos/5/jugadores) o, si no hay, su historia.
   useEffect(() => {
-    setSeccionActiva('historia')
-  }, [equipo?.id])
+    const pedida = SECCIONES.find((seccion) => seccion === seccionInicial)
+    setSeccionActiva(pedida ?? 'historia')
+  }, [equipo?.id, seccionInicial])
 
   return (
     <section
