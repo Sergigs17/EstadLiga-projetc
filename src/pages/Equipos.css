@@ -1,0 +1,12 @@
+
+/* Estilos específicos de la página de equipos.
+   Los estilos generales se mantienen en App.css. */
+
+.pagina-equipos .tarjeta-equipo {
+  color: inherit;
+  text-decoration: none;
+}
+
+.pagina-equipos .tarjeta-equipo img {
+  object-fit: contain;
+}

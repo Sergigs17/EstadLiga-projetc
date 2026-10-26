@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Rojo y blanco */
+  --rojo: #d4202c;
+  --rojo-vivo: #e8333f;
+  --rojo-oscuro: #9e1520;
+  --rojo-suave: #fdeceb;
+
+  --tinta: #16110f;
+  --tinta-suave: #5b5552;
+  --papel: #ffffff;
+  --papel-calido: #f7f4f2;
+  --linea: #e7e1de;
+
+  /* Colores del club (se sobrescriben en cada ficha de equipo) */
+  --club-1: var(--rojo);
+  --club-2: #ffffff;
+
+  /* Tipografía */
+  --fuente-titulo: 'Archivo', 'Arial Black', Arial, sans-serif;
+  --fuente-texto: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Forma */
+  --radio: 16px;
+  --radio-grande: 24px;
+  --sombra-suave: 0 6px 24px rgb(22 17 15 / 6%);
+  --sombra-fuerte: 0 18px 40px rgb(22 17 15 / 14%);
+
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--papel-calido);
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 16px;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+}
+
+h1 {
+  font-size: clamp(2.4rem, 5.5vw, 4rem);
+}
+
+h2 {
+  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+}
+
+h3 {
+  font-size: 1.15rem;
+}
+
+p {
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--rojo);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 3px solid var(--rojo);
+  outline-offset: 3px;
+}
+.logo-imagen {
+  display: block;
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+}

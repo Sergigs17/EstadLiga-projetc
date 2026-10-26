@@ -1,0 +1,558 @@
+
+/* =====================================================
+   FICHA INDIVIDUAL DEL JUGADOR
+   ===================================================== */
+
+.pagina-jugador-detalle {
+  padding-bottom: 56px;
+}
+
+.navegacion-ficha-jugador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.navegacion-ficha-jugador a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid color-mix(in srgb, var(--club-acento, #d4202c) 30%, var(--linea));
+  border-radius: 999px;
+  background: #fff;
+  color: var(--club-acento, #d4202c);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.navegacion-ficha-jugador a.principal {
+  border-color: transparent;
+  background: var(--club-acento, #d4202c);
+  color: #fff;
+}
+
+.navegacion-ficha-jugador a:hover {
+  transform: translateX(-3px);
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 14%, #fff);
+}
+
+.navegacion-ficha-jugador a.principal:hover {
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 80%, #000);
+  color: #fff;
+}
+
+.navegacion-ficha-jugador a:focus-visible {
+  outline: 3px solid var(--club-acento, #d4202c);
+  outline-offset: 3px;
+}
+
+/* Cabecera */
+
+.cabecera-jugador-detalle {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) minmax(190px, 240px);
+  align-items: center;
+  gap: 26px;
+  padding: 30px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: 20px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--club-acento, #d4202c) 7%, #fff), #ffffff 70%);
+  box-shadow: 0 8px 24px rgb(22 17 15 / 6%);
+}
+
+/* Foto del jugador */
+
+.jugador-detalle-foto {
+  display: flex;
+  width: 150px;
+  height: 170px;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--club-acento, #d4202c) 9%, #fff), color-mix(in srgb, var(--club-acento, #d4202c) 20%, #fff));
+}
+
+.jugador-detalle-foto > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.jugador-detalle-foto .jugador-foto-pendiente {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: var(--club-acento, #d4202c);
+}
+
+.jugador-detalle-foto .jugador-foto-pendiente span {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--club-acento, #d4202c) 18%, #fff);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 65%);
+  font-size: 2.5rem;
+}
+
+/* Identidad */
+
+.jugador-detalle-identidad {
+  min-width: 0;
+}
+
+.jugador-detalle-identidad .subtitulo {
+  display: inline-block;
+  color: var(--club-acento, #d4202c);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.jugador-detalle-identidad h1 {
+  margin: 8px 0;
+  color: var(--tinta);
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.jugador-detalle-identidad > p {
+  margin: 0 0 14px;
+  color: var(--club-acento, #d4202c);
+  font-weight: 700;
+}
+
+.jugador-detalle-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jugador-detalle-etiquetas span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 12%, #fff);
+  color: var(--tinta-suave);
+  font-size: 0.8rem;
+}
+
+/* Selector de temporada */
+
+.selector-temporada {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.selector-temporada label {
+  color: var(--tinta-suave);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.selector-temporada select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--tinta);
+  font: inherit;
+}
+
+.selector-temporada select:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--club-acento, #d4202c) 55%, #fff);
+  outline-offset: 2px;
+}
+
+.selector-temporada select:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+/* =====================================================
+   RESUMEN DE ESTADÍSTICAS
+   ===================================================== */
+
+.resumen-estadisticas-jugador {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.resumen-estadistica {
+  display: flex;
+  min-width: 0;
+  min-height: 110px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgb(22 17 15 / 4%);
+}
+
+.resumen-estadistica span {
+  color: var(--tinta-suave);
+  font-size: 0.9rem;
+}
+
+.resumen-estadistica strong {
+  color: var(--club-acento, #d4202c);
+  font-size: 2rem;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =====================================================
+   CATEGORÍAS DE ESTADÍSTICAS
+   ===================================================== */
+
+.categoria-estadisticas {
+  margin-bottom: 38px;
+}
+
+.categoria-estadisticas .titulo-seccion {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.categoria-estadisticas .titulo-seccion .subtitulo {
+  color: var(--club-acento, #d4202c);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.categoria-estadisticas .titulo-seccion h2 {
+  margin-top: 6px;
+  margin-bottom: 0;
+  color: var(--tinta);
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+}
+
+.contador-metricas {
+  flex-shrink: 0;
+  color: var(--tinta-suave);
+  font-size: 0.85rem;
+}
+
+/* Tarjetas de métricas */
+
+.rejilla-metricas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tarjeta-metrica {
+  display: flex;
+  min-width: 0;
+  min-height: 88px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  background: #ffffff;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.tarjeta-metrica:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--club-acento, #d4202c) 45%, #fff);
+  box-shadow: 0 5px 14px rgb(22 17 15 / 6%);
+}
+
+.tarjeta-metrica span {
+  color: var(--tinta-suave);
+  font-size: 0.84rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-metrica strong {
+  color: var(--tinta);
+  font-size: 1.35rem;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =====================================================
+   ESTADOS DE CARGA Y ERROR
+   ===================================================== */
+
+.estado-estadisticas {
+  padding: 28px 0;
+  color: var(--tinta-suave);
+}
+
+.mensaje-error-estadisticas {
+  padding: 24px;
+  border: 1px solid #f0d2d2;
+  border-radius: 14px;
+  background: #fff8f8;
+}
+
+.mensaje-error-estadisticas h2 {
+  margin-top: 0;
+  color: #922f2f;
+}
+
+.mensaje-error-estadisticas p {
+  color: #694848;
+  overflow-wrap: anywhere;
+}
+
+.mensaje-error-estadisticas button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--club-acento, #d4202c);
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.mensaje-error-estadisticas button:hover {
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 70%, #000);
+}
+
+.mensaje-error-estadisticas button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--club-acento, #d4202c) 55%, #fff);
+  outline-offset: 3px;
+}
+
+/* Nota de procedencia */
+
+.nota-estadisticas {
+  margin-top: 28px;
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* =====================================================
+   TABLETS
+   ===================================================== */
+
+@media (max-width: 1000px) {
+  .cabecera-jugador-detalle {
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .jugador-detalle-foto {
+    width: 120px;
+    height: 145px;
+  }
+
+  .selector-temporada {
+    grid-column: 1 / -1;
+  }
+
+  .resumen-estadisticas-jugador {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rejilla-metricas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* =====================================================
+   MÓVILES
+   ===================================================== */
+
+@media (max-width: 650px) {
+  .pagina-jugador-detalle {
+    padding-bottom: 36px;
+  }
+
+  .pagina-jugador-detalle .volver-enlace {
+    margin-bottom: 20px;
+  }
+
+  .cabecera-jugador-detalle {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border-radius: 16px;
+  }
+
+  .jugador-detalle-foto {
+    width: 112px;
+    height: 125px;
+  }
+
+  .jugador-detalle-identidad h1 {
+    font-size: clamp(1.7rem, 7vw, 2.3rem);
+  }
+
+  .selector-temporada {
+    grid-column: auto;
+  }
+
+  .resumen-estadisticas-jugador {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+
+  .resumen-estadistica {
+    min-height: 90px;
+    padding: 14px;
+  }
+
+  .resumen-estadistica span {
+    font-size: 0.82rem;
+  }
+
+  .resumen-estadistica strong {
+    font-size: 1.7rem;
+  }
+
+  .categoria-estadisticas {
+    margin-bottom: 30px;
+  }
+
+  .categoria-estadisticas .titulo-seccion {
+    align-items: flex-start;
+  }
+
+  .categoria-estadisticas .titulo-seccion h2 {
+    font-size: 1.3rem;
+  }
+
+  .contador-metricas {
+    padding-top: 4px;
+    font-size: 0.75rem;
+  }
+
+  .rejilla-metricas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .tarjeta-metrica {
+    min-height: 84px;
+    padding: 12px;
+  }
+
+  .tarjeta-metrica span {
+    font-size: 0.78rem;
+  }
+
+  .tarjeta-metrica strong {
+    font-size: 1.15rem;
+  }
+
+  .mensaje-error-estadisticas {
+    padding: 18px;
+  }
+}
+
+/* Accesibilidad */
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-metrica {
+    transition: none;
+  }
+
+  .tarjeta-metrica:hover {
+    transform: none;
+  }
+}
+
+
+/* =====================================================
+   DATOS PERSONALES Y TODAS LAS MÉTRICAS
+   ===================================================== */
+
+.jugador-detalle-etiquetas .etiqueta-edad {
+  background: var(--club-acento, #d4202c);
+  color: #fff;
+  font-weight: 800;
+}
+
+.jugador-detalle-etiquetas .etiqueta-dorsal {
+  background: #17110f;
+  color: #fff;
+  font-weight: 800;
+}
+
+.todas-las-metricas {
+  margin-top: 8px;
+  border: 1px solid var(--linea);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.todas-las-metricas > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+  color: var(--tinta);
+  font-weight: 900;
+  list-style: none;
+  cursor: pointer;
+}
+
+.todas-las-metricas > summary::-webkit-details-marker {
+  display: none;
+}
+
+.todas-las-metricas > summary::after {
+  content: '＋';
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--club-acento, #d4202c) 12%, #fff);
+  color: var(--club-acento, #d4202c);
+  font-weight: 900;
+}
+
+.todas-las-metricas[open] > summary::after {
+  content: '－';
+}
+
+.todas-las-metricas > summary:focus-visible {
+  outline: 3px solid var(--club-acento, #d4202c);
+  outline-offset: 2px;
+  border-radius: 16px;
+}
+
+.todas-las-metricas > .contenido-metricas {
+  padding: 4px 22px 10px;
+}
