@@ -1,0 +1,613 @@
+/* =====================================================
+   COMPARADOR DE JUGADORES
+   --ca = color del jugador 1 · --cb = color del jugador 2
+   ===================================================== */
+
+.cj {
+  --ca: #d4202c;
+  --cb: #1f2937;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ───── Selectores ───── */
+
+.cj-selectores {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--papel);
+}
+
+.cj-selector {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cj-selector:first-child label {
+  color: var(--ca);
+}
+
+.cj-selector:last-child label {
+  color: var(--cb);
+}
+
+.cj-selector label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cj-selector input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 2px solid var(--linea);
+  border-radius: 12px;
+  background: var(--papel-calido);
+  color: var(--tinta);
+  font: inherit;
+  font-weight: 700;
+}
+
+.cj-selector:first-child input:focus {
+  border-color: var(--ca);
+  outline: none;
+}
+
+.cj-selector:last-child input:focus {
+  border-color: var(--cb);
+  outline: none;
+}
+
+.cj-opciones {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  right: 0;
+  left: 0;
+  margin: 6px 0 0;
+  padding: 6px;
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  background: var(--papel);
+  box-shadow: var(--sombra-fuerte);
+  list-style: none;
+}
+
+.cj-opciones button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--tinta);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cj-opciones button:hover,
+.cj-opciones button:focus-visible {
+  background: var(--rojo-suave, #fdeceb);
+  outline: none;
+}
+
+.cj-opciones li[aria-selected='true'] button {
+  background: var(--papel-calido);
+}
+
+.cj-opciones span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.cj-opciones b {
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.cj-opciones small {
+  color: var(--tinta-suave);
+  font-size: 0.74rem;
+}
+
+.cj-sin-resultados {
+  padding: 14px;
+  color: var(--tinta-suave);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.cj-intercambiar {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid var(--linea);
+  border-radius: 50%;
+  background: var(--papel);
+  color: var(--tinta);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.3s;
+}
+
+.cj-intercambiar:hover {
+  background: var(--rojo, #d4202c);
+  color: #fff;
+  transform: rotate(180deg);
+}
+
+.cj-intercambiar:focus-visible,
+.cj-barra-modo button:focus-visible,
+.cj-jugador:focus-visible {
+  outline: 3px solid var(--rojo, #d4202c);
+  outline-offset: 3px;
+}
+
+.cj-vacio,
+.cj-aviso {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--papel-calido);
+  color: var(--tinta-suave);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.cj-vacio {
+  padding: 36px 18px;
+  text-align: center;
+}
+
+/* ───── Duelo ───── */
+
+.cj-duelo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 190px) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 14px;
+}
+
+.cj-jugador {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  border-radius: var(--radio-grande, 24px);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.cj-jugador:hover {
+  transform: translateY(-3px);
+}
+
+.cj-jugador-a {
+  background: linear-gradient(150deg, var(--ca), color-mix(in srgb, var(--ca) 55%, #000));
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--ca) 32%, transparent);
+}
+
+.cj-jugador-b {
+  background: linear-gradient(150deg, var(--cb), color-mix(in srgb, var(--cb) 55%, #000));
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--cb) 32%, transparent);
+}
+
+.cj-foto {
+  width: 112px;
+  height: 112px;
+  border: 4px solid rgb(255 255 255 / 85%);
+  background: rgb(255 255 255 / 20%);
+  font-size: 2rem;
+}
+
+.cj-foto.foto-jugador-vacia {
+  color: #fff;
+}
+
+.cj-jugador strong {
+  font-family: var(--fuente-titulo);
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.cj-equipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.cj-equipo .escudo-club {
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.cj-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.cj-chips i {
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 20%);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.cj-marcador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.cj-vs {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--tinta);
+  color: #fff;
+  font-family: var(--fuente-titulo);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.cj-resultado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--fuente-titulo);
+  font-size: 2.6rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.cj-resultado span {
+  color: var(--tinta-suave);
+}
+
+.cj-resultado-a { color: var(--ca); }
+.cj-resultado-b { color: var(--cb); }
+
+.cj-marcador small {
+  color: var(--tinta-suave);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+/* ───── Radar ───── */
+
+.cj-radar-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 18px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-grande, 24px);
+  background: var(--papel);
+  box-shadow: var(--sombra-suave);
+}
+
+.cj-radar-caja h3 {
+  margin: 0;
+  color: var(--tinta);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.cj-radar-caja p {
+  margin: 4px 0 0;
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.cj-radar {
+  width: 100%;
+  max-width: 520px;
+  overflow: visible;
+}
+
+.cj-radar-malla {
+  fill: none;
+  stroke: var(--linea);
+  stroke-width: 1;
+}
+
+.cj-radar-eje {
+  stroke: var(--linea);
+  stroke-width: 1;
+}
+
+.cj-radar-area {
+  stroke-width: 3;
+  stroke-linejoin: round;
+  animation: cj-aparecer 0.8s ease both;
+  transform-origin: 160px 160px;
+}
+
+.cj-radar-a {
+  fill: color-mix(in srgb, var(--ca) 28%, transparent);
+  stroke: var(--ca);
+}
+
+.cj-radar-b {
+  fill: color-mix(in srgb, var(--cb) 24%, transparent);
+  stroke: var(--cb);
+}
+
+.cj-radar-etiqueta {
+  fill: var(--tinta);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cj-radar-valor {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.cj-tspan-a { fill: var(--ca); }
+.cj-tspan-b { fill: var(--cb); }
+.cj-tspan-sep { fill: var(--tinta-suave); }
+
+@keyframes cj-aparecer {
+  from { opacity: 0; transform: scale(0.6); }
+}
+
+.cj-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.cj-leyenda li::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 7px;
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+
+.cj-leyenda-a::before { background: var(--ca); }
+.cj-leyenda-b::before { background: var(--cb); }
+
+/* ───── Totales / por 90 ───── */
+
+.cj-barra-modo {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 4px;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  background: var(--papel);
+}
+
+.cj-barra-modo button {
+  padding: 9px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tinta-suave);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cj-barra-modo button.activo {
+  background: var(--rojo, #d4202c);
+  color: #fff;
+}
+
+/* ───── Filas comparadas ───── */
+
+.cj-secciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cj-seccion {
+  padding: 22px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-grande, 24px);
+  background: var(--papel);
+  box-shadow: var(--sombra-suave);
+}
+
+.cj-seccion h3 {
+  margin: 0 0 18px;
+  padding-left: 12px;
+  border-left: 5px solid var(--rojo, #d4202c);
+  color: var(--tinta);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.cj-filas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cj-fila-etiqueta {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--tinta-suave);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cj-fila-datos {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 4px;
+}
+
+.cj-valor {
+  color: var(--tinta-suave);
+  font-family: var(--fuente-titulo);
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.cj-valor-a { text-align: right; padding-right: 8px; }
+.cj-valor-b { text-align: left; padding-left: 8px; }
+
+.cj-valor.gana {
+  color: var(--tinta);
+  font-weight: 900;
+}
+
+.cj-valor-a.gana { color: var(--ca); }
+.cj-valor-b.gana { color: var(--cb); }
+
+.cj-barra {
+  display: flex;
+  height: 12px;
+  overflow: hidden;
+  background: var(--papel-calido);
+}
+
+.cj-barra-a {
+  justify-content: flex-end;
+  border-radius: 999px 0 0 999px;
+}
+
+.cj-barra-b {
+  justify-content: flex-start;
+  border-radius: 0 999px 999px 0;
+}
+
+.cj-barra i {
+  display: block;
+  height: 100%;
+  opacity: 0.35;
+  transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.cj-barra i.gana {
+  opacity: 1;
+}
+
+.cj-barra i.igual {
+  opacity: 0.7;
+}
+
+.cj-barra-a i { background: var(--ca); border-radius: 999px 0 0 999px; }
+.cj-barra-b i { background: var(--cb); border-radius: 0 999px 999px 0; }
+
+/* ───── Adaptable ───── */
+
+@media (max-width: 900px) {
+  .cj-selectores {
+    grid-template-columns: 1fr;
+  }
+
+  .cj-intercambiar {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .cj-intercambiar:hover {
+    transform: rotate(270deg);
+  }
+
+  .cj-duelo {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cj-marcador {
+    order: -1;
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .cj-secciones {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cj-foto {
+    width: 84px;
+    height: 84px;
+  }
+
+  .cj-jugador {
+    padding: 18px 10px;
+  }
+
+  .cj-jugador strong {
+    font-size: 1.05rem;
+  }
+
+  .cj-fila-datos {
+    grid-template-columns: 54px minmax(0, 1fr) minmax(0, 1fr) 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cj-radar-area {
+    animation: none;
+  }
+
+  .cj-jugador,
+  .cj-intercambiar,
+  .cj-barra i {
+    transition: none;
+  }
+
+  .cj-jugador:hover,
+  .cj-intercambiar:hover {
+    transform: none;
+  }
+}

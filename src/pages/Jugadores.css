@@ -1,103 +1,97 @@
-
-/* Estilos específicos de las estadísticas de jugadores.
-   Los estilos generales se mantienen en App.css. */
+/* Estilos de la pÃ¡gina de estadÃ­sticas de jugadores.
+   Las clasificaciones y el comparador tienen sus propios CSS en
+   src/components/jugadores/. Los estilos generales estÃ¡n en App.css. */
 
 .pagina-estadisticas {
   min-height: 55vh;
 }
 
-.introduccion-estadisticas {
-  margin: -10px 0 28px;
-  color: #718078;
-  font-size: 14px;
+.pestanas-jugadores {
+  display: inline-flex;
+  margin-bottom: 26px;
+  padding: 5px;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  background: var(--papel);
+  box-shadow: var(--sombra-suave);
 }
 
-.rejilla-estadisticas {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+.pestanas-jugadores button {
+  padding: 12px 26px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tinta-suave);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
-.tarjeta-estadistica {
-  padding: 25px;
-  border: 1px solid #e2ebe5;
-  border-radius: 17px;
-  background: #fff;
-  box-shadow: 0 5px 20px rgb(20 55 35 / 4%);
+.pestanas-jugadores button:hover {
+  color: var(--rojo);
 }
 
-.estadistica-icono {
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border-radius: 13px;
-  background: #eaf7ef;
-  font-size: 24px;
+.pestanas-jugadores button.activa {
+  background: var(--rojo);
+  color: #fff;
+  box-shadow: 0 8px 18px rgb(212 32 44 / 28%);
 }
 
-.estadistica-etiqueta {
+.pestanas-jugadores button:focus-visible {
+  outline: 3px solid var(--rojo);
+  outline-offset: 2px;
+}
+
+.estado-jugadores {
+  margin: 0;
+  padding: 48px 24px;
+  border: 1px dashed var(--linea);
+  border-radius: var(--radio);
+  background: var(--papel);
+  color: var(--tinta-suave);
+  text-align: center;
+}
+
+.estado-jugadores strong {
   display: block;
-  margin-top: 23px;
-  color: #087c50;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+  color: var(--tinta);
+  font-size: 1.1rem;
 }
 
-.tarjeta-estadistica h3 {
-  margin: 8px 0 12px;
-  font-size: 19px;
+.estado-jugadores p {
+  margin: 0;
 }
 
-.estadistica-pendiente {
-  color: #718078;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.puestos-pendientes {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-top: 20px;
-}
-
-.puestos-pendientes span {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 13px 0;
-  border-top: 1px solid #edf1ee;
-  color: #087c50;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.puestos-pendientes b {
-  color: #8a968e;
-  font-size: 12px;
-  font-weight: 500;
+.estado-error {
+  border-color: color-mix(in srgb, var(--rojo) 40%, var(--linea));
+  background: var(--rojo-suave);
+  color: var(--rojo-oscuro);
+  font-weight: 600;
 }
 
 .aviso-estadisticas {
-  margin-top: 24px;
-  padding: 16px 18px;
-  border-radius: 10px;
-  background: #eaf5ed;
-  color: #466353;
-  font-size: 13px;
-  line-height: 1.7;
+  margin: 28px 0 0;
+  color: var(--tinta-suave);
+  font-size: 0.78rem;
+  line-height: 1.6;
 }
 
-@media (max-width: 900px) {
-  .rejilla-estadisticas {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .pestanas-jugadores {
+    display: flex;
+  }
+
+  .pestanas-jugadores button {
+    flex: 1;
+    padding-inline: 10px;
   }
 }
 
-@media (max-width: 600px) {
-  .tarjeta-estadistica {
-    padding: 21px;
+@media (prefers-reduced-motion: reduce) {
+  .pestanas-jugadores button {
+    transition: none;
   }
 }

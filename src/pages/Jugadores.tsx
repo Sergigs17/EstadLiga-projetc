@@ -1,7 +1,61 @@
-
+import { useEffect, useState } from 'react'
+import ComparadorJugadores from '../components/jugadores/ComparadorJugadores'
+import TablasJugadores from '../components/jugadores/TablasJugadores'
+import {
+  TEMPORADA_ACTUAL,
+  TORNEO_LALIGA,
+  fechaCorta,
+  type JugadorStats,
+  type RespuestaJugadoresStats,
+} from '../components/jugadores/estadisticasJugadores'
 import './Jugadores.css'
 
+type Pestana = 'clasificaciones' | 'comparador'
+
 function Jugadores() {
+  const [pestana, setPestana] = useState<Pestana>('clasificaciones')
+  const [jugadores, setJugadores] = useState<JugadorStats[]>([])
+  const [actualizado, setActualizado] = useState<string | null>(null)
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
+
+  // Todas las estadísticas salen de lo que ya está guardado en la base de datos.
+  useEffect(() => {
+    const controlador = new AbortController()
+
+    fetch(
+      `/api/jugadores/estadisticas?unique_tournament_id=${TORNEO_LALIGA}&season_id=${TEMPORADA_ACTUAL}`,
+      { signal: controlador.signal },
+    )
+      .then(async (respuesta) => {
+        if (!respuesta.ok) {
+          throw new Error('No se han podido cargar las estadísticas')
+        }
+
+        return (await respuesta.json()) as RespuestaJugadoresStats
+      })
+      .then((datos) => {
+        setJugadores(datos.jugadores ?? [])
+        setActualizado(datos.actualizado_en)
+      })
+      .catch((fallo: unknown) => {
+        if (fallo instanceof DOMException && fallo.name === 'AbortError') return
+
+        setError(
+          fallo instanceof Error
+            ? fallo.message
+            : 'No se han podido cargar las estadísticas',
+        )
+      })
+      .finally(() => {
+        if (!controlador.signal.aborted) setCargando(false)
+      })
+
+    return () => controlador.abort()
+  }, [])
+
+  const fecha = fechaCorta(actualizado)
+
   return (
     <section className="seccion-contenido pagina-estadisticas">
       <div className="titulo-seccion">
@@ -12,58 +66,61 @@ function Jugadores() {
         <p>LaLiga · Primera División</p>
       </div>
 
-      <p className="introduccion-estadisticas">
-        Consulta las clasificaciones individuales de la competición.
-      </p>
+      <div className="pestanas-jugadores" role="tablist" aria-label="Sección de jugadores">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={pestana === 'clasificaciones'}
+          className={pestana === 'clasificaciones' ? 'activa' : ''}
+          onClick={() => setPestana('clasificaciones')}
+        >
+          🏆 Clasificaciones
+        </button>
 
-      <div className="rejilla-estadisticas">
-        <article className="tarjeta-estadistica">
-          <div className="estadistica-icono">⚽</div>
-          <span className="estadistica-etiqueta">GOLES</span>
-          <h3>Máximos goleadores</h3>
-          <p className="estadistica-pendiente">
-            Estadísticas pendientes de conectar
-          </p>
-          <div className="puestos-pendientes">
-            <span>1.º <b>Por determinar</b></span>
-            <span>2.º <b>Por determinar</b></span>
-            <span>3.º <b>Por determinar</b></span>
-          </div>
-        </article>
-
-        <article className="tarjeta-estadistica">
-          <div className="estadistica-icono">🎯</div>
-          <span className="estadistica-etiqueta">ASISTENCIAS</span>
-          <h3>Máximos asistentes</h3>
-          <p className="estadistica-pendiente">
-            Estadísticas pendientes de conectar
-          </p>
-          <div className="puestos-pendientes">
-            <span>1.º <b>Por determinar</b></span>
-            <span>2.º <b>Por determinar</b></span>
-            <span>3.º <b>Por determinar</b></span>
-          </div>
-        </article>
-
-        <article className="tarjeta-estadistica">
-          <div className="estadistica-icono">⏱️</div>
-          <span className="estadistica-etiqueta">PARTICIPACIÓN</span>
-          <h3>Más partidos jugados</h3>
-          <p className="estadistica-pendiente">
-            Estadísticas pendientes de conectar
-          </p>
-          <div className="puestos-pendientes">
-            <span>1.º <b>Por determinar</b></span>
-            <span>2.º <b>Por determinar</b></span>
-            <span>3.º <b>Por determinar</b></span>
-          </div>
-        </article>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={pestana === 'comparador'}
+          className={pestana === 'comparador' ? 'activa' : ''}
+          onClick={() => setPestana('comparador')}
+        >
+          ⚖️ Comparador
+        </button>
       </div>
 
-      <p className="aviso-estadisticas">
-        Los puestos se completarán cuando conectemos la fuente de
-        estadísticas de la temporada. No mostramos cifras inventadas.
-      </p>
+      {cargando && <p className="estado-jugadores">Cargando estadísticas…</p>}
+
+      {!cargando && error && (
+        <p className="estado-jugadores estado-error" role="alert">
+          {error}. Comprueba que el servidor está activo e inténtalo de nuevo.
+        </p>
+      )}
+
+      {!cargando && !error && jugadores.length === 0 && (
+        <div className="estado-jugadores">
+          <strong>Todavía no hay estadísticas guardadas</strong>
+          <p>
+            Cuando importes las estadísticas de los jugadores a la base de datos, aparecerán aquí
+            automáticamente.
+          </p>
+        </div>
+      )}
+
+      {!cargando && !error && jugadores.length > 0 && (
+        <>
+          {pestana === 'clasificaciones' ? (
+            <TablasJugadores jugadores={jugadores} />
+          ) : (
+            <ComparadorJugadores jugadores={jugadores} />
+          )}
+
+          <p className="aviso-estadisticas">
+            Datos de {jugadores.length} jugadores guardados en EstadLiga
+            {fecha && <> · Última actualización: {fecha}</>}. Solo se muestran cifras reales; en las
+            clasificaciones no aparecen los jugadores con valor cero.
+          </p>
+        </>
+      )}
     </section>
   )
 }

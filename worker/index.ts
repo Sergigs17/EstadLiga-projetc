@@ -183,7 +183,7 @@ function respuestaError(
 
 const TORNEO_LALIGA = 8
 const TEMPORADA_LALIGA = 97268
-const JUGADORES_ESTADISTICAS_POR_DIA = 25
+const JUGADORES_POR_LOTE = 25
 
 /** Actualiza la plantilla de un equipo sin borrar jugadores históricos. */
 async function actualizarPlantillaProgramada(
@@ -268,109 +268,414 @@ async function actualizarPlantillaProgramada(
   return jugadores.length
 }
 
-async function ejecutarActualizacionDiaria(env: Env): Promise<void> {
+
+interface ErrorActualizacion {
+  id: number
+  tipo: 'plantilla' | 'equipo' | 'jugador'
+  entidad_id: number
+  intentos: number
+}
+
+async function registrarErrorActualizacion(
+  env: Env,
+  actualizacionId: number,
+  tipo: ErrorActualizacion['tipo'],
+  entidadId: number,
+  nombre: string,
+  error: unknown,
+): Promise<void> {
+  const mensaje = error instanceof Error ? error.message : String(error)
+
+  await env.estadliga_db.prepare(`
+    INSERT INTO errores_actualizacion_estadisticas
+      (actualizacion_id, tipo, entidad_id, nombre, intentos, ultimo_error)
+    VALUES (?, ?, ?, ?, 1, ?)
+    ON CONFLICT(actualizacion_id, tipo, entidad_id)
+    DO UPDATE SET
+      intentos = errores_actualizacion_estadisticas.intentos + 1,
+      ultimo_error = excluded.ultimo_error,
+      resuelto = 0,
+      actualizado_en = CURRENT_TIMESTAMP
+  `).bind(actualizacionId, tipo, entidadId, nombre, mensaje).run()
+
+  await env.estadliga_db.prepare(`
+    UPDATE control_actualizacion_estadisticas
+    SET errores = errores + 1,
+        actualizado_en = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).bind(actualizacionId).run()
+}
+
+async function resolverErrorActualizacion(
+  env: Env,
+  errorId: number,
+): Promise<void> {
+  await env.estadliga_db.prepare(`
+    UPDATE errores_actualizacion_estadisticas
+    SET resuelto = 1, actualizado_en = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).bind(errorId).run()
+}
+
+async function actualizarEstadisticasSemanales(env: Env, fechaEjecucion: Date): Promise<void> {
   if (!env.APIFY_TOKEN) {
-    console.error('[EstadLiga cron] Falta APIFY_TOKEN; se cancela la actualización.')
+    console.error('[EstadLiga semanal] Falta APIFY_TOKEN.')
     return
   }
 
-  const equiposResult = await env.estadliga_db
-    .prepare('SELECT id, nombre, api_id FROM equipos WHERE api_id IS NOT NULL ORDER BY id')
-    .all<EquipoBD>()
-  const equipos = equiposResult.results
+  // La fecha y hora se calculan en horario peninsular, no en UTC.
+  const partes = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Madrid',
+    weekday: 'short',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(fechaEjecucion)
 
-  let plantillasOk = 0
-  let erroresPlantillas = 0
-  let estadisticasEquiposOk = 0
-  let erroresEstadisticasEquipos = 0
-  let estadisticasJugadoresOk = 0
-  let erroresEstadisticasJugadores = 0
+  const valor = (tipo: string) =>
+    partes.find((parte) => parte.type === tipo)?.value ?? ''
 
-  // Actualizar plantillas en grupos de dos para limitar las llamadas simultáneas.
-  for (let i = 0; i < equipos.length; i += 2) {
-    const grupo = equipos.slice(i, i + 2)
-    await Promise.all(grupo.map(async (equipo) => {
-      try {
-        const total = await actualizarPlantillaProgramada(env, equipo, env.APIFY_TOKEN)
-        plantillasOk++
-        console.log(`[EstadLiga cron] Plantilla actualizada: ${equipo.nombre} (${total} jugadores)`)
-      } catch (error) {
-        erroresPlantillas++
-        console.error(`[EstadLiga cron] Error de plantilla en ${equipo.nombre}:`, error)
-      }
-    }))
+  const fechaLocal = `${valor('year')}-${valor('month')}-${valor('day')}`
+  const esLunesALas23 = valor('weekday') === 'Mon' &&
+    valor('hour') === '23' &&
+    valor('minute') === '00'
+
+  // Solo se crea una actualización nueva los lunes a las 23:00.
+  if (esLunesALas23) {
+    const totalEquipos = await env.estadliga_db.prepare(
+      'SELECT COUNT(*) AS total FROM equipos WHERE api_id IS NOT NULL',
+    ).first<{ total: number }>()
+
+    await env.estadliga_db.prepare(`
+      INSERT OR IGNORE INTO control_actualizacion_estadisticas
+        (semana, estado, total_equipos)
+      VALUES (?, 'equipos', ?)
+    `).bind(fechaLocal, totalEquipos?.total ?? 0).run()
+
+    console.log(`[EstadLiga semanal] Inicio de actualización: ${fechaLocal}`)
   }
 
-  // Actualizar las estadísticas de los equipos para LaLiga y la temporada configurada.
-  for (let i = 0; i < equipos.length; i += 2) {
-    const grupo = equipos.slice(i, i + 2)
-    await Promise.all(grupo.map(async (equipo) => {
-      if (!equipo.api_id) return
-      try {
-        const respuesta = await obtenerEstadisticasEquipo(
-          equipo.api_id, TORNEO_LALIGA, TEMPORADA_LALIGA, env.APIFY_TOKEN,
-        )
-        if (!respuesta.ok) throw new Error(`SofaScore respondió ${respuesta.status}`)
-        await guardarEstadisticasEquipo(
-          env, equipo.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
-        )
-        estadisticasEquiposOk++
-      } catch (error) {
-        erroresEstadisticasEquipos++
-        console.error(`[EstadLiga cron] Error de estadísticas del equipo ${equipo.nombre}:`, error)
-      }
-    }))
+  // Recuperar cualquier actualización que todavía esté pendiente.
+  const actualizacion = await env.estadliga_db.prepare(`
+    SELECT id, estado
+    FROM control_actualizacion_estadisticas
+    WHERE estado IN ('equipos', 'jugadores', 'reintentos')
+    ORDER BY id ASC
+    LIMIT 1
+  `).first<{ id: number; estado: string }>()
+
+  if (!actualizacion) return
+
+  // Evitar que dos ejecuciones trabajen sobre la misma actualización.
+  const bloqueo = await env.estadliga_db.prepare(`
+    UPDATE control_actualizacion_estadisticas
+    SET bloqueado_hasta = datetime('now', '+20 minutes')
+    WHERE id = ?
+      AND (bloqueado_hasta IS NULL OR bloqueado_hasta <= datetime('now'))
+  `).bind(actualizacion.id).run()
+
+  if (bloqueo.meta.changes === 0) {
+    console.log('[EstadLiga semanal] Ya existe una ejecución activa.')
+    return
   }
 
-  // Refrescar un lote de jugadores cada día, priorizando los que llevan más tiempo sin actualizar.
-  const jugadoresResult = await env.estadliga_db.prepare(
-    `SELECT j.id, j.nombre, j.apellido, j.api_id
-     FROM jugadores j
-     LEFT JOIN estadisticas_jugadores e
-       ON e.jugador_id = j.id
-       AND e.unique_tournament_id = ?
-       AND e.season_id = ?
-     WHERE j.api_id IS NOT NULL
-     ORDER BY CASE WHEN e.actualizado_en IS NULL THEN 0 ELSE 1 END,
-              e.actualizado_en ASC, j.id ASC
-     LIMIT ?`,
-  ).bind(TORNEO_LALIGA, TEMPORADA_LALIGA, JUGADORES_ESTADISTICAS_POR_DIA)
-    .all<JugadorBD>()
-  const jugadores = jugadoresResult.results
+  try {
+    const id = actualizacion.id
 
-  for (let i = 0; i < jugadores.length; i += 2) {
-    const grupo = jugadores.slice(i, i + 2)
-    await Promise.all(grupo.map(async (jugador) => {
-      if (!jugador.api_id) return
-      try {
-        const respuesta = await obtenerEstadisticas(
-          jugador.api_id, TORNEO_LALIGA, TEMPORADA_LALIGA, env.APIFY_TOKEN,
-        )
-        if (!respuesta.ok) throw new Error(`SofaScore respondió ${respuesta.status}`)
-        await guardarEstadisticas(
-          env, jugador.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
-        )
-        estadisticasJugadoresOk++
-      } catch (error) {
-        erroresEstadisticasJugadores++
-        console.error(`[EstadLiga cron] Error de estadísticas del jugador ${jugador.id}:`, error)
+    // FASE 1: plantillas y estadísticas de los equipos.
+    if (actualizacion.estado === 'equipos') {
+      const control = await env.estadliga_db.prepare(`
+        SELECT ultimo_equipo_id
+        FROM control_actualizacion_estadisticas
+        WHERE id = ?
+      `).bind(id).first<{ ultimo_equipo_id: number }>()
+
+      const equipos = await env.estadliga_db.prepare(`
+        SELECT id, nombre, api_id
+        FROM equipos
+        WHERE api_id IS NOT NULL AND id > ?
+        ORDER BY id
+        LIMIT 2
+      `).bind(control?.ultimo_equipo_id ?? 0).all<EquipoBD>()
+
+      if (equipos.results.length === 0) {
+        const total = await env.estadliga_db.prepare(
+          'SELECT COUNT(*) AS total FROM jugadores WHERE api_id IS NOT NULL',
+        ).first<{ total: number }>()
+
+        await env.estadliga_db.prepare(`
+          UPDATE control_actualizacion_estadisticas
+          SET estado = 'jugadores',
+              total_jugadores = ?,
+              actualizado_en = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(total?.total ?? 0, id).run()
+
+        console.log('[EstadLiga semanal] Equipos completados. Comienza la fase de jugadores.')
+        return
       }
-    }))
-  }
 
-  console.log('[EstadLiga cron] Resumen diario', {
-    equipos: equipos.length,
-    plantillasOk,
-    erroresPlantillas,
-    estadisticasEquiposOk,
-    erroresEstadisticasEquipos,
-    jugadoresProcesados: jugadores.length,
-    estadisticasJugadoresOk,
-    erroresEstadisticasJugadores,
-    torneo: TORNEO_LALIGA,
-    temporada: TEMPORADA_LALIGA,
-  })
+      for (const equipo of equipos.results) {
+        let plantillaOk = false
+        let estadisticasOk = false
+
+        try {
+          const total = await actualizarPlantillaProgramada(
+            env, equipo, env.APIFY_TOKEN,
+          )
+          plantillaOk = true
+          console.log(`[EstadLiga semanal] Plantilla: ${equipo.nombre} (${total} jugadores)`)
+        } catch (error) {
+          await registrarErrorActualizacion(
+            env, id, 'plantilla', equipo.id, equipo.nombre, error,
+          )
+          console.error(`[EstadLiga semanal] Error de plantilla: ${equipo.nombre}`, error)
+        }
+
+        try {
+          if (!equipo.api_id) throw new Error('El equipo no tiene api_id')
+
+          const respuesta = await obtenerEstadisticasEquipo(
+            equipo.api_id,
+            TORNEO_LALIGA,
+            TEMPORADA_LALIGA,
+            env.APIFY_TOKEN,
+          )
+
+          if (!respuesta.ok) {
+            throw new Error(`SofaScore respondió ${respuesta.status}`)
+          }
+
+          await guardarEstadisticasEquipo(
+            env, equipo.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
+          )
+          estadisticasOk = true
+        } catch (error) {
+          await registrarErrorActualizacion(
+            env, id, 'equipo', equipo.id, equipo.nombre, error,
+          )
+          console.error(`[EstadLiga semanal] Error de estadísticas: ${equipo.nombre}`, error)
+        }
+
+        await env.estadliga_db.prepare(`
+          UPDATE control_actualizacion_estadisticas
+          SET ultimo_equipo_id = ?,
+              equipos_ok = equipos_ok + ?,
+              actualizado_en = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(
+          equipo.id,
+          plantillaOk && estadisticasOk ? 1 : 0,
+          id,
+        ).run()
+      }
+
+      return
+    }
+
+    // FASE 2: estadísticas de todos los jugadores, en lotes de 25.
+    if (actualizacion.estado === 'jugadores') {
+      const control = await env.estadliga_db.prepare(`
+        SELECT ultimo_jugador_id
+        FROM control_actualizacion_estadisticas
+        WHERE id = ?
+      `).bind(id).first<{ ultimo_jugador_id: number }>()
+
+      const jugadores = await env.estadliga_db.prepare(`
+        SELECT id, nombre, apellido, api_id
+        FROM jugadores
+        WHERE api_id IS NOT NULL AND id > ?
+        ORDER BY id
+        LIMIT ?
+      `).bind(
+        control?.ultimo_jugador_id ?? 0,
+        JUGADORES_POR_LOTE,
+      ).all<JugadorBD>()
+
+      if (jugadores.results.length === 0) {
+        await env.estadliga_db.prepare(`
+          UPDATE control_actualizacion_estadisticas
+          SET estado = 'reintentos',
+              actualizado_en = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(id).run()
+
+        console.log('[EstadLiga semanal] Primera pasada de jugadores completada.')
+        return
+      }
+
+      // Dos consultas simultáneas como máximo.
+      for (let i = 0; i < jugadores.results.length; i += 2) {
+        const grupo = jugadores.results.slice(i, i + 2)
+
+        await Promise.all(grupo.map(async (jugador) => {
+          try {
+            if (!jugador.api_id) throw new Error('El jugador no tiene api_id')
+
+            const respuesta = await obtenerEstadisticas(
+              jugador.api_id,
+              TORNEO_LALIGA,
+              TEMPORADA_LALIGA,
+              env.APIFY_TOKEN,
+            )
+
+            if (!respuesta.ok) {
+              throw new Error(`SofaScore respondió ${respuesta.status}`)
+            }
+
+            await guardarEstadisticas(
+              env, jugador.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
+            )
+
+            await env.estadliga_db.prepare(`
+              UPDATE control_actualizacion_estadisticas
+              SET jugadores_ok = jugadores_ok + 1,
+                  actualizado_en = CURRENT_TIMESTAMP
+              WHERE id = ?
+            `).bind(id).run()
+          } catch (error) {
+            await registrarErrorActualizacion(
+              env,
+              id,
+              'jugador',
+              jugador.id,
+              `${jugador.nombre} ${jugador.apellido ?? ''}`.trim(),
+              error,
+            )
+            console.error(`[EstadLiga semanal] Error en jugador ${jugador.id}:`, error)
+          } finally {
+            await env.estadliga_db.prepare(`
+              UPDATE control_actualizacion_estadisticas
+              SET ultimo_jugador_id = MAX(ultimo_jugador_id, ?),
+                  actualizado_en = CURRENT_TIMESTAMP
+              WHERE id = ?
+            `).bind(jugador.id, id).run()
+          }
+        }))
+      }
+
+      console.log(`[EstadLiga semanal] Lote procesado: ${jugadores.results.length} jugadores.`)
+      return
+    }
+
+    // FASE 3: reintentar los errores, con un máximo de tres intentos.
+    if (actualizacion.estado === 'reintentos') {
+      const pendientes = await env.estadliga_db.prepare(`
+        SELECT id, tipo, entidad_id, intentos
+        FROM errores_actualizacion_estadisticas
+        WHERE actualizacion_id = ?
+          AND resuelto = 0
+          AND intentos < 3
+        ORDER BY id
+        LIMIT 10
+      `).bind(id).all<ErrorActualizacion>()
+
+      for (const errorPendiente of pendientes.results) {
+        try {
+          if (errorPendiente.tipo === 'jugador') {
+            const jugador = await env.estadliga_db.prepare(`
+              SELECT id, nombre, apellido, api_id
+              FROM jugadores WHERE id = ?
+            `).bind(errorPendiente.entidad_id).first<JugadorBD>()
+
+            if (!jugador?.api_id) {
+              await resolverErrorActualizacion(env, errorPendiente.id)
+              continue
+            }
+
+            const respuesta = await obtenerEstadisticas(
+              jugador.api_id, TORNEO_LALIGA, TEMPORADA_LALIGA, env.APIFY_TOKEN,
+            )
+            if (!respuesta.ok) throw new Error(`SofaScore respondió ${respuesta.status}`)
+
+            await guardarEstadisticas(
+              env, jugador.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
+            )
+          } else {
+            const equipo = await env.estadliga_db.prepare(`
+              SELECT id, nombre, api_id
+              FROM equipos WHERE id = ?
+            `).bind(errorPendiente.entidad_id).first<EquipoBD>()
+
+            if (!equipo?.api_id) {
+              await resolverErrorActualizacion(env, errorPendiente.id)
+              continue
+            }
+
+            if (errorPendiente.tipo === 'plantilla') {
+              await actualizarPlantillaProgramada(env, equipo, env.APIFY_TOKEN)
+            } else {
+              const respuesta = await obtenerEstadisticasEquipo(
+                equipo.api_id, TORNEO_LALIGA, TEMPORADA_LALIGA, env.APIFY_TOKEN,
+              )
+              if (!respuesta.ok) throw new Error(`SofaScore respondió ${respuesta.status}`)
+
+              await guardarEstadisticasEquipo(
+                env, equipo.id, TORNEO_LALIGA, TEMPORADA_LALIGA, respuesta.datos,
+              )
+            }
+          }
+
+          await resolverErrorActualizacion(env, errorPendiente.id)
+          console.log(`[EstadLiga semanal] Error resuelto: ${errorPendiente.tipo} ${errorPendiente.entidad_id}`)
+        } catch (error) {
+          await registrarErrorActualizacion(
+            env,
+            id,
+            errorPendiente.tipo,
+            errorPendiente.entidad_id,
+            `${errorPendiente.tipo} ${errorPendiente.entidad_id}`,
+            error,
+          )
+          console.error('[EstadLiga semanal] Falló un reintento:', error)
+        }
+      }
+
+      // Cuando ya no quedan errores con intentos disponibles, finalizar.
+      const quedanReintentos = await env.estadliga_db.prepare(`
+        SELECT COUNT(*) AS total
+        FROM errores_actualizacion_estadisticas
+        WHERE actualizacion_id = ?
+          AND resuelto = 0
+          AND intentos < 3
+      `).bind(id).first<{ total: number }>()
+
+      if ((quedanReintentos?.total ?? 0) === 0) {
+        const erroresSinResolver = await env.estadliga_db.prepare(`
+          SELECT COUNT(*) AS total
+          FROM errores_actualizacion_estadisticas
+          WHERE actualizacion_id = ? AND resuelto = 0
+        `).bind(id).first<{ total: number }>()
+
+        const estadoFinal = (erroresSinResolver?.total ?? 0) === 0
+          ? 'completada'
+          : 'completada_con_errores'
+
+        await env.estadliga_db.prepare(`
+          UPDATE control_actualizacion_estadisticas
+          SET estado = ?,
+              finalizado_en = CURRENT_TIMESTAMP,
+              actualizado_en = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).bind(estadoFinal, id).run()
+
+        console.log(`[EstadLiga semanal] Actualización finalizada: ${estadoFinal}`)
+      }
+    }
+  } catch (error) {
+    console.error('[EstadLiga semanal] Error general:', error)
+  } finally {
+    await env.estadliga_db.prepare(`
+      UPDATE control_actualizacion_estadisticas
+      SET bloqueado_hasta = NULL
+      WHERE id = ?
+    `).bind(actualizacion.id).run()
+  }
 }
+
 async function actualizarCachesFootballData(env: Env): Promise<void> {
   const ahora = new Date();
 
@@ -486,6 +791,39 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
   } catch (error) {
     console.error("Error actualizando los partidos:", error);
   }
+}
+
+/** Estadísticas que se envían a la web para clasificaciones y comparador. */
+const CLAVES_ESTADISTICAS_WEB = [
+  'rating', 'appearances', 'matchesStarted', 'minutesPlayed',
+  'goals', 'assists', 'goalsAssistsSum', 'expectedGoals', 'expectedAssists',
+  'bigChancesCreated', 'bigChancesMissed',
+  'totalShots', 'shotsOnTarget', 'goalConversionPercentage',
+  'penaltyGoals', 'headedGoals',
+  'keyPasses', 'totalPasses', 'accuratePassesPercentage',
+  'accurateLongBallsPercentage', 'accurateCrosses',
+  'successfulDribbles', 'successfulDribblesPercentage',
+  'tackles', 'tacklesWon', 'interceptions', 'clearances', 'ballRecovery',
+  'totalDuelsWon', 'totalDuelsWonPercentage', 'aerialDuelsWon',
+  'fouls', 'wasFouled', 'yellowCards', 'redCards', 'offsides',
+  'saves', 'savesPercentage', 'cleanSheet', 'goalsConceded',
+  'penaltySave', 'highClaims',
+  'kilometersCovered', 'topSpeed', 'numberOfSprints',
+] as const
+
+interface FilaEstadisticasWeb {
+  id: number
+  nombre: string
+  apellido: string | null
+  posicion: string | null
+  nacionalidad: string | null
+  fecha_nacimiento: string | null
+  dorsal: number | null
+  equipo_id: number | null
+  api_id: number | null
+  equipo: string | null
+  estadisticas_json: string
+  actualizado_en: string | null
 }
 
 export default {
@@ -1502,6 +1840,132 @@ export default {
       }
     }
 
+    // Estadísticas de todos los jugadores guardadas en D1 (solo lectura).
+    // Alimentan las clasificaciones y el comparador de la página Jugadores.
+    // No consulta ninguna API externa: solo lee lo que ya está guardado.
+    if (
+      url.pathname === '/api/jugadores/estadisticas' &&
+      request.method === 'GET'
+    ) {
+      const torneoId = Number(
+        url.searchParams.get('unique_tournament_id') ?? TORNEO_LALIGA,
+      )
+      const temporadaId = Number(
+        url.searchParams.get('season_id') ?? TEMPORADA_LALIGA,
+      )
+
+      if (
+        !Number.isInteger(torneoId) ||
+        torneoId <= 0 ||
+        !Number.isInteger(temporadaId) ||
+        temporadaId <= 0
+      ) {
+        return respuestaError(
+          'unique_tournament_id y season_id deben ser números válidos',
+          400,
+        )
+      }
+
+      try {
+        const { results } = await env.estadliga_db
+          .prepare(
+            `SELECT jugadores.id, jugadores.nombre, jugadores.apellido,
+                    jugadores.posicion, jugadores.nacionalidad,
+                    jugadores.fecha_nacimiento, jugadores.dorsal,
+                    jugadores.equipo_id, jugadores.api_id,
+                    equipos.nombre AS equipo,
+                    estadisticas_jugadores.estadisticas_json,
+                    estadisticas_jugadores.actualizado_en
+             FROM estadisticas_jugadores
+             JOIN jugadores
+               ON jugadores.id = estadisticas_jugadores.jugador_id
+             LEFT JOIN equipos
+               ON equipos.id = jugadores.equipo_id
+             WHERE estadisticas_jugadores.unique_tournament_id = ?
+               AND estadisticas_jugadores.season_id = ?`,
+          )
+          .bind(torneoId, temporadaId)
+          .all<FilaEstadisticasWeb>()
+
+        let ultimaActualizacion: string | null = null
+
+        const jugadores = results.flatMap((fila) => {
+          let datos: { statistics?: Record<string, unknown> }
+
+          try {
+            datos = JSON.parse(fila.estadisticas_json)
+          } catch {
+            return []
+          }
+
+          const originales = datos.statistics ?? {}
+          const stats: Record<string, number> = {}
+
+          for (const clave of CLAVES_ESTADISTICAS_WEB) {
+            const valor = originales[clave]
+
+            if (valor === null || valor === undefined || valor === '') {
+              continue
+            }
+
+            const numero = Number(valor)
+
+            if (Number.isFinite(numero)) {
+              stats[clave] = numero
+            }
+          }
+
+          // Sin partidos jugados no hay nada que clasificar.
+          if (!stats.appearances && !stats.minutesPlayed) {
+            return []
+          }
+
+          if (
+            fila.actualizado_en &&
+            (!ultimaActualizacion || fila.actualizado_en > ultimaActualizacion)
+          ) {
+            ultimaActualizacion = fila.actualizado_en
+          }
+
+          return [
+            {
+              id: fila.id,
+              nombre: fila.nombre,
+              apellido: fila.apellido,
+              posicion: fila.posicion,
+              nacionalidad: fila.nacionalidad,
+              fecha_nacimiento: fila.fecha_nacimiento,
+              dorsal: fila.dorsal,
+              equipo_id: fila.equipo_id,
+              api_id: fila.api_id,
+              equipo: fila.equipo ?? '',
+              stats,
+            },
+          ]
+        })
+
+        return Response.json(
+          {
+            unique_tournament_id: torneoId,
+            season_id: temporadaId,
+            total: jugadores.length,
+            actualizado_en: ultimaActualizacion,
+            jugadores,
+          },
+          { headers: { 'Cache-Control': 'public, max-age=300' } },
+        )
+      } catch (error) {
+        return Response.json(
+          {
+            error: 'No se han podido consultar las estadísticas guardadas',
+            detalle:
+              error instanceof Error ? error.message : String(error),
+          },
+          { status: 500 },
+        )
+      }
+    }
+
     // Obtener jugadores guardados en D1.
     if (url.pathname === '/api/jugadores' && request.method === 'GET') {
       const equipoId = url.searchParams.get('equipo_id')
@@ -1831,8 +2295,13 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ): Promise<void> {
-    if (controller.cron === "0 21 * * 1") {
-      ctx.waitUntil(ejecutarActualizacionDiaria(env));
+    if (controller.cron === "*/5 * * * *") {
+      ctx.waitUntil(
+        actualizarEstadisticasSemanales(
+          env,
+          new Date(controller.scheduledTime),
+        ),
+      );
       return;
     }
 

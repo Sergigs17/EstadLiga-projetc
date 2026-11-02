@@ -1,0 +1,229 @@
+/* =====================================================
+   VIÑETA DE UN TROFEO (ventana emergente con su historia)
+   ===================================================== */
+
+.mt-dialogo {
+  width: min(880px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radio-grande, 24px);
+  background: var(--papel, #fff);
+  color: var(--tinta);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 40%);
+}
+
+.mt-dialogo::backdrop {
+  background: rgb(22 17 15 / 62%);
+  backdrop-filter: blur(3px);
+}
+
+.mt-dialogo[open] {
+  animation: mt-entrar 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.mt-dialogo[open]::backdrop {
+  animation: mt-fondo 0.25s ease;
+}
+
+@keyframes mt-entrar {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+}
+
+@keyframes mt-fondo {
+  from { opacity: 0; }
+}
+
+.mt-tarjeta {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  max-height: calc(100dvh - 24px);
+}
+
+.mt-cerrar {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(22 17 15 / 8%);
+  color: var(--tinta);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mt-cerrar:hover {
+  background: var(--rojo);
+  color: #fff;
+}
+
+.mt-cerrar:focus-visible {
+  outline: 3px solid var(--rojo);
+  outline-offset: 2px;
+}
+
+/* ───── Vitrina con el trofeo ───── */
+
+.mt-vitrina {
+  display: grid;
+  place-items: center;
+  padding: 36px 24px;
+  background:
+    radial-gradient(circle at 50% 38%, rgb(255 255 255 / 95%), transparent 62%),
+    linear-gradient(160deg, var(--rojo-suave, #fdeceb), color-mix(in srgb, var(--rojo) 22%, #fff));
+}
+
+.mt-vitrina img {
+  display: block;
+  max-width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 22px rgb(22 17 15 / 28%));
+}
+
+.mt-imagen-vacia {
+  font-size: 6rem;
+}
+
+/* ───── Texto ───── */
+
+.mt-contenido {
+  min-width: 0;
+  padding: 34px 36px 34px 32px;
+  overflow-y: auto;
+}
+
+.mt-categoria {
+  display: inline-block;
+  color: var(--rojo);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mt-contenido h2 {
+  margin: 6px 44px 14px 0;
+  color: var(--tinta);
+  font-family: var(--fuente-titulo);
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.mt-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.mt-etiquetas span {
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: var(--papel-calido);
+  color: var(--tinta-suave);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.mt-club {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--rojo);
+  border-radius: 0 12px 12px 0;
+  background: var(--rojo-suave);
+  color: var(--tinta);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.mt-contenido h3 {
+  margin: 22px 0 8px;
+  color: var(--tinta);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mt-contenido p {
+  margin: 0 0 12px;
+  color: var(--tinta-suave);
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+.mt-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mt-lista li {
+  position: relative;
+  margin-bottom: 7px;
+  padding-left: 22px;
+  color: var(--tinta-suave);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.mt-lista li::before {
+  content: '🏆';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-size: 0.78rem;
+}
+
+.mt-datos li::before {
+  content: '💡';
+}
+
+/* ───── Adaptable ───── */
+
+@media (max-width: 700px) {
+  .mt-dialogo {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  .mt-tarjeta {
+    grid-template-columns: 1fr;
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+  }
+
+  .mt-vitrina {
+    padding: 28px 24px 18px;
+  }
+
+  .mt-vitrina img {
+    max-height: 200px;
+  }
+
+  .mt-contenido {
+    padding: 22px 22px 28px;
+    overflow: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mt-dialogo[open],
+  .mt-dialogo[open]::backdrop {
+    animation: none;
+  }
+}

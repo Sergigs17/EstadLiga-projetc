@@ -11,12 +11,12 @@ button {
   font: inherit;
 }
 
-/* Margen lateral común: 5% en pantallas normales y centrado a 1200px en grandes */
+/* Margen lateral comÃºn: 5% en pantallas normales y centrado a 1200px en grandes */
 .estadliga {
   --margen: max(20px, 5vw, calc((100vw - 1200px) / 2));
 }
 
-/* ───────── CABECERA ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ CABECERA â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .cabecera {
   position: sticky;
@@ -30,6 +30,12 @@ button {
   gap: 28px;
   background: var(--papel);
   border-bottom: 3px solid var(--rojo);
+}
+
+.cabecera-acciones {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .logo {
@@ -111,7 +117,7 @@ button {
   transform: translateX(-50%) scale(1);
 }
 
-/* ───────── BOTONES ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ BOTONES â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .boton-login,
 .boton-secundario {
@@ -155,7 +161,7 @@ button {
   background: var(--rojo-oscuro);
 }
 
-/* ───────── ETIQUETAS ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ ETIQUETAS â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .etiqueta,
 .subtitulo {
@@ -178,7 +184,7 @@ button {
   border-radius: 50%;
 }
 
-/* ───────── PORTADA ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ PORTADA â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .presentacion {
   position: relative;
@@ -215,7 +221,7 @@ button {
   font-size: 1.1rem;
 }
 
-/* El círculo del centro del campo, recortado por el borde */
+/* El cÃ­rculo del centro del campo, recortado por el borde */
 .presentacion-visual {
   position: absolute;
   top: 50%;
@@ -255,7 +261,7 @@ button {
   height: 220px;
 }
 
-/* El balón se convierte en el punto central del campo */
+/* El balÃ³n se convierte en el punto central del campo */
 .balon {
   width: 22px;
   height: 22px;
@@ -296,7 +302,7 @@ button {
   font-size: 0.74rem;
 }
 
-/* ───────── SECCIONES ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ SECCIONES â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .seccion-contenido {
   padding: 72px var(--margen);
@@ -381,7 +387,7 @@ button {
   text-transform: uppercase;
 }
 
-/* Única banda roja a todo color */
+/* Ãšnica banda roja a todo color */
 .bloque-informativo {
   margin: 0 0 72px;
   padding: 56px var(--margen);
@@ -421,7 +427,7 @@ button {
   color: var(--rojo);
 }
 
-/* ───────── PIE ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ PIE â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .pie {
   margin-top: auto;
@@ -449,7 +455,7 @@ button {
   font-size: 0.82rem;
 }
 
-/* ───────── DIRECTORIO DE EQUIPOS ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ DIRECTORIO DE EQUIPOS â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .rejilla-equipos {
   display: grid;
@@ -496,7 +502,7 @@ button {
   transform: scaleX(1);
 }
 
-/* El escudo sobre su círculo */
+/* El escudo sobre su cÃ­rculo */
 .tarjeta-equipo img,
 .escudo-pendiente {
   width: 108px;
@@ -555,7 +561,7 @@ button {
   outline-offset: 3px;
 }
 
-/* ───────── JUGADORES ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ JUGADORES â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .pagina-jugadores {
   min-height: 55vh;
@@ -662,7 +668,7 @@ button {
   font-size: 0.86rem;
 }
 
-/* ───────── BASE DE LA FICHA DE EQUIPO (se afina en EquipoDetalle.css) ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ BASE DE LA FICHA DE EQUIPO (se afina en EquipoDetalle.css) â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .volver-enlace {
   display: inline-block;
@@ -723,7 +729,7 @@ button {
   font-size: 0.92rem;
 }
 
-/* ───────── ADAPTABLE ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ ADAPTABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 @media (max-width: 1100px) {
   .cabecera {
@@ -770,7 +776,7 @@ button {
 }
 
 @media (max-width: 700px) {
-  /* Cabecera: logo y botón en la misma fila */
+  /* Cabecera: logo y botÃ³n en la misma fila */
   .cabecera {
     gap: 12px;
   }
@@ -850,5 +856,83 @@ button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ CABECERA CON BUSCADOR â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.boton-login {
+  white-space: nowrap;
+}
+
+.cabecera-acciones {
+  margin-left: auto;
+}
+
+/* En pantallas anchas el menÃº cabe en una sola fila: se ajusta la
+   separaciÃ³n para dejar sitio a la lupa del buscador. */
+@media (min-width: 1280px) {
+  .navegacion {
+    gap: clamp(16px, 2vw, 30px);
+  }
+}
+
+/* Por debajo de 1280 px el menÃº pasa a su propia fila. */
+@media (max-width: 1279px) {
+  .cabecera {
+    padding-block: 14px;
+    flex-wrap: wrap;
+  }
+
+  .navegacion {
+    order: 3;
+    width: 100%;
+    align-self: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+  }
+
+  .navegacion a {
+    padding: 8px 0 16px;
+  }
+
+  .navegacion a::after {
+    bottom: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cabecera {
+    gap: 12px;
+  }
+
+  .logo-imagen {
+    width: 118px;
+    height: 42px;
+  }
+
+  .cabecera-acciones {
+    gap: 8px;
+  }
+
+  .buscador-boton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .boton-login {
+    padding: 9px 14px;
+    font-size: 0.68rem;
+  }
+
+  /* Con la pestaÃ±a Tienda, el menÃº cabe en dos filas. */
+  .navegacion {
+    gap: 4px 16px;
+  }
+
+  .navegacion a {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
   }
 }

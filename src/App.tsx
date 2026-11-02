@@ -11,6 +11,7 @@ import Clasificacion from './pages/Clasificacion'
 import Partidos from './pages/Partidos'
 import Quiniela from './pages/Quiniela'
 import Tienda from './pages/Tienda'
+import BuscadorGlobal from './components/BuscadorGlobal'
 
 function leerRuta() {
   return window.location.hash.replace(/^#\/?/, '') || 'inicio'
@@ -239,9 +240,13 @@ function App() {
           </a>
         </nav>
 
-        <button className="boton-login" type="button">
-          Iniciar sesión
-        </button>
+        <div className="cabecera-acciones">
+          <BuscadorGlobal />
+
+          <button className="boton-login" type="button">
+            Iniciar sesión
+          </button>
+        </div>
       </header>
 
       <main>
