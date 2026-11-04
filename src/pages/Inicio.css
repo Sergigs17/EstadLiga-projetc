@@ -1,0 +1,21 @@
+
+/* Estilos propios de la página de inicio.
+   Los estilos generales siguen en App.css. */
+
+.presentacion {
+  /* La apariencia principal se conserva desde App.css. */
+}
+
+.presentacion-contenido,
+.presentacion-visual {
+  min-width: 0;
+}
+
+.rejilla-secciones > .tarjeta {
+  text-decoration: none;
+  color: inherit;
+}
+
+.bloque-informativo a {
+  text-decoration: none;
+}

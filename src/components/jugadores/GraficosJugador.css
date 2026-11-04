@@ -1,0 +1,540 @@
+/* =====================================================
+   GRÁFICOS DE LA FICHA DEL JUGADOR
+   Los colores salen de --club-acento (lo pone JugadorDetalle)
+   ===================================================== */
+
+.gj {
+  --gj-acento: var(--club-acento, var(--rojo));
+  --gj-suave: color-mix(in srgb, var(--gj-acento) 11%, #fff);
+  --gj-medio: color-mix(in srgb, var(--gj-acento) 55%, #fff);
+  --gj-oscuro: color-mix(in srgb, var(--gj-acento) 55%, #000);
+  --gj-verde: #14a35a;
+  --gj-rojo: #d4202c;
+
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  margin-bottom: 40px;
+}
+
+/* ───── Valoración + radar ───── */
+
+.gj-cabecera {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.gj-nota,
+.gj-radar-caja {
+  border-radius: var(--radio-grande, 24px);
+}
+
+.gj-nota {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 26px 20px;
+  background: linear-gradient(150deg, var(--gj-acento), var(--gj-oscuro));
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--gj-acento) 35%, transparent);
+}
+
+.gj-nota > span {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.gj-nota small {
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+.gj-nota .gj-anillo svg {
+  width: 150px;
+  height: 150px;
+}
+
+.gj-nota .gj-anillo-fondo {
+  stroke: rgb(255 255 255 / 22%);
+}
+
+.gj-nota .gj-anillo-valor {
+  stroke: #fff;
+  filter: none;
+}
+
+.gj-nota .gj-anillo-texto {
+  fill: #fff;
+  font-size: 26px;
+}
+
+.gj-nota .gj-anillo strong,
+.gj-nota .gj-anillo > span {
+  color: rgb(255 255 255 / 88%);
+}
+
+.gj-radar-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 16px 10px;
+  border: 1px solid color-mix(in srgb, var(--gj-acento) 20%, var(--linea));
+  background: linear-gradient(160deg, var(--gj-suave), #fff 70%);
+}
+
+.gj-radar-caja h3 {
+  margin: 0;
+  color: var(--tinta);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.gj-radar-caja p {
+  margin: 4px 0 0;
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.gj-radar {
+  width: 100%;
+  max-width: 460px;
+  overflow: visible;
+}
+
+.gj-radar-malla {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gj-acento) 22%, #fff);
+  stroke-width: 1;
+}
+
+.gj-radar-eje {
+  stroke: color-mix(in srgb, var(--gj-acento) 18%, #fff);
+  stroke-width: 1;
+}
+
+.gj-radar-area {
+  fill: color-mix(in srgb, var(--gj-acento) 32%, transparent);
+  stroke: var(--gj-acento);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  animation: gj-aparecer 0.9s ease both;
+  transform-origin: 160px 160px;
+}
+
+.gj-radar-punto {
+  fill: #fff;
+  stroke: var(--gj-acento);
+  stroke-width: 3;
+}
+
+.gj-radar-etiqueta {
+  fill: var(--tinta);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.gj-radar-valor {
+  fill: var(--gj-acento);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@keyframes gj-aparecer {
+  from { opacity: 0; transform: scale(0.6); }
+}
+
+/* ───── Secciones y paneles ───── */
+
+.gj-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gj-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding-left: 14px;
+  border-left: 5px solid var(--gj-acento);
+  color: var(--tinta);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.gj-rejilla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.gj-panel {
+  padding: 22px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio, 16px);
+  background: var(--papel, #fff);
+  box-shadow: 0 4px 16px rgb(22 17 15 / 4%);
+}
+
+.gj-panel > header {
+  margin-bottom: 18px;
+}
+
+.gj-panel > header h3 {
+  margin: 0 0 4px;
+  color: var(--tinta);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.gj-panel > header p {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* ───── Anillos ───── */
+
+.gj-anillos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-around;
+  gap: 24px;
+}
+
+.gj-anillo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.gj-anillo svg {
+  width: 118px;
+  height: 118px;
+  overflow: visible;
+}
+
+.gj-anillo-fondo {
+  fill: none;
+  stroke: var(--gj-suave);
+  stroke-width: 11;
+}
+
+.gj-anillo-valor {
+  fill: none;
+  stroke: var(--gj-acento);
+  stroke-width: 11;
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--gj-acento) 45%, transparent));
+  animation: gj-dibujar 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.gj-anillo-texto {
+  fill: var(--tinta);
+  font-family: var(--fuente-titulo);
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.gj-anillo strong {
+  color: var(--tinta);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.gj-anillo > span {
+  color: var(--tinta-suave);
+  font-size: 0.78rem;
+}
+
+@keyframes gj-dibujar {
+  from { stroke-dasharray: 0 400; }
+}
+
+/* ───── Barras ───── */
+
+.gj-barras {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gj-barra-texto {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+  font-size: 0.85rem;
+}
+
+.gj-barra-texto span {
+  color: var(--tinta-suave);
+  font-weight: 600;
+}
+
+.gj-barra-texto strong {
+  color: var(--tinta);
+  font-weight: 900;
+}
+
+.gj-barra-pista {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--gj-suave);
+}
+
+.gj-barra-pista i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gj-oscuro), var(--gj-acento));
+  transform-origin: left;
+  animation: gj-crecer 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.gj-barra-suave .gj-barra-pista i {
+  background: linear-gradient(90deg, var(--gj-medio), color-mix(in srgb, var(--gj-acento) 30%, #fff));
+}
+
+@keyframes gj-crecer {
+  from { transform: scaleX(0); }
+}
+
+.gj-veredicto {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--papel-calido, #f7f4f2);
+  color: var(--tinta-suave);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.gj-veredicto.gj-positivo {
+  background: #e8f7ee;
+  color: #0c6b3a;
+}
+
+.gj-veredicto.gj-negativo {
+  background: #fdecea;
+  color: #a3141d;
+}
+
+/* ───── Barra apilada de tiros ───── */
+
+.gj-apilada {
+  display: flex;
+  height: 44px;
+  gap: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.gj-seg {
+  display: grid;
+  min-width: 40px;
+  place-items: center;
+  color: #fff;
+  font-family: var(--fuente-titulo);
+  font-weight: 900;
+}
+
+.gj-seg-a { background: var(--gj-acento); }
+.gj-seg-b { background: #4a4340; }
+.gj-seg-c { background: #b9b0ab; }
+
+.gj-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.gj-leyenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.gj-leyenda i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.gj-leyenda b {
+  color: var(--tinta);
+  font-weight: 900;
+}
+
+/* ───── Puntos (titularidad) ───── */
+
+.gj-puntos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gj-puntos i {
+  width: 16px;
+  height: 16px;
+  border: 1px solid color-mix(in srgb, var(--gj-acento) 25%, #fff);
+  border-radius: 50%;
+  background: var(--gj-suave);
+}
+
+.gj-puntos i.activo {
+  border-color: transparent;
+  background: var(--gj-acento);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gj-acento) 18%, transparent);
+}
+
+/* ───── Fichas ───── */
+
+.gj-fichas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.gj-ficha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 22px 12px;
+  border-radius: var(--radio, 16px);
+  background: var(--gj-suave);
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.gj-ficha:hover {
+  transform: translateY(-3px);
+  background: color-mix(in srgb, var(--gj-acento) 20%, #fff);
+}
+
+.gj-ficha-icono {
+  font-size: 1.8rem;
+}
+
+.gj-ficha strong {
+  color: var(--gj-acento);
+  font-family: var(--fuente-titulo);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.gj-ficha > span:not(.gj-ficha-icono) {
+  color: var(--tinta);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+/* ───── Disciplina ───── */
+
+.gj-disciplina {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 16px;
+}
+
+.gj-cartulina-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 24px 12px 18px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio, 16px);
+  background: var(--papel, #fff);
+  text-align: center;
+}
+
+.gj-cartulina {
+  display: block;
+  width: 38px;
+  height: 54px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  box-shadow: 0 6px 14px rgb(0 0 0 / 22%);
+  transform: rotate(-8deg);
+}
+
+.gj-amarilla { background: linear-gradient(145deg, #ffe33d, #f5b800); }
+.gj-roja { background: linear-gradient(145deg, #ff4d4d, #c40d1b); }
+
+.gj-cartulina-caja strong {
+  color: var(--tinta);
+  font-family: var(--fuente-titulo);
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.gj-cartulina-caja span {
+  color: var(--tinta);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.gj-faltas {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ───── Adaptable ───── */
+
+@media (max-width: 800px) {
+  .gj-cabecera,
+  .gj-rejilla {
+    grid-template-columns: 1fr;
+  }
+
+  .gj-disciplina {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gj-faltas {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gj-anillo-valor,
+  .gj-barra-pista i,
+  .gj-radar-area {
+    animation: none;
+  }
+
+  .gj-ficha {
+    transition: none;
+  }
+
+  .gj-ficha:hover {
+    transform: none;
+  }
+}

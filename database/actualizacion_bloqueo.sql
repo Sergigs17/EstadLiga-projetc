@@ -1,0 +1,2 @@
+ALTER TABLE control_actualizacion_estadisticas
+ADD COLUMN bloqueado_hasta TEXT;

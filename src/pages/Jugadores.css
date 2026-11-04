@@ -1,0 +1,97 @@
+/* Estilos de la pÃ¡gina de estadÃ­sticas de jugadores.
+   Las clasificaciones y el comparador tienen sus propios CSS en
+   src/components/jugadores/. Los estilos generales estÃ¡n en App.css. */
+
+.pagina-estadisticas {
+  min-height: 55vh;
+}
+
+.pestanas-jugadores {
+  display: inline-flex;
+  margin-bottom: 26px;
+  padding: 5px;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  background: var(--papel);
+  box-shadow: var(--sombra-suave);
+}
+
+.pestanas-jugadores button {
+  padding: 12px 26px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tinta-suave);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pestanas-jugadores button:hover {
+  color: var(--rojo);
+}
+
+.pestanas-jugadores button.activa {
+  background: var(--rojo);
+  color: #fff;
+  box-shadow: 0 8px 18px rgb(212 32 44 / 28%);
+}
+
+.pestanas-jugadores button:focus-visible {
+  outline: 3px solid var(--rojo);
+  outline-offset: 2px;
+}
+
+.estado-jugadores {
+  margin: 0;
+  padding: 48px 24px;
+  border: 1px dashed var(--linea);
+  border-radius: var(--radio);
+  background: var(--papel);
+  color: var(--tinta-suave);
+  text-align: center;
+}
+
+.estado-jugadores strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--tinta);
+  font-size: 1.1rem;
+}
+
+.estado-jugadores p {
+  margin: 0;
+}
+
+.estado-error {
+  border-color: color-mix(in srgb, var(--rojo) 40%, var(--linea));
+  background: var(--rojo-suave);
+  color: var(--rojo-oscuro);
+  font-weight: 600;
+}
+
+.aviso-estadisticas {
+  margin: 28px 0 0;
+  color: var(--tinta-suave);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .pestanas-jugadores {
+    display: flex;
+  }
+
+  .pestanas-jugadores button {
+    flex: 1;
+    padding-inline: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pestanas-jugadores button {
+    transition: none;
+  }
+}
