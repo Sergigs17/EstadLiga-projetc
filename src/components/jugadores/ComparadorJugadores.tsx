@@ -445,7 +445,11 @@ function Selector({
           ) : (
             resultados.map((j) => (
               <li key={j.id} role="option" aria-selected={j.id === seleccionado?.id}>
-                <button type="button" onClick={() => elegir(j.id)}>
+                <button
+                  type="button"
+                  onMouseDown={(evento) => evento.preventDefault()}
+                  onClick={() => elegir(j.id)}
+                >
                   <EscudoClub equipo={j.equipo} />
                   <span>
                     <b>{nombreCompleto(j)}</b>
