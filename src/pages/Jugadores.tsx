@@ -1,4 +1,6 @@
+
 import { useEffect, useState } from 'react'
+import Cargando from '../components/Cargando'
 import ComparadorJugadores from '../components/jugadores/ComparadorJugadores'
 import TablasJugadores from '../components/jugadores/TablasJugadores'
 import {
@@ -39,7 +41,12 @@ function Jugadores() {
         setActualizado(datos.actualizado_en)
       })
       .catch((fallo: unknown) => {
-        if (fallo instanceof DOMException && fallo.name === 'AbortError') return
+        if (
+          fallo instanceof DOMException &&
+          fallo.name === 'AbortError'
+        ) {
+          return
+        }
 
         setError(
           fallo instanceof Error
@@ -48,7 +55,9 @@ function Jugadores() {
         )
       })
       .finally(() => {
-        if (!controlador.signal.aborted) setCargando(false)
+        if (!controlador.signal.aborted) {
+          setCargando(false)
+        }
       })
 
     return () => controlador.abort()
@@ -63,10 +72,15 @@ function Jugadores() {
           <span className="subtitulo">TEMPORADA ACTUAL</span>
           <h2>Estadísticas de jugadores</h2>
         </div>
+
         <p>LaLiga · Primera División</p>
       </div>
 
-      <div className="pestanas-jugadores" role="tablist" aria-label="Sección de jugadores">
+      <div
+        className="pestanas-jugadores"
+        role="tablist"
+        aria-label="Sección de jugadores"
+      >
         <button
           type="button"
           role="tab"
@@ -88,24 +102,34 @@ function Jugadores() {
         </button>
       </div>
 
-      {cargando && <p className="estado-jugadores">Cargando estadísticas…</p>}
+      {/* Animación mientras se cargan las estadísticas */}
+      {cargando && (
+        <Cargando mensaje="Cargando estadísticas de jugadores..." />
+      )}
 
+      {/* Mensaje cuando ocurre un error */}
       {!cargando && error && (
-        <p className="estado-jugadores estado-error" role="alert">
+        <p
+          className="estado-jugadores estado-error"
+          role="alert"
+        >
           {error}. Comprueba que el servidor está activo e inténtalo de nuevo.
         </p>
       )}
 
+      {/* Mensaje cuando no existen estadísticas */}
       {!cargando && !error && jugadores.length === 0 && (
         <div className="estado-jugadores">
           <strong>Todavía no hay estadísticas guardadas</strong>
+
           <p>
-            Cuando importes las estadísticas de los jugadores a la base de datos, aparecerán aquí
-            automáticamente.
+            Cuando importes las estadísticas de los jugadores a la base de
+            datos, aparecerán aquí automáticamente.
           </p>
         </div>
       )}
 
+      {/* Clasificaciones y comparador */}
       {!cargando && !error && jugadores.length > 0 && (
         <>
           {pestana === 'clasificaciones' ? (
@@ -116,8 +140,9 @@ function Jugadores() {
 
           <p className="aviso-estadisticas">
             Datos de {jugadores.length} jugadores guardados en EstadLiga
-            {fecha && <> · Última actualización: {fecha}</>}. Solo se muestran cifras reales; en las
-            clasificaciones no aparecen los jugadores con valor cero.
+            {fecha && <> · Última actualización: {fecha}</>}. Solo se
+            muestran cifras reales; en las clasificaciones no aparecen
+            los jugadores con valor cero.
           </p>
         </>
       )}

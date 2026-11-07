@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
+import Cargando from '../components/Cargando'
 import './Clasificacion.css'
 import { coloresClub } from '../utils/clubes'
 
@@ -882,9 +883,7 @@ function Clasificacion() {
         </div>
 
         {cargando && (
-          <div className="clasificacion-mensaje">
-            Cargando clasificación...
-          </div>
+          <Cargando mensaje="Cargando clasificación de LaLiga..." />
         )}
 
         {!cargando && error && (
@@ -1041,7 +1040,7 @@ function Clasificacion() {
         )}
 
         {!errorPartidos && !partidos && !cargando && !error && (
-          <div className="clasificacion-mensaje">Cargando resultados...</div>
+          <Cargando mensaje="Cargando resultados de las jornadas..." />
         )}
 
         {!errorPartidos && partidos && !evolucion && (

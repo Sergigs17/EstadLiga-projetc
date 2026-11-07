@@ -1,5 +1,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
+import Cargando from '../components/Cargando'
 import './JugadorDetalle.css'
 import type { Jugador } from './EquipoDetalle'
 import GraficosJugador from '../components/jugadores/GraficosJugador'
@@ -668,9 +669,7 @@ function JugadorDetalle({ jugador }: JugadorDetalleProps) {
       </header>
 
       {cargando && (
-        <p className="estado-estadisticas">
-          Cargando estadísticas...
-        </p>
+        <Cargando mensaje="Cargando estadísticas del jugador..." />
       )}
 
       {!cargando && error && (

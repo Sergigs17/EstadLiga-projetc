@@ -1,23 +1,18 @@
 * {
   box-sizing: border-box;
 }
-
 a {
   color: inherit;
   text-decoration: none;
 }
-
 button {
   font: inherit;
 }
-
-/* Margen lateral comÃºn: 5% en pantallas normales y centrado a 1200px en grandes */
+/* Margen lateral común: 5% en pantallas normales y centrado a 1200px en grandes */
 .estadliga {
-  --margen: max(20px, 5vw, calc((100vw - 1200px) / 2));
+  \--margen: max(20px, 5vw, calc((100vw - 1200px) / 2));
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ CABECERA â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .cabecera {
   position: sticky;
   top: 0;
@@ -31,13 +26,11 @@ button {
   background: var(--papel);
   border-bottom: 3px solid var(--rojo);
 }
-
 .cabecera-acciones {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .logo {
   display: inline-flex;
   align-items: center;
@@ -59,7 +52,6 @@ button {
   width: 135px;
   height: 45px;
 }
-
 .logo-icono {
   display: grid;
   place-items: center;
@@ -70,18 +62,15 @@ button {
   border-radius: 50%;
   font-size: 1.15rem;
 }
-
 .logo-destacado {
   color: var(--rojo);
 }
-
 .navegacion {
   display: flex;
   align-items: stretch;
   align-self: stretch;
   gap: 30px;
 }
-
 .navegacion a {
   position: relative;
   display: flex;
@@ -93,7 +82,6 @@ button {
   text-transform: uppercase;
   transition: color 0.2s;
 }
-
 .navegacion a::after {
   content: '';
   position: absolute;
@@ -106,19 +94,15 @@ button {
   transform: translateX(-50%) scale(0);
   transition: transform 0.2s;
 }
-
 .navegacion a:hover,
 .navegacion a.activo {
   color: var(--rojo);
 }
-
 .navegacion a.activo::after,
 .navegacion a:hover::after {
   transform: translateX(-50%) scale(1);
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ BOTONES â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .boton-login,
 .boton-secundario {
   padding: 11px 22px;
@@ -133,13 +117,11 @@ button {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-
 .boton-login:hover,
 .boton-secundario:hover {
   background: var(--rojo);
   color: #fff;
 }
-
 .boton-principal {
   margin-top: 28px;
   display: inline-flex;
@@ -155,14 +137,11 @@ button {
   text-transform: uppercase;
   transition: transform 0.2s, background 0.2s;
 }
-
 .boton-principal:hover {
   transform: translateY(-2px);
   background: var(--rojo-oscuro);
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ ETIQUETAS â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .etiqueta,
 .subtitulo {
   display: inline-flex;
@@ -174,7 +153,6 @@ button {
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
-
 .etiqueta::before,
 .subtitulo::before {
   content: '';
@@ -183,9 +161,7 @@ button {
   background: currentColor;
   border-radius: 50%;
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ PORTADA â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .presentacion {
   position: relative;
   min-height: 580px;
@@ -196,13 +172,11 @@ button {
   background: var(--papel);
   border-bottom: 1px solid var(--linea);
 }
-
 .presentacion-contenido {
   position: relative;
   z-index: 1;
   max-width: 600px;
 }
-
 .presentacion h1 {
   margin: 22px 0 22px;
   font-size: clamp(2.8rem, 7vw, 5.6rem);
@@ -210,18 +184,15 @@ button {
   line-height: 0.96;
   letter-spacing: -0.045em;
 }
-
 .presentacion h1 span {
   color: var(--rojo);
 }
-
 .presentacion-contenido > p {
   max-width: 460px;
   color: var(--tinta-suave);
   font-size: 1.1rem;
 }
-
-/* El cÃ­rculo del centro del campo, recortado por el borde */
+/* El círculo del centro del campo, recortado por el borde */
 .presentacion-visual {
   position: absolute;
   top: 50%;
@@ -234,7 +205,6 @@ button {
   border-radius: 50%;
   transform: translateY(-50%);
 }
-
 .presentacion-visual::before {
   content: '';
   position: absolute;
@@ -244,24 +214,20 @@ button {
   width: 2px;
   background: rgb(255 255 255 / 35%);
 }
-
 .circulo {
   position: absolute;
   border: 2px solid rgb(255 255 255 / 35%);
   border-radius: 50%;
 }
-
 .circulo-externo {
   width: 400px;
   height: 400px;
 }
-
 .circulo-interior {
   width: 220px;
   height: 220px;
 }
-
-/* El balÃ³n se convierte en el punto central del campo */
+/* El balón se convierte en el punto central del campo */
 .balon {
   width: 22px;
   height: 22px;
@@ -269,7 +235,6 @@ button {
   border-radius: 50%;
   font-size: 0;
 }
-
 .dato-flotante {
   position: absolute;
   left: -40px;
@@ -283,31 +248,25 @@ button {
   border-radius: 12px;
   box-shadow: var(--sombra-fuerte);
 }
-
 .dato-flotante span {
   color: var(--rojo);
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.14em;
 }
-
 .dato-flotante strong {
   color: var(--tinta);
   font-family: var(--fuente-titulo);
   font-size: 1.05rem;
 }
-
 .dato-flotante small {
   color: var(--tinta-suave);
   font-size: 0.74rem;
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ SECCIONES â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .seccion-contenido {
   padding: 72px var(--margen);
 }
-
 .titulo-seccion {
   margin-bottom: 36px;
   padding-bottom: 22px;
@@ -317,24 +276,20 @@ button {
   gap: 20px;
   border-bottom: 1px solid var(--linea);
 }
-
 .titulo-seccion h2,
 .bloque-informativo h2 {
   margin: 12px 0 0;
 }
-
 .titulo-seccion > p {
   color: var(--tinta-suave);
   font-size: 0.85rem;
   font-weight: 600;
 }
-
 .rejilla-secciones {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
 }
-
 .tarjeta {
   min-height: 240px;
   padding: 28px 24px;
@@ -346,13 +301,11 @@ button {
   background: var(--papel);
   transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
 }
-
 .tarjeta:hover {
   transform: translateY(-6px);
   border-color: var(--rojo);
   box-shadow: var(--sombra-fuerte);
 }
-
 .tarjeta-icono {
   width: 52px;
   height: 52px;
@@ -363,20 +316,16 @@ button {
   font-size: 1.45rem;
   transition: background 0.25s;
 }
-
 .tarjeta:hover .tarjeta-icono {
   background: var(--rojo);
 }
-
 .tarjeta h3 {
   margin: 22px 0 8px;
 }
-
 .tarjeta p {
   color: var(--tinta-suave);
   font-size: 0.9rem;
 }
-
 .tarjeta-enlace {
   margin-top: auto;
   padding-top: 20px;
@@ -386,7 +335,6 @@ button {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-
 /* Ãšnica banda roja a todo color */
 .bloque-informativo {
   margin: 0 0 72px;
@@ -398,37 +346,29 @@ button {
   background: var(--rojo);
   color: #fff;
 }
-
 .bloque-informativo > div {
   max-width: 620px;
 }
-
 .bloque-informativo .subtitulo {
   color: #fff;
 }
-
 .bloque-informativo h2 {
   color: #fff;
 }
-
 .bloque-informativo p {
   margin-top: 14px;
   color: rgb(255 255 255 / 85%);
 }
-
 .bloque-informativo .boton-secundario {
   flex-shrink: 0;
   border-color: #fff;
   color: #fff;
 }
-
 .bloque-informativo .boton-secundario:hover {
   background: #fff;
   color: var(--rojo);
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ PIE â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .pie {
   margin-top: auto;
   padding: 30px var(--margen);
@@ -439,30 +379,24 @@ button {
   background: var(--papel);
   border-top: 3px solid var(--rojo);
 }
-
 .pie .logo {
   font-size: 1.2rem;
 }
-
 .pie .logo-icono {
   width: 32px;
   height: 32px;
   font-size: 0.95rem;
 }
-
 .pie p {
   color: var(--tinta-suave);
   font-size: 0.82rem;
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ DIRECTORIO DE EQUIPOS â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .rejilla-equipos {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 22px;
 }
-
 .tarjeta-equipo {
   position: relative;
   min-height: 310px;
@@ -480,7 +414,6 @@ button {
   border-radius: var(--radio-grande);
   transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
 }
-
 .tarjeta-equipo::before {
   content: '';
   position: absolute;
@@ -491,18 +424,15 @@ button {
   transform-origin: left;
   transition: transform 0.35s ease;
 }
-
 .tarjeta-equipo:hover {
   transform: translateY(-6px);
   border-color: var(--rojo);
   box-shadow: var(--sombra-fuerte);
 }
-
 .tarjeta-equipo:hover::before {
   transform: scaleX(1);
 }
-
-/* El escudo sobre su cÃ­rculo */
+/* El escudo sobre su círculo */
 .tarjeta-equipo img,
 .escudo-pendiente {
   width: 108px;
@@ -515,29 +445,24 @@ button {
   background: var(--papel-calido);
   transition: transform 0.25s, background 0.25s;
 }
-
 .escudo-pendiente {
   display: grid;
   place-items: center;
   font-size: 2.6rem;
 }
-
 .tarjeta-equipo:hover img,
 .tarjeta-equipo:hover .escudo-pendiente {
   background: var(--rojo-suave);
   transform: scale(1.06);
 }
-
 .tarjeta-equipo h3 {
   font-size: 1.05rem;
   line-height: 1.2;
 }
-
 .tarjeta-equipo p {
   color: var(--tinta-suave);
   font-size: 0.84rem;
 }
-
 .enlace-plantilla {
   align-self: stretch;
   margin: auto -20px 0;
@@ -550,30 +475,24 @@ button {
   text-transform: uppercase;
   transition: background 0.25s, color 0.25s;
 }
-
 .tarjeta-equipo:hover .enlace-plantilla {
   background: var(--rojo);
   color: #fff;
 }
-
 .tarjeta-equipo:focus-visible {
   outline: 3px solid var(--rojo);
   outline-offset: 3px;
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ JUGADORES â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .pagina-jugadores {
   min-height: 55vh;
 }
-
 .filtros-jugadores {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
   margin: 28px 0;
 }
-
 .filtros-jugadores input,
 .filtros-jugadores select {
   min-height: 48px;
@@ -584,29 +503,24 @@ button {
   color: var(--tinta);
   font: inherit;
 }
-
 .filtros-jugadores input {
   flex: 1;
   min-width: 220px;
 }
-
 .filtros-jugadores select {
   min-width: 210px;
   cursor: pointer;
 }
-
 .filtros-jugadores input:focus,
 .filtros-jugadores select:focus {
   outline: 2px solid var(--rojo);
   outline-offset: 2px;
 }
-
 .rejilla-jugadores {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 18px;
 }
-
 .tarjeta-jugador {
   display: flex;
   align-items: center;
@@ -617,13 +531,11 @@ button {
   background: var(--papel);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
-
 .tarjeta-jugador:hover {
   transform: translateY(-3px);
   border-color: var(--rojo);
   box-shadow: var(--sombra-suave);
 }
-
 .jugador-dorsal {
   display: grid;
   flex-shrink: 0;
@@ -638,16 +550,13 @@ button {
   font-weight: 900;
   transition: background 0.2s, color 0.2s;
 }
-
 .tarjeta-jugador:hover .jugador-dorsal {
   background: var(--rojo);
   color: #fff;
 }
-
 .jugador-informacion {
   min-width: 0;
 }
-
 .jugador-equipo {
   color: var(--rojo);
   font-size: 0.7rem;
@@ -655,21 +564,17 @@ button {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-
 .tarjeta-jugador h3 {
   margin: 6px 0;
   font-size: 1.1rem;
   overflow-wrap: anywhere;
 }
-
 .tarjeta-jugador p {
   margin: 3px 0;
   color: var(--tinta-suave);
   font-size: 0.86rem;
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ BASE DE LA FICHA DE EQUIPO (se afina en EquipoDetalle.css) â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .volver-enlace {
   display: inline-block;
   margin-bottom: 28px;
@@ -679,7 +584,6 @@ button {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-
 .cabecera-plantilla {
   display: flex;
   align-items: center;
@@ -690,24 +594,20 @@ button {
   border-radius: var(--radio-grande);
   background: var(--papel);
 }
-
 .cabecera-plantilla img {
   width: 100px;
   height: 100px;
   object-fit: contain;
 }
-
 .cabecera-plantilla h1 {
   margin: 8px 0;
   font-size: clamp(1.8rem, 4vw, 2.6rem);
 }
-
 .cabecera-plantilla p {
   margin: 5px 0;
   color: var(--tinta-suave);
   font-size: 0.9rem;
 }
-
 .mensaje-vacio {
   padding: 48px 20px;
   text-align: center;
@@ -715,28 +615,22 @@ button {
   border-radius: var(--radio);
   background: var(--papel);
 }
-
 .mensaje-vacio > span {
   font-size: 2.4rem;
 }
-
 .mensaje-vacio h3 {
   margin-bottom: 8px;
 }
-
 .mensaje-vacio p {
   color: var(--tinta-suave);
   font-size: 0.92rem;
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ ADAPTABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 @media (max-width: 1100px) {
   .cabecera {
     padding-block: 14px;
     flex-wrap: wrap;
   }
-
   .navegacion {
     order: 3;
     width: 100%;
@@ -745,109 +639,88 @@ button {
     flex-wrap: wrap;
     gap: 6px 24px;
   }
-
   .navegacion a {
     padding: 8px 0 16px;
   }
-
   .navegacion a::after {
     bottom: 4px;
   }
-
   .rejilla-secciones,
   .rejilla-equipos {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
   .rejilla-secciones {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
 @media (max-width: 960px) {
   .presentacion {
     min-height: auto;
     padding-block: 64px;
   }
-
   .presentacion-visual {
     display: none;
   }
 }
-
 @media (max-width: 700px) {
-  /* Cabecera: logo y botÃ³n en la misma fila */
+  /* Cabecera: logo y botón en la misma fila */
   .cabecera {
     gap: 12px;
   }
-
   .boton-login {
     padding: 9px 16px;
   }
-
   .titulo-seccion {
     align-items: flex-start;
     flex-direction: column;
   }
-
   .rejilla-secciones {
     grid-template-columns: 1fr;
   }
-
   .rejilla-equipos {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
   }
-
   .tarjeta-equipo {
     min-height: 270px;
     padding-top: 26px;
   }
-
   .tarjeta-equipo img,
   .escudo-pendiente {
     width: 84px;
     height: 84px;
     padding: 14px;
   }
-
   .bloque-informativo {
     align-items: flex-start;
     flex-direction: column;
   }
-
   .pie {
     align-items: flex-start;
     flex-direction: column;
   }
-
   .filtros-jugadores {
     flex-direction: column;
   }
-
   .filtros-jugadores input,
   .filtros-jugadores select {
     width: 100%;
   }
-
   .cabecera-plantilla {
     align-items: flex-start;
     flex-direction: column;
     padding: 22px;
   }
-
   .cabecera-plantilla img {
     width: 78px;
     height: 78px;
   }
 }
-
 @media (max-width: 380px) {
   .rejilla-equipos {
     grid-template-columns: 1fr;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -858,32 +731,26 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
-
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ CABECERA CON BUSCADOR â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
 .boton-login {
   white-space: nowrap;
 }
-
 .cabecera-acciones {
   margin-left: auto;
 }
-
-/* En pantallas anchas el menÃº cabe en una sola fila: se ajusta la
-   separaciÃ³n para dejar sitio a la lupa del buscador. */
+/* En pantallas anchas el menú cabe en una sola fila: se ajusta la
+   separación para dejar sitio a la lupa del buscador. */
 @media (min-width: 1280px) {
   .navegacion {
     gap: clamp(16px, 2vw, 30px);
   }
 }
-
-/* Por debajo de 1280 px el menÃº pasa a su propia fila. */
+/* Por debajo de 1280 px el menú pasa a su propia fila. */
 @media (max-width: 1279px) {
   .cabecera {
     padding-block: 14px;
     flex-wrap: wrap;
   }
-
   .navegacion {
     order: 3;
     width: 100%;
@@ -892,47 +759,185 @@ button {
     flex-wrap: wrap;
     gap: 6px 24px;
   }
-
   .navegacion a {
     padding: 8px 0 16px;
   }
-
   .navegacion a::after {
     bottom: 4px;
   }
 }
-
 @media (max-width: 480px) {
   .cabecera {
     gap: 12px;
   }
-
   .logo-imagen {
     width: 118px;
     height: 42px;
   }
-
   .cabecera-acciones {
     gap: 8px;
   }
-
   .buscador-boton {
     width: 40px;
     height: 40px;
   }
-
   .boton-login {
     padding: 9px 14px;
     font-size: 0.68rem;
   }
-
-  /* Con la pestaÃ±a Tienda, el menÃº cabe en dos filas. */
+  /* Con la pestaña Tienda, el menú cabe en dos filas. */
   .navegacion {
     gap: 4px 16px;
   }
-
   .navegacion a {
     font-size: 0.7rem;
     letter-spacing: 0.06em;
+  }
+}
+
+/* ==========================================
+   MENÚ HAMBURGUESA RESPONSIVE
+   ========================================== */
+.boton-hamburguesa,
+.login-menu-movil {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .cabecera {
+    min-height: 64px;
+    padding-block: 10px;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .cabecera .logo {
+    flex-shrink: 0;
+  }
+
+  .cabecera .logo-imagen {
+    width: 125px;
+    height: 44px;
+  }
+
+  .cabecera-acciones {
+    margin-left: auto;
+    gap: 10px;
+  }
+
+  .cabecera-acciones > .boton-login {
+    display: none;
+  }
+
+  .boton-hamburguesa {
+    display: flex;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    border: 1px solid var(--linea);
+    border-radius: 10px;
+    background: var(--papel);
+    color: var(--rojo);
+    cursor: pointer;
+  }
+
+  .boton-hamburguesa > span:not(.hamburguesa-cerrar) {
+    width: 21px;
+    height: 2px;
+    background: var(--rojo);
+    border-radius: 3px;
+  }
+
+  .hamburguesa-cerrar {
+    font-size: 30px;
+    line-height: 1;
+  }
+
+  .boton-hamburguesa:focus-visible {
+    outline: 2px solid var(--rojo);
+    outline-offset: 3px;
+  }
+
+  .cabecera .navegacion {
+    display: none;
+  }
+
+  .cabecera .navegacion.navegacion-abierta {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    max-height: calc(100dvh - 75px);
+    overflow-y: auto;
+    padding: 12px var(--margen) 18px;
+    gap: 4px;
+    background: var(--papel);
+    border-bottom: 3px solid var(--rojo);
+    box-shadow: 0 12px 25px rgb(0 0 0 / 12%);
+  }
+
+  .cabecera .navegacion a {
+    display: flex;
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 15px;
+    border-radius: 9px;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-align: left;
+  }
+
+  .cabecera .navegacion a:hover,
+  .cabecera .navegacion a.activo {
+    color: var(--rojo);
+    background: var(--rojo-suave);
+  }
+
+  .cabecera .navegacion a::after {
+    display: none;
+  }
+
+  .login-menu-movil {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    margin-top: 8px;
+    padding: 12px 15px;
+    border: 2px solid var(--rojo);
+    border-radius: 9px;
+    background: transparent;
+    color: var(--rojo);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 380px) {
+  .cabecera .logo-imagen {
+    width: 105px;
+    height: 40px;
+  }
+
+  .cabecera-acciones {
+    gap: 6px;
+  }
+
+  .boton-hamburguesa {
+    width: 40px;
+    height: 40px;
   }
 }

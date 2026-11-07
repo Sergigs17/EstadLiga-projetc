@@ -1,0 +1,82 @@
+
+.estadliga-cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+  min-height: 180px;
+  padding: 35px 20px;
+  text-align: center;
+}
+
+.estadliga-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border: 5px solid rgba(150, 150, 150, 0.2);
+  border-top-color: #d4202c;
+  border-right-color: #d4202c;
+  border-radius: 50%;
+  animation: estadliga-girar 1s linear infinite;
+}
+
+.estadliga-spinner-balon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 29px;
+  line-height: 1;
+  animation: estadliga-balon 1.5s ease-in-out infinite;
+}
+
+.estadliga-cargando-mensaje {
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.75;
+  animation: estadliga-pulso 1.5s ease-in-out infinite;
+}
+
+@keyframes estadliga-girar {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes estadliga-balon {
+  0%, 100% {
+    transform: scale(0.9);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes estadliga-pulso {
+  0%, 100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estadliga-spinner,
+  .estadliga-spinner-balon,
+  .estadliga-cargando-mensaje {
+    animation: none;
+  }
+}

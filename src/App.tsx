@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react'
+
 import './App.css'
 
 import Inicio from './pages/Inicio'
@@ -12,6 +13,7 @@ import Partidos from './pages/Partidos'
 import Quiniela from './pages/Quiniela'
 import Tienda from './pages/Tienda'
 import BuscadorGlobal from './components/BuscadorGlobal'
+import Cargando from './components/Cargando'
 
 function leerRuta() {
   return window.location.hash.replace(/^#\/?/, '') || 'inicio'
@@ -23,6 +25,8 @@ function App() {
   const [jugadorDetalle, setJugadorDetalle] = useState<Jugador | null>(null)
 
   const [pagina, setPagina] = useState(leerRuta)
+  const [menuAbierto, setMenuAbierto] = useState(false)
+
   const [cargando, setCargando] = useState(true)
   const [cargandoPlantilla, setCargandoPlantilla] = useState(false)
   const [cargandoJugadorDetalle, setCargandoJugadorDetalle] = useState(false)
@@ -31,7 +35,10 @@ function App() {
   const [errorPlantilla, setErrorPlantilla] = useState(false)
 
   useEffect(() => {
-    const cambiarPagina = () => setPagina(leerRuta())
+    const cambiarPagina = () => {
+      setPagina(leerRuta())
+      setMenuAbierto(false)
+    }
 
     window.addEventListener('hashchange', cambiarPagina)
 
@@ -56,16 +63,24 @@ function App() {
 
   const partesRuta = pagina.split('/')
 
-  // #/equipos/5  →  ficha del equipo
-  // #/equipos/5/jugadores  →  ficha del equipo abierta en la pestaña de jugadores
-  const SECCIONES_EQUIPO = ['historia', 'palmares', 'jugadores', 'estadisticas']
+  // #/equipos/5 → ficha del equipo
+  // #/equipos/5/jugadores → pestaña de jugadores
+
+  const SECCIONES_EQUIPO = [
+    'historia',
+    'palmares',
+    'jugadores',
+    'estadisticas',
+  ]
 
   const esFichaEquipo =
     partesRuta[0] === 'equipos' &&
     (partesRuta.length === 2 ||
-      (partesRuta.length === 3 && SECCIONES_EQUIPO.includes(partesRuta[2])))
+      (partesRuta.length === 3 &&
+        SECCIONES_EQUIPO.includes(partesRuta[2])))
 
-  const seccionEquipo = partesRuta.length === 3 ? partesRuta[2] : undefined
+  const seccionEquipo =
+    partesRuta.length === 3 ? partesRuta[2] : undefined
 
   const equipoId = esFichaEquipo ? Number(partesRuta[1]) : null
 
@@ -79,9 +94,12 @@ function App() {
     Number.isInteger(Number(partesRuta[1])) &&
     Number(partesRuta[1]) > 0
 
-  const jugadorId = esFichaJugador ? Number(partesRuta[1]) : null
+  const jugadorId = esFichaJugador
+    ? Number(partesRuta[1])
+    : null
 
   // Cargar la plantilla del equipo seleccionado.
+
   useEffect(() => {
     if (!esFichaEquipo || !equipoId || !Number.isFinite(equipoId)) {
       setJugadores([])
@@ -125,6 +143,7 @@ function App() {
   }, [pagina, esFichaEquipo, equipoId])
 
   // Cargar los datos del jugador al abrir su ficha individual.
+
   useEffect(() => {
     if (!esFichaJugador || jugadorId === null) {
       setJugadorDetalle(null)
@@ -189,8 +208,15 @@ function App() {
           />
         </a>
 
-        <nav className="navegacion">
+        <nav
+          id="menu-principal"
+          className={`navegacion ${
+            menuAbierto ? 'navegacion-abierta' : ''
+          }`}
+          aria-label="Navegación principal"
+        >
           <a
+            onClick={() => setMenuAbierto(false)}
             className={esInicio ? 'activo' : ''}
             href="#/inicio"
           >
@@ -198,20 +224,27 @@ function App() {
           </a>
 
           <a
-            className={esEquipos || esFichaEquipo ? 'activo' : ''}
+            onClick={() => setMenuAbierto(false)}
+            className={
+              esEquipos || esFichaEquipo ? 'activo' : ''
+            }
             href="#/equipos"
           >
             Equipos
           </a>
 
           <a
-            className={esJugadores || esFichaJugador ? 'activo' : ''}
+            onClick={() => setMenuAbierto(false)}
+            className={
+              esJugadores || esFichaJugador ? 'activo' : ''
+            }
             href="#/jugadores"
           >
             Jugadores
           </a>
 
           <a
+            onClick={() => setMenuAbierto(false)}
             className={esClasificacion ? 'activo' : ''}
             href="#/clasificacion"
           >
@@ -219,6 +252,7 @@ function App() {
           </a>
 
           <a
+            onClick={() => setMenuAbierto(false)}
             className={esPartidos ? 'activo' : ''}
             href="#/partidos"
           >
@@ -226,6 +260,7 @@ function App() {
           </a>
 
           <a
+            onClick={() => setMenuAbierto(false)}
             className={esQuiniela ? 'activo' : ''}
             href="#/quiniela"
           >
@@ -233,18 +268,50 @@ function App() {
           </a>
 
           <a
+            onClick={() => setMenuAbierto(false)}
             className={esTienda ? 'activo' : ''}
             href="#/tienda"
           >
             Tienda
           </a>
+
+          <button
+            className="login-menu-movil"
+            type="button"
+          >
+            Iniciar sesión
+          </button>
         </nav>
 
         <div className="cabecera-acciones">
           <BuscadorGlobal />
 
-          <button className="boton-login" type="button">
+          <button
+            className="boton-login"
+            type="button"
+          >
             Iniciar sesión
+          </button>
+
+          <button
+            className="boton-hamburguesa"
+            type="button"
+            aria-label={
+              menuAbierto ? 'Cerrar menú' : 'Abrir menú'
+            }
+            aria-expanded={menuAbierto}
+            aria-controls="menu-principal"
+            onClick={() => setMenuAbierto(!menuAbierto)}
+          >
+            {menuAbierto ? (
+              <span className="hamburguesa-cerrar">×</span>
+            ) : (
+              <>
+                <span />
+                <span />
+                <span />
+              </>
+            )}
           </button>
         </div>
       </header>
@@ -261,13 +328,21 @@ function App() {
         )}
 
         {esFichaEquipo && (
-          <EquipoDetalle
-            equipo={equipoSeleccionado}
-            seccionInicial={seccionEquipo}
-            jugadores={jugadores}
-            cargando={cargandoPlantilla}
-            error={errorPlantilla}
-          />
+          <>
+            {cargando && !equipoSeleccionado ? (
+              <section className="seccion-contenido">
+                <Cargando mensaje="Cargando equipo..." />
+              </section>
+            ) : (
+              <EquipoDetalle
+                equipo={equipoSeleccionado}
+                seccionInicial={seccionEquipo}
+                jugadores={jugadores}
+                cargando={cargandoPlantilla}
+                error={errorPlantilla}
+              />
+            )}
+          </>
         )}
 
         {esJugadores && <Jugadores />}
@@ -276,7 +351,7 @@ function App() {
           <>
             {cargandoJugadorDetalle && (
               <section className="seccion-contenido">
-                <p>Cargando ficha del jugador...</p>
+                <Cargando mensaje="Cargando ficha del jugador..." />
               </section>
             )}
 
@@ -287,9 +362,11 @@ function App() {
             {!cargandoJugadorDetalle && !jugadorDetalle && (
               <section className="seccion-contenido">
                 <h2>Jugador no encontrado</h2>
+
                 <p>
                   No hemos encontrado ese jugador en la base de datos.
                 </p>
+
                 <a
                   className="boton-principal"
                   href="#/equipos"
@@ -320,7 +397,11 @@ function App() {
           !esTienda && (
             <section className="seccion-contenido">
               <h2>Página no encontrada</h2>
-              <a className="boton-principal" href="#/inicio">
+
+              <a
+                className="boton-principal"
+                href="#/inicio"
+              >
                 Volver al inicio →
               </a>
             </section>

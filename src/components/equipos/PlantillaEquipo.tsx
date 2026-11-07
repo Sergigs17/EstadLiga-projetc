@@ -1,6 +1,8 @@
+
 import { useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 import type { Jugador } from '../../pages/EquipoDetalle'
+import Cargando from '../Cargando'
 import './PlantillaEquipo.css'
 
 interface PlantillaEquipoProps {
@@ -432,9 +434,11 @@ function PlantillaEquipo({ jugadores, cargando, error }: PlantillaEquipoProps) {
         <p>{jugadores.length} jugadores</p>
       </div>
 
-      {cargando && <p>Cargando plantilla...</p>}
+      {cargando && (
+        <Cargando mensaje="Cargando plantilla del equipo..." />
+      )}
 
-      {error && <p>No se ha podido cargar esta plantilla.</p>}
+      {!cargando && error && <p>No se ha podido cargar esta plantilla.</p>}
 
       {!cargando && !error && jugadores.length === 0 && (
         <div className="mensaje-vacio">

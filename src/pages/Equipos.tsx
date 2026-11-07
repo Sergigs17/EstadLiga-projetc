@@ -1,4 +1,5 @@
 
+import Cargando from '../components/Cargando'
 import './Equipos.css'
 
 export interface Equipo {
@@ -127,12 +128,15 @@ function Equipos({ equipos, cargando, error }: EquiposProps) {
           <span className="subtitulo">PRIMERA DIVISIÓN</span>
           <h2>Equipos de LaLiga</h2>
         </div>
+
         <p>{equipos.length} clubes</p>
       </div>
 
-      {cargando && <p>Cargando equipos...</p>}
+      {cargando && (
+        <Cargando mensaje="Cargando equipos de LaLiga..." />
+      )}
 
-      {error && (
+      {!cargando && error && (
         <p>
           No se han podido cargar los equipos. Inténtalo más tarde.
         </p>

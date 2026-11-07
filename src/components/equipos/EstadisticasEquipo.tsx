@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import type { Equipo } from '../../pages/Equipos'
+import Cargando from '../Cargando'
 import './EstadisticasEquipo.css'
 
 const TORNEO_LALIGA = 8
@@ -266,12 +267,7 @@ function EstadisticasEquipo({ equipo }: EstadisticasEquipoProps) {
       </header>
 
       {cargando && (
-        <div className="estadisticas-mensaje" role="status">
-          <span className="estadisticas-cargando-icono" aria-hidden="true">
-            ⚽
-          </span>
-          <p>Cargando estadísticas del equipo...</p>
-        </div>
+        <Cargando mensaje="Cargando estadísticas del equipo..." />
       )}
 
       {error && !cargando && (
