@@ -1,3 +1,6 @@
+import { manejarAuth } from './auth'
+import { manejarFavoritos } from './favoritos'
+
 
 interface Env {
   ASSETS: {
@@ -7,6 +10,7 @@ interface Env {
   estadliga_imagenes: R2Bucket
   APIFY_TOKEN: string
   FOOTBALL_DATA_API_TOKEN: string
+  TOTP_ENCRYPTION_KEY: string
 }
 
 interface JugadorSofaScore {
@@ -829,6 +833,15 @@ interface FilaEstadisticasWeb {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
+
+    const respuestaAuth = await manejarAuth(request, env)
+
+    if (respuestaAuth) {
+      return respuestaAuth
+    }
+
+    const respuestaFavoritos = await manejarFavoritos(request, env)
+    if (respuestaFavoritos) return respuestaFavoritos
 
     // Comprobar el servidor.
     if (url.pathname === '/api/health') {
@@ -2286,8 +2299,16 @@ export default {
       }
     }
 
-    // El resto de las peticiones se sirven desde los assets de Vite.
-    return env.ASSETS.fetch(request)
+   // En producción, Cloudflare sirve los archivos del frontend.
+    if (env.ASSETS) {
+      return env.ASSETS.fetch(request)
+    }
+
+    // En local, el frontend lo sirve Vite en el puerto 5173.
+    return Response.json(
+      { error: 'Ruta no encontrada' },
+      { status: 404 },
+    )
   },
 
    async scheduled(

@@ -26,3 +26,17 @@ dist-ssr
 # Cloudflare
 .wrangler/
 .dev.vars
+
+.dev.vars.*
+dist/
+# Secretos de pruebas locales
+pruebas/.dev.vars
+
+# Datos privados de las pruebas de autenticación
+pruebas/cookies-auth.txt
+pruebas/preparacion-2fa.json
+pruebas/codigos-recuperacion-privados.json
+
+# Copias locales de autenticación
+/pruebas/backups/
+/pruebas/datos-deportivos.sql
