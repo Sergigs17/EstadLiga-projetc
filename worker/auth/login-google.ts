@@ -229,8 +229,18 @@ export async function iniciarSesionGoogle(
       mensaje: 'Introduce el código de Google Authenticator',
     })
   }
+const token = await crearSesionSin2FA(env, usuario.id)
 
-  const token = await crearSesion(env, usuario.id)
+if (!token) {
+  const desafio = await crearDesafio2FA(env, usuario.id)
+
+  return responder({
+    requiere_2fa: true,
+    desafio,
+    expira_en_segundos: 300,
+    mensaje: 'Introduce el código de Google Authenticator',
+  })
+}
 
   return responder({
     mensaje: 'Sesión iniciada con Google correctamente',

@@ -19,11 +19,7 @@ interface RespuestaAuth {
   desafio?: string
 }
 
-type Modo = 'login' | 'registro'
-
 export default function Login() {
-  const [modo, setModo] = useState<Modo>('login')
-  const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mostrarPassword, setMostrarPassword] = useState(false)
@@ -67,15 +63,6 @@ export default function Login() {
     void recuperarSesion()
     return () => controlador.abort()
   }, [])
-
-  function cambiarModo(nuevoModo: Modo) {
-    if (cargando) return
-    setModo(nuevoModo)
-    setError('')
-    setMensaje('')
-    setPassword('')
-    setMostrarPassword(false)
-  }
 
   function completarAcceso(datos: RespuestaAuth) {
     if (datos.requiere_2fa) {
@@ -126,58 +113,17 @@ export default function Login() {
 
     const emailLimpio = email.trim().toLowerCase()
 
-    if (modo === 'registro') {
-      if (nombre.trim().length < 3 || nombre.trim().length > 50) {
-        setError('El nombre debe tener entre 3 y 50 caracteres.')
-        return
-      }
-
-      if (password.length < 12 || password.length > 128) {
-        setError('La contraseña debe tener entre 12 y 128 caracteres.')
-        return
-      }
-    }
-
     setCargando(true)
 
     try {
-      const esRegistro = modo === 'registro'
+      const respuesta = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ email: emailLimpio, password }),
+      })
 
-      const respuesta = await fetch(
-        esRegistro ? '/api/auth/registro' : '/api/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'same-origin',
-          body: JSON.stringify(
-            esRegistro
-              ? {
-                  nombre: nombre.trim(),
-                  email: emailLimpio,
-                  password,
-                }
-              : {
-                  email: emailLimpio,
-                  password,
-                },
-          ),
-        },
-      )
-
-      const datos = await leerRespuesta(respuesta)
-
-      if (esRegistro) {
-        setPassword('')
-        setModo('login')
-        setMensaje(
-          datos.mensaje ??
-            'Cuenta creada. Ya puedes iniciar sesión.',
-        )
-      } else {
-        completarAcceso(datos)
-      }
+      completarAcceso(await leerRespuesta(respuesta))
     } catch (err) {
       setError(
         err instanceof Error
@@ -353,9 +299,7 @@ export default function Login() {
                   ? 'Mi sesión'
                   : desafio2FA
                     ? 'Verificación en dos pasos'
-                    : modo === 'registro'
-                      ? 'Crea tu cuenta'
-                      : 'Bienvenido de nuevo'}
+                    : 'Bienvenido de nuevo'}
             </h2>
 
             <p>
@@ -363,9 +307,7 @@ export default function Login() {
                 ? 'Tu sesión está activa.'
                 : desafio2FA
                   ? 'Confirma tu identidad para continuar.'
-                  : modo === 'registro'
-                    ? 'Regístrate para personalizar tu experiencia.'
-                    : 'Accede para continuar donde lo dejaste.'}
+                  : 'Accede para continuar donde lo dejaste.'}
             </p>
           </div>
 
@@ -478,67 +420,15 @@ export default function Login() {
             </form>
           ) : (
             <>
-              <div
-                className="auth-pestanas"
-                role="group"
-                aria-label="Tipo de acceso"
-              >
-                <button
-                  type="button"
-                  className={
-                    modo === 'login'
-                      ? 'auth-pestana activa'
-                      : 'auth-pestana'
-                  }
-                  aria-pressed={modo === 'login'}
-                  disabled={cargando}
-                  onClick={() => cambiarModo('login')}
-                >
-                  Iniciar sesión
-                </button>
-
-                <button
-                  type="button"
-                  className={
-                    modo === 'registro'
-                      ? 'auth-pestana activa'
-                      : 'auth-pestana'
-                  }
-                  aria-pressed={modo === 'registro'}
-                  disabled={cargando}
-                  onClick={() => cambiarModo('registro')}
-                >
-                  Crear cuenta
-                </button>
-              </div>
+              <p className="auth-ayuda">
+                ¿Todavía no tienes cuenta? Puedes crearla con Google.
+                El registro por correo estará disponible próximamente.
+              </p>
 
               <form
                 className="auth-formulario"
                 onSubmit={enviarFormulario}
               >
-                {modo === 'registro' && (
-                  <div className="auth-campo">
-                    <label htmlFor="registro-nombre">
-                      Nombre
-                    </label>
-
-                    <input
-                      id="registro-nombre"
-                      type="text"
-                      autoComplete="name"
-                      minLength={3}
-                      maxLength={50}
-                      required
-                      value={nombre}
-                      onChange={(evento) =>
-                        setNombre(evento.target.value)
-                      }
-                      disabled={cargando}
-                      placeholder="Tu nombre"
-                    />
-                  </div>
-                )}
-
                 <div className="auth-campo">
                   <label htmlFor="auth-email">
                     Correo electrónico
@@ -569,14 +459,7 @@ export default function Login() {
                     type={
                       mostrarPassword ? 'text' : 'password'
                     }
-                    autoComplete={
-                      modo === 'registro'
-                        ? 'new-password'
-                        : 'current-password'
-                    }
-                    minLength={
-                      modo === 'registro' ? 12 : undefined
-                    }
+                    autoComplete="current-password"
                     maxLength={128}
                     required
                     value={password}
@@ -584,11 +467,7 @@ export default function Login() {
                       setPassword(evento.target.value)
                     }
                     disabled={cargando}
-                    placeholder={
-                      modo === 'registro'
-                        ? 'Mínimo 12 caracteres'
-                        : 'Tu contraseña'
-                    }
+                    placeholder="Tu contraseña"
                   />
                 </div>
 
@@ -606,13 +485,6 @@ export default function Login() {
                   Mostrar contraseña
                 </label>
 
-                {modo === 'registro' && (
-                  <p className="auth-ayuda">
-                    La contraseña debe tener entre 12 y
-                    128 caracteres.
-                  </p>
-                )}
-
                 <button
                   className="auth-boton auth-boton-principal"
                   type="submit"
@@ -620,14 +492,12 @@ export default function Login() {
                 >
                   {cargando
                     ? 'Procesando...'
-                    : modo === 'registro'
-                      ? 'Crear cuenta'
-                      : 'Iniciar sesión'}
+                    : 'Iniciar sesión'}
                 </button>
               </form>
 
               <div className="auth-separador">
-                <span>O continúa con</span>
+                <span>O accede o crea tu cuenta con</span>
               </div>
 
               <div className="auth-google">

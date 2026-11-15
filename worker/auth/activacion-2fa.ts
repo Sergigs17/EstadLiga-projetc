@@ -1,10 +1,15 @@
+
 import {
   prepararCodigosRecuperacion,
   consultasGuardarCodigosRecuperacion,
 } from './recuperacion-2fa'
 import { verificarPassword } from './passwords'
 import { consumirIntento } from './rate-limit'
-import { obtenerUsuarioSesion } from './sesiones'
+import {
+  obtenerUsuarioSesion,
+  consultaRevocarOtrasSesiones,
+  consultaComprobarSesionActual,
+} from './sesiones'
 import {
   generarSecretoTOTP,
   crearEnlaceTOTP,
@@ -45,10 +50,16 @@ export async function preparar2FA(
   }
 
   const limiteIP = await consumirIntento(
-    request, env, '2fa_preparar',
+    request,
+    env,
+    '2fa_preparar',
   )
+
   const limiteCuenta = await consumirIntento(
-    request, env, '2fa_preparar', String(usuario.id),
+    request,
+    env,
+    '2fa_preparar',
+    String(usuario.id),
   )
 
   if (!limiteIP.permitido || !limiteCuenta.permitido) {
@@ -126,6 +137,7 @@ export async function preparar2FA(
   }
 
   const secreto = generarSecretoTOTP()
+
   const secretoCifrado = await cifrarSecretoTOTP(
     secreto,
     env.TOTP_ENCRYPTION_KEY,
@@ -171,10 +183,16 @@ export async function activar2FA(
   }
 
   const limiteIP = await consumirIntento(
-    request, env, '2fa_activar',
+    request,
+    env,
+    '2fa_activar',
   )
+
   const limiteCuenta = await consumirIntento(
-    request, env, '2fa_activar', String(usuario.id),
+    request,
+    env,
+    '2fa_activar',
+    String(usuario.id),
   )
 
   if (!limiteIP.permitido || !limiteCuenta.permitido) {
@@ -218,7 +236,9 @@ export async function activar2FA(
   const codigo = (datos as Record<string, unknown>).codigo
 
   if (typeof codigo !== 'string' || !/^\d{6}$/.test(codigo)) {
-    return json({ error: 'Introduce un código de seis dígitos' }, 400)
+    return json({
+      error: 'Introduce un código de seis dígitos',
+    }, 400)
   }
 
   const configuracion = await env.estadliga_db
@@ -231,7 +251,9 @@ export async function activar2FA(
     .first<Configuracion2FA>()
 
   if (!configuracion || configuracion.activado === 1) {
-    return json({ error: 'No hay una activación pendiente' }, 409)
+    return json({
+      error: 'No hay una activación pendiente',
+    }, 409)
   }
 
   const secreto = await descifrarSecretoTOTP(
@@ -245,9 +267,20 @@ export async function activar2FA(
     return json({ error: 'Código incorrecto' }, 401)
   }
 
-  const { codigos, hashes } = await prepararCodigosRecuperacion()
+  const { codigos, hashes } =
+    await prepararCodigosRecuperacion()
 
-  const operaciones = [
+  // Todas las operaciones se ejecutan en una transacción D1.
+  const operaciones: D1PreparedStatement[] = [
+    // La sesión que activa el 2FA debe seguir siendo válida.
+    await consultaComprobarSesionActual(
+      request,
+      env,
+      usuario.id,
+    ),
+
+    // Activar Google Authenticator solo si la configuración
+    // sigue siendo la misma que acabamos de verificar.
     env.estadliga_db
       .prepare(`
         UPDATE usuarios_2fa
@@ -259,8 +292,13 @@ export async function activar2FA(
           AND activado = 0
           AND secreto_cifrado = ?
       `)
-      .bind(paso, usuario.id, configuracion.secreto_cifrado),
+      .bind(
+        paso,
+        usuario.id,
+        configuracion.secreto_cifrado,
+      ),
 
+    // Exigir que exactamente una configuración se active.
     env.estadliga_db.prepare(`
       SELECT CASE
         WHEN changes() = 1 THEN 1
@@ -268,10 +306,32 @@ export async function activar2FA(
       END AS comprobacion
     `),
 
+    // Guardar los códigos de recuperación.
     ...consultasGuardarCodigosRecuperacion(
       env,
       usuario.id,
       hashes,
+    ),
+
+    // Invalidar los desafíos anteriores de este usuario.
+    // Así no podrán utilizarse después de la activación.
+    env.estadliga_db
+      .prepare(`
+        UPDATE desafios_2fa
+        SET utilizado_en = ?
+        WHERE usuario_id = ?
+          AND utilizado_en IS NULL
+      `)
+      .bind(
+        Math.floor(Date.now() / 1000),
+        usuario.id,
+      ),
+
+    // Cerrar las demás sesiones del usuario.
+    await consultaRevocarOtrasSesiones(
+      request,
+      env,
+      usuario.id,
     ),
   ]
 

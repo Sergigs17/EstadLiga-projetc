@@ -1,5 +1,6 @@
 import { manejarAuth } from './auth'
 import { manejarFavoritos } from './favoritos'
+import { obtenerUsuarioSesion } from './auth/sesiones'
 
 
 interface Env {
@@ -833,6 +834,39 @@ interface FilaEstadisticasWeb {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
+
+    // Las rutas que modifican datos o consumen recursos externos son administrativas.
+    const rutaAdministrativa =
+      (request.method === 'POST' && (
+        url.pathname === '/api/estadisticas/importar' ||
+        url.pathname === '/api/estadisticas-equipos/importar' ||
+        /^\/api\/equipos\/\d+\/jugadores\/importar$/.test(url.pathname)
+      )) ||
+      (request.method === 'GET' && (
+        url.pathname === '/api/buscar-equipos' ||
+        url.pathname === '/api/test-sofascore'
+      ))
+
+    if (rutaAdministrativa) {
+      const usuario = await obtenerUsuarioSesion(request, env)
+      if (!usuario) {
+        return Response.json({ error: 'Debes iniciar sesión' }, { status: 401 })
+      }
+      if (usuario.rol !== 'admin') {
+        return Response.json({ error: 'No tienes permisos de administrador' }, { status: 403 })
+      }
+
+      // Impedir peticiones de modificación desde otros orígenes.
+      if (request.method === 'POST') {
+        const origen = request.headers.get('Origin')
+        const origenLocalPermitido = url.hostname === 'localhost' &&
+          url.port === '8788' && origen === 'http://localhost:5173'
+        if (!origen || (origen !== url.origin && !origenLocalPermitido)) {
+          return Response.json({ error: 'Origen no autorizado' }, { status: 403 })
+        }
+      }
+    }
+
 
     const respuestaAuth = await manejarAuth(request, env)
 

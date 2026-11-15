@@ -8,6 +8,8 @@ export type TipoRateLimit =
   | '2fa_preparar'
   | '2fa_activar'
   | '2fa_verificar'
+  | '2fa_regenerar'
+  | '2fa_desactivar'
 
 const CONFIGURACION = {
   login: {
@@ -30,6 +32,14 @@ const CONFIGURACION = {
     maxIntentos: 5,
     ventanaSegundos: 5 * 60,
   },
+  '2fa_regenerar': {
+  maxIntentos: 5,
+  ventanaSegundos: 15 * 60,
+},
+'2fa_desactivar': {
+  maxIntentos: 5,
+  ventanaSegundos: 15 * 60,
+},
 } as const
 
 interface RegistroIntentos {

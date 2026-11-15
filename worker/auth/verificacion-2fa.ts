@@ -1,8 +1,17 @@
+
 import { consumirIntento } from './rate-limit'
 import { obtenerDesafio2FA } from './desafios'
-import { descifrarSecretoTOTP, obtenerPasoTOTP } from './totp'
-import { crearSesion, cookieIniciarSesion } from './sesiones'
-import { calcularHashCodigoRecuperacion } from './recuperacion-2fa'
+import {
+  descifrarSecretoTOTP,
+  obtenerPasoTOTP,
+} from './totp'
+import {
+  prepararSesion2FA,
+  cookieIniciarSesion,
+} from './sesiones'
+import {
+  calcularHashCodigoRecuperacion,
+} from './recuperacion-2fa'
 
 interface VerificacionEnv {
   estadliga_db: D1Database
@@ -41,6 +50,7 @@ export async function verificarSegundoFactor(
   request: Request,
   env: VerificacionEnv,
 ): Promise<Response> {
+  // 1. Comprobar el tipo de contenido.
   const tipo = request.headers.get('Content-Type') ?? ''
 
   if (!tipo.toLowerCase().startsWith('application/json')) {
@@ -64,6 +74,7 @@ export async function verificarSegundoFactor(
   const codigo = campos.codigo
   const codigoRecuperacion = campos.codigo_recuperacion
 
+  // 2. Identificar el método de verificación.
   const esTOTP =
     typeof codigo === 'string' &&
     /^\d{6}$/.test(codigo) &&
@@ -81,16 +92,21 @@ export async function verificarSegundoFactor(
     !/^[0-9a-f]{64}$/.test(desafio) ||
     (!esTOTP && !esRecuperacion)
   ) {
-    return respuesta({ error: 'Datos de verificación no válidos' }, 400)
+    return respuesta({
+      error: 'Datos de verificación no válidos',
+    }, 400)
   }
 
+  // 3. Comprobar que el desafío existe y no ha caducado.
   const desafioBD = await obtenerDesafio2FA(env, desafio)
 
   if (!desafioBD) {
-    return respuesta({ error: 'Desafío no válido o caducado' }, 401)
+    return respuesta({
+      error: 'Desafío no válido o caducado',
+    }, 401)
   }
 
-  // Limitar intentos por IP y por cuenta antes de verificar TOTP.
+  // 4. Limitar intentos por IP y cuenta.
   const limiteIP = await consumirIntento(
     request,
     env,
@@ -111,15 +127,22 @@ export async function verificarSegundoFactor(
     )
 
     return respuesta(
-      { error: 'Demasiados intentos. Inténtalo más tarde.' },
+      {
+        error: 'Demasiados intentos. Inténtalo más tarde.',
+      },
       429,
-      { 'Retry-After': String(Math.max(1, espera)) },
+      {
+        'Retry-After': String(Math.max(1, espera)),
+      },
     )
   }
 
+  // 5. Obtener la configuración 2FA activa.
   const configuracion = await env.estadliga_db
     .prepare(`
-      SELECT secreto_cifrado, ultimo_paso_totp
+      SELECT
+        secreto_cifrado,
+        ultimo_paso_totp
       FROM usuarios_2fa
       WHERE usuario_id = ?
         AND activado = 1
@@ -128,19 +151,26 @@ export async function verificarSegundoFactor(
     .first<Configuracion2FA>()
 
   if (!configuracion) {
-    return respuesta({ error: 'Segundo factor no disponible' }, 401)
+    return respuesta({
+      error: 'Segundo factor no disponible',
+    }, 401)
   }
 
   let paso: number | null = null
   let hashRecuperacion: string | null = null
 
+  // 6. Verificar el código TOTP o preparar el hash
+  // del código de recuperación.
   if (esTOTP) {
     const secreto = await descifrarSecretoTOTP(
       configuracion.secreto_cifrado,
       env.TOTP_ENCRYPTION_KEY,
     )
 
-    paso = await obtenerPasoTOTP(secreto, codigo as string)
+    paso = await obtenerPasoTOTP(
+      secreto,
+      codigo as string,
+    )
 
     if (paso === null) {
       return respuesta({
@@ -148,14 +178,20 @@ export async function verificarSegundoFactor(
       }, 401)
     }
   } else {
-    hashRecuperacion = await calcularHashCodigoRecuperacion(
-      codigoRecuperacion as string,
-    )
+    hashRecuperacion =
+      await calcularHashCodigoRecuperacion(
+        codigoRecuperacion as string,
+      )
   }
 
+  // 7. Obtener el usuario.
   const usuario = await env.estadliga_db
     .prepare(`
-      SELECT id, nombre, email, rol
+      SELECT
+        id,
+        nombre,
+        email,
+        rol
       FROM usuarios
       WHERE id = ?
     `)
@@ -163,13 +199,15 @@ export async function verificarSegundoFactor(
     .first<Usuario2FA>()
 
   if (!usuario) {
-    return respuesta({ error: 'Usuario no encontrado' }, 401)
+    return respuesta({
+      error: 'Usuario no encontrado',
+    }, 401)
   }
 
   const ahora = Math.floor(Date.now() / 1000)
 
-  // Consumir el desafío y el segundo factor en una única
-  // transacción. Un fallo revierte todas las operaciones.
+  // Hace fallar la transacción si la operación anterior
+  // no ha modificado exactamente una fila.
   const comprobarCambio = () =>
     env.estadliga_db.prepare(`
       SELECT CASE
@@ -178,7 +216,9 @@ export async function verificarSegundoFactor(
       END AS comprobacion
     `)
 
+  // 8. Preparar las operaciones de la transacción.
   const operaciones: D1PreparedStatement[] = [
+    // Consumir el desafío.
     env.estadliga_db
       .prepare(`
         UPDATE desafios_2fa
@@ -188,12 +228,19 @@ export async function verificarSegundoFactor(
           AND utilizado_en IS NULL
           AND expira_en > ?
       `)
-      .bind(ahora, desafioBD.id, usuario.id, ahora),
+      .bind(
+        ahora,
+        desafioBD.id,
+        usuario.id,
+        ahora,
+      ),
 
     comprobarCambio(),
   ]
 
   if (hashRecuperacion !== null) {
+    // 9A. Consumir un código de recuperación.
+    // Exigir que siga activa la misma configuración 2FA.
     operaciones.push(
       env.estadliga_db
         .prepare(`
@@ -207,12 +254,21 @@ export async function verificarSegundoFactor(
               FROM usuarios_2fa
               WHERE usuario_id = ?
                 AND activado = 1
+                AND secreto_cifrado = ?
             )
         `)
-        .bind(usuario.id, hashRecuperacion, usuario.id),
+        .bind(
+          usuario.id,
+          hashRecuperacion,
+          usuario.id,
+          configuracion.secreto_cifrado,
+        ),
+
       comprobarCambio(),
     )
   } else {
+    // 9B. Consumir el paso TOTP.
+    // Impedir su reutilización y comprobar el secreto vigente.
     operaciones.push(
       env.estadliga_db
         .prepare(`
@@ -221,12 +277,35 @@ export async function verificarSegundoFactor(
           WHERE usuario_id = ?
             AND activado = 1
             AND ultimo_paso_totp < ?
+            AND secreto_cifrado = ?
         `)
-        .bind(paso, usuario.id, paso),
+        .bind(
+          paso,
+          usuario.id,
+          paso,
+          configuracion.secreto_cifrado,
+        ),
+
       comprobarCambio(),
     )
   }
 
+  // 10. Preparar la sesión sin insertarla todavía.
+  // Se exige el mismo secreto cifrado que se ha verificado.
+  const sesionPreparada = await prepararSesion2FA(
+    env,
+    usuario.id,
+    configuracion.secreto_cifrado,
+  )
+
+  // La sesión se insertará dentro de la misma transacción
+  // que consume el desafío y el segundo factor.
+  operaciones.push(
+    sesionPreparada.consulta,
+    comprobarCambio(),
+  )
+
+  // 11. Ejecutar todas las operaciones de forma atómica.
   try {
     await env.estadliga_db.batch(operaciones)
   } catch {
@@ -235,7 +314,9 @@ export async function verificarSegundoFactor(
     }, 401)
   }
 
-  const token = await crearSesion(env, usuario.id)
+  // 12. Entregar la sesión únicamente si la transacción
+  // se ha completado correctamente.
+  const token = sesionPreparada.token
 
   return respuesta({
     mensaje: 'Verificación completada correctamente',

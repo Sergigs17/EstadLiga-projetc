@@ -40,3 +40,9 @@ pruebas/codigos-recuperacion-privados.json
 # Copias locales de autenticación
 /pruebas/backups/
 /pruebas/datos-deportivos.sql
+
+# Pruebas locales de seguridad
+/pruebas/
+
+# Copias de seguridad locales
+*.backup
