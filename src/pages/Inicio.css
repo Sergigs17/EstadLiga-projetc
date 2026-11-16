@@ -19,3 +19,107 @@
 .bloque-informativo a {
   text-decoration: none;
 }
+
+/* Mi EstadLiga: tarjetas adaptadas a las variables del tema claro/oscuro */
+.mi-estadliga { padding-top: 38px; }
+.mi-estadliga .titulo-seccion { align-items: center; }
+.mi-estadliga-config { color: var(--rojo-vivo); font-weight: 700; text-decoration: none; }
+.mi-estadliga-rejilla { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; margin-top: 22px; }
+.mi-estadliga-panel { min-width: 0; padding: 26px; border: 1px solid var(--linea); background: var(--papel); border-radius: var(--radio); box-shadow: var(--sombra-suave); color: var(--tinta); }
+.mi-estadliga-panel h3 { margin: 12px 0; font-size: 1.45rem; color: var(--tinta); }
+.mi-estadliga-panel p { color: var(--tinta-suave); margin: 12px 0 18px; }
+.mi-estadliga-rotulo { color: var(--rojo-vivo); font-size: .75rem; letter-spacing: .08em; font-weight: 800; }
+.mi-estadliga-panel > a, .mi-estadliga-panel li a { color: var(--rojo-vivo); font-weight: 700; text-decoration: none; }
+.mi-estadliga-panel a:hover { text-decoration: underline; }
+.mi-estadliga-panel ul { list-style: none; padding: 0; margin: 12px 0 18px; }
+.mi-estadliga-panel li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--linea); padding: 10px 0; color: var(--tinta); }
+.mi-estadliga-panel li span { min-width: 0; overflow-wrap: anywhere; }
+.mi-estadliga-panel li small { flex-shrink: 0; color: var(--tinta-suave); text-align: right; }
+@media(max-width:760px) { .mi-estadliga-rejilla { grid-template-columns: 1fr; } .mi-estadliga-panel { padding: 20px; } .mi-estadliga-panel li { flex-direction: column; gap: 2px; } .mi-estadliga-panel li small { text-align: left; } }
+
+/* Mi EstadLiga: portada deportiva personalizada */
+.mi-estadliga { padding-top: 56px; }
+.mi-estadliga-heading { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:26px; }
+.mi-estadliga-heading h2 { margin:8px 0 10px; font-size:clamp(2rem,3.5vw,3rem); }
+.mi-estadliga-heading p { color:var(--tinta-suave); }
+.mi-estadliga-dashboard { display:flex; flex-direction:column; gap:26px; }
+.mi-estadliga-hero { min-height:310px; display:flex; position:relative; overflow:hidden; border-radius:24px; background:linear-gradient(118deg,#9b1021 0%,#d4202c 52%,#ed5961 100%); color:#fff; box-shadow:0 16px 40px rgba(140,20,35,.2); }
+.mi-estadliga-hero-content { position:relative; z-index:1; width:100%; padding:36px 42px; }
+.mi-estadliga-eyebrow { display:block; font-size:11px; letter-spacing:.14em; font-weight:800; color:#ffe3e5; }
+.mi-estadliga-hero-team { display:flex; align-items:center; gap:22px; margin:24px 0; }
+.mi-estadliga-hero-team img { width:96px; height:96px; object-fit:contain; filter:drop-shadow(0 5px 12px #0003); }
+.mi-estadliga-hero h3 { color:#fff; font-size:clamp(1.7rem,3vw,2.8rem); margin:0 0 5px; }
+.mi-estadliga-hero-team span { color:#ffe0e3; }
+.mi-estadliga-kpis { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+.mi-estadliga-kpis div { display:flex; flex-direction:column; min-width:105px; padding:11px 20px; background:#ffffff1d; border:1px solid #ffffff45; border-radius:12px; backdrop-filter:blur(8px); }
+.mi-estadliga-kpis strong { font-size:27px; line-height:1.15; color:#fff; }
+.mi-estadliga-kpis span { font-size:12px; color:#ffe4e7; }
+.mi-estadliga-hero-link { color:#fff; font-weight:800; text-decoration:none; border-bottom:1px solid #ffffffa0; padding-bottom:4px; }
+.mi-estadliga-hero-decoration { position:absolute; right:-50px; bottom:-110px; font-size:370px; opacity:.10; transform:rotate(-18deg); pointer-events:none; }
+.mi-estadliga-section-heading { display:flex; justify-content:space-between; align-items:end; gap:16px; margin:16px 0 -8px; }
+.mi-estadliga-section-heading h3 { font-size:clamp(1.4rem,2.5vw,2rem); margin-top:5px; }
+.mi-estadliga-section-heading a,.mi-estadliga-card>a { color:var(--rojo-vivo); font-weight:750; text-decoration:none; }
+.mi-estadliga-match-feature { border:1px solid var(--linea); background:var(--papel); border-radius:22px; padding:26px 34px; box-shadow:var(--sombra-suave); }
+.mi-estadliga-match-meta { display:flex; justify-content:space-between; gap:10px; color:var(--tinta-suave); font-size:13px; }
+.mi-estadliga-match-meta span { color:var(--rojo-vivo); font-weight:800; letter-spacing:.08em; }
+.mi-estadliga-match-versus { display:grid; grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr); align-items:center; gap:15px; padding:18px 0 4px; }
+.mi-estadliga-match-club { display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; font-size:clamp(14px,1.6vw,20px); }
+.mi-estadliga-match-club img { width:76px; height:76px; object-fit:contain; }
+.mi-estadliga-vs { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.mi-estadliga-vs strong { font-size:29px; color:var(--rojo-vivo); }
+.mi-estadliga-vs small { color:var(--tinta-suave); }
+.mi-estadliga-fixtures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.mi-estadliga-fixture { border:1px solid var(--linea); background:var(--papel); border-radius:15px; padding:15px 18px; min-width:0; }
+.mi-estadliga-fixture-date { color:var(--rojo-vivo); font-weight:800; font-size:12px; }
+.mi-estadliga-fixture-teams { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:8px; font-size:13px; }
+.mi-estadliga-fixture-teams img { width:26px; height:26px; object-fit:contain; }
+.mi-estadliga-fixture-teams strong { overflow-wrap:anywhere; }
+.mi-estadliga-fixture-vs { color:var(--tinta-suave); }
+.mi-estadliga-two-cols { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.mi-estadliga-card { display:flex; flex-direction:column; gap:18px; border:1px solid var(--linea); background:var(--papel); border-radius:22px; padding:26px; min-width:0; box-shadow:var(--sombra-suave); }
+.mi-estadliga-card-head { display:flex; justify-content:space-between; align-items:start; gap:12px; }
+.mi-estadliga-card-head h3 { margin:8px 0 0; font-size:1.6rem; }
+.mi-estadliga-card-symbol { font-size:30px; color:var(--rojo-vivo); }
+.mi-estadliga-form { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center; padding:16px; border-radius:14px; background:var(--papel-calido); }
+.mi-estadliga-form>div:first-child { display:flex; flex-direction:column; }
+.mi-estadliga-form>div:first-child strong { font-size:30px; line-height:1.2; }
+.mi-estadliga-form>div:first-child span { color:var(--tinta-suave); font-size:12px; }
+.mi-estadliga-form-badges { display:flex; gap:5px; }
+.mi-estadliga-form-badges span { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; color:#fff; font-size:12px; font-weight:800; background:#6b7280; }
+.mi-estadliga-form-badges .mi-estadliga-form-V { background:#16854c; }
+.mi-estadliga-form-badges .mi-estadliga-form-D { background:#d4202c; }
+.mi-estadliga-results { display:flex; flex-direction:column; gap:0; }
+.mi-estadliga-result { display:grid; grid-template-columns:minmax(0,1fr) 65px minmax(0,1fr); gap:10px; align-items:center; padding:12px 0; border-bottom:1px solid var(--linea); font-size:13px; }
+.mi-estadliga-result strong { text-align:center; padding:6px 4px; border-radius:7px; background:var(--papel-calido); font-size:16px; }
+.mi-estadliga-result span:last-child { text-align:right; }
+.mi-estadliga-player { display:flex; align-items:center; gap:10px; padding:13px 0; border-bottom:1px solid var(--linea); color:var(--tinta); text-decoration:none; }
+.mi-estadliga-player-avatar { display:grid; place-items:center; width:44px; height:44px; flex:0 0 44px; background:var(--papel-calido); border-radius:12px; font-size:22px; }
+.mi-estadliga-player-name { display:flex; flex:1; min-width:0; flex-direction:column; }
+.mi-estadliga-player-name strong { overflow-wrap:anywhere; }
+.mi-estadliga-player-name small,.mi-estadliga-player-stats small { color:var(--tinta-suave); }
+.mi-estadliga-player-stats { display:flex; flex-direction:column; text-align:center; min-width:42px; }
+.mi-estadliga-player-stats strong { font-size:20px; }
+.mi-estadliga-player-arrow { color:var(--rojo-vivo); }
+.mi-estadliga-empty { border:1px dashed var(--linea); background:var(--papel); border-radius:16px; padding:22px; color:var(--tinta-suave); }
+@media(max-width:850px){.mi-estadliga-fixtures,.mi-estadliga-two-cols{grid-template-columns:1fr}.mi-estadliga-heading{align-items:start;flex-direction:column}.mi-estadliga-hero-content{padding:26px}.mi-estadliga-hero-decoration{font-size:250px}}
+@media(max-width:520px){.mi-estadliga-match-feature{padding:18px}.mi-estadliga-match-versus{grid-template-columns:minmax(0,1fr) 55px minmax(0,1fr);gap:4px}.mi-estadliga-match-club img{width:50px;height:50px}.mi-estadliga-vs strong{font-size:21px}.mi-estadliga-hero-team img{width:64px;height:64px}.mi-estadliga-kpis div{min-width:76px;padding:10px 13px}.mi-estadliga-result{font-size:11px;gap:5px}.mi-estadliga-player-stats{min-width:32px}}
+
+/* Imágenes de los favoritos: foto del Worker/R2 y fallback cuando no existe. */
+.mi-estadliga-player-avatar { overflow: hidden; position: relative; flex-shrink: 0; }
+.mi-estadliga-player-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; }
+.mi-estadliga-player-avatar span { display: none; }
+.mi-estadliga-player-avatar.sin-foto span { display: grid; place-items: center; width: 100%; height: 100%; }
+
+/* Selector de equipos favoritos: tema claro y oscuro */
+.mi-estadliga-selector { padding: 20px 22px; border: 1px solid var(--linea); border-radius: 18px; background: var(--papel); color: var(--tinta); }
+.mi-estadliga-selector-titulo { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.mi-estadliga-selector-titulo strong { font-size:18px; }
+.mi-estadliga-selector-titulo span { color:var(--tinta-suave); font-size:13px; }
+.mi-estadliga-selector-lista { display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; }
+.mi-estadliga-selector-equipo { display:flex; flex:0 0 auto; align-items:center; gap:10px; border:1px solid var(--linea); border-radius:14px; background:var(--papel-calido); color:var(--tinta); padding:10px 14px; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.mi-estadliga-selector-equipo img { width:34px; height:34px; object-fit:contain; }
+.mi-estadliga-selector-equipo small { color:var(--tinta-suave); font-size:10px; }
+.mi-estadliga-selector-equipo:hover { border-color:var(--rojo); }
+.mi-estadliga-selector-equipo.activo { border:2px solid var(--rojo); background:var(--rojo-suave); }
+.mi-estadliga-selector-equipo:focus-visible { outline:3px solid var(--rojo); outline-offset:2px; }
+@media(max-width:600px) { .mi-estadliga-selector { padding:14px; } .mi-estadliga-selector-equipo { padding:8px 10px; } }
