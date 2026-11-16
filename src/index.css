@@ -100,3 +100,6 @@ img {
   height: auto;
   object-fit: contain;
 }
+/* Tema global. La elección «sistema» sigue las preferencias de macOS. */
+:root[data-tema="oscuro"]{color-scheme:dark;--tinta:#f7f4f2;--tinta-suave:#bfb9b6;--papel:#1c2028;--papel-calido:#12151b;--linea:#343b45;--rojo-suave:#3d222a;--sombra-suave:0 6px 24px rgb(0 0 0 / 25%);--sombra-fuerte:0 18px 40px rgb(0 0 0 / 40%)}
+@media(prefers-color-scheme:dark){:root:not([data-tema]),:root[data-tema="sistema"]{color-scheme:dark;--tinta:#f7f4f2;--tinta-suave:#bfb9b6;--papel:#1c2028;--papel-calido:#12151b;--linea:#343b45;--rojo-suave:#3d222a;--sombra-suave:0 6px 24px rgb(0 0 0 / 25%);--sombra-fuerte:0 18px 40px rgb(0 0 0 / 40%)}}

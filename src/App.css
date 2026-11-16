@@ -231,7 +231,7 @@ button {
 .balon {
   width: 22px;
   height: 22px;
-  background: #fff;
+  background: var(--papel);
   border-radius: 50%;
   font-size: 0;
 }
@@ -365,7 +365,7 @@ button {
   color: #fff;
 }
 .bloque-informativo .boton-secundario:hover {
-  background: #fff;
+  background: var(--papel);
   color: var(--rojo);
 }
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€ PIE â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -941,3 +941,10 @@ button {
     height: 40px;
   }
 }
+
+/* Selector de tema de la cabecera */
+.selector-tema{display:flex;align-items:center;gap:6px;color:var(--tinta-suave);font-size:.74rem;font-weight:700;white-space:nowrap}.selector-tema select{background:var(--papel);color:var(--tinta);border:1px solid var(--linea);border-radius:10px;padding:8px 5px;max-width:115px}.mi-equipo-inicio{margin-top:20px;margin-bottom:20px;border:1px solid var(--linea);border-radius:18px;background:var(--papel);padding:25px}.mi-equipo-inicio p{color:var(--tinta-suave)}
+/* Refuerzo para controles y paneles comunes en modo oscuro */
+:root[data-tema="oscuro"] input,:root[data-tema="oscuro"] textarea,:root[data-tema="oscuro"] select{color-scheme:dark}
+@media(prefers-color-scheme:dark){:root[data-tema="sistema"] input,:root[data-tema="sistema"] textarea,:root[data-tema="sistema"] select{color-scheme:dark}}
+@media(max-width:900px){.selector-tema{font-size:0}.selector-tema select{font-size:.75rem;max-width:105px}}

@@ -11,7 +11,7 @@
   overflow: hidden;
   border: 0;
   border-radius: var(--radio-grande, 24px);
-  background: var(--papel, #fff);
+  background: var(--papel, var(--papel));
   color: var(--tinta);
   box-shadow: 0 30px 80px rgb(0 0 0 / 40%);
 }
@@ -81,7 +81,7 @@
   padding: 36px 24px;
   background:
     radial-gradient(circle at 50% 38%, rgb(255 255 255 / 95%), transparent 62%),
-    linear-gradient(160deg, var(--rojo-suave, #fdeceb), color-mix(in srgb, var(--rojo) 22%, #fff));
+    linear-gradient(160deg, var(--rojo-suave, #fdeceb), color-mix(in srgb, var(--rojo) 22%, var(--papel)));
 }
 
 .mt-vitrina img {

@@ -77,7 +77,7 @@
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.partidos-flecha:hover:not(:disabled) { background: #fff; color: var(--rojo); }
+.partidos-flecha:hover:not(:disabled) { background: var(--papel); color: var(--rojo); }
 .partidos-flecha:disabled { opacity: 0.35; cursor: default; }
 .partidos-flecha:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
@@ -102,7 +102,7 @@
   padding: 0 8px;
   border: 1.5px solid var(--linea);
   border-radius: 12px;
-  background: #fff;
+  background: var(--papel);
   color: var(--tinta-suave);
   font: 800 0.9rem var(--fuente-titulo);
   cursor: pointer;
@@ -120,7 +120,7 @@
   border-radius: 50%;
   background: var(--rojo);
 }
-.partidos-tira button.es-actual[aria-pressed="true"]::after { background: #fff; }
+.partidos-tira button.es-actual[aria-pressed="true"]::after { background: var(--papel); }
 .partidos-tira button:focus-visible,
 .partidos-actual:focus-visible { outline: 3px solid var(--rojo); outline-offset: 2px; }
 .partidos-actual {
@@ -164,7 +164,7 @@
   overflow: hidden;
   border: 1px solid var(--linea);
   border-radius: 18px;
-  background: #fff;
+  background: var(--papel);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .partido:hover { border-color: var(--rojo); box-shadow: var(--sombra-suave); }
@@ -177,7 +177,7 @@
 }
 .partido-final::before { background: var(--tinta); }
 .partido-directo::before { background: var(--rojo); }
-.partido-directo { border-color: var(--rojo); background: linear-gradient(90deg, var(--rojo-suave), #fff 40%); }
+.partido-directo { border-color: var(--rojo); background: linear-gradient(90deg, var(--rojo-suave), var(--papel) 40%); }
 
 .partido-meta { display: grid; gap: 4px; justify-items: start; padding-left: 8px; }
 .partido-meta strong { font: 900 1.45rem var(--fuente-titulo); letter-spacing: -0.02em; line-height: 1; }
@@ -263,3 +263,7 @@
 @media (prefers-reduced-motion: reduce) {
   .partido-estado i { animation: none; }
 }
+
+/* Contraste del marcador final cuando el tema es oscuro. */
+:root[data-tema="oscuro"] .partido-final .partido-marcador { background: #303946; color: #fff; }
+:root[data-tema="oscuro"] .partido-final .partido-marcador span { color: #e2e6ec; }

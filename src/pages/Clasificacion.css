@@ -91,7 +91,7 @@
   padding: 7px 14px 7px 12px;
   border: 1px solid color-mix(in srgb, var(--zona) 30%, var(--linea));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--zona) 8%, #fff);
+  background: color-mix(in srgb, var(--zona) 8%, var(--papel));
   font-size: 0.8rem;
 }
 
@@ -161,7 +161,7 @@
 }
 
 .tabla-clasificacion tbody tr:hover {
-  background: color-mix(in srgb, var(--zona, var(--tinta)) 5%, #fff);
+  background: color-mix(in srgb, var(--zona, var(--tinta)) 5%, var(--papel));
 }
 
 /* La franja de color de cada zona */
@@ -170,7 +170,7 @@
 }
 
 .tabla-clasificacion tr.con-zona {
-  background: color-mix(in srgb, var(--zona) 4%, #fff);
+  background: color-mix(in srgb, var(--zona) 4%, var(--papel));
 }
 
 .posicion-equipo {
@@ -345,7 +345,7 @@
   overflow-x: auto;
   border: 1px solid var(--linea);
   border-radius: var(--radio);
-  background: #fff;
+  background: var(--papel);
 }
 
 .evolucion-lienzo svg {
@@ -443,3 +443,6 @@
     padding-inline: 8px;
   }
 }
+/* Contraste de las zonas de clasificación en tema oscuro. */
+:root[data-tema="oscuro"] .tabla-clasificacion tr.con-zona { color: var(--tinta); }
+:root[data-tema="oscuro"] .zonas-leyenda li { color: var(--tinta); }

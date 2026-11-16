@@ -1,3 +1,6 @@
+import SelectorTema from './components/SelectorTema'
+import PreferenciasCookies from './components/PreferenciasCookies'
+import { aplicarTema, leerTema, temaValido } from './utils/apariencia'
 import { useEffect, useState } from 'react'
 import './App.css'
 import Inicio from './pages/Inicio'
@@ -15,6 +18,7 @@ import Cargando from './components/Cargando'
 import MisFavoritos from './pages/MisFavoritos'
 import MiCuenta from './pages/MiCuenta'
 import Seguridad from './pages/Seguridad'
+import MenuFavoritos from './components/MenuFavoritos'
 
 function leerRuta() {
   return window.location.hash.replace(/^#\/?/, '') || 'inicio'
@@ -27,6 +31,7 @@ interface UsuarioSesion {
 }
 
 function App() {
+  useEffect(() => { aplicarTema(leerTema(), false) }, [])
   const [equipos, setEquipos] = useState<Equipo[]>([])
   const [jugadores, setJugadores] = useState<Jugador[]>([])
   const [jugadorDetalle, setJugadorDetalle] = useState<Jugador | null>(null)
@@ -69,6 +74,18 @@ function App() {
         const datos: { usuario?: UsuarioSesion } = await respuesta.json()
         if (activo && solicitud === solicitudActual) {
           setUsuarioSesion(datos.usuario ?? null)
+          if (datos.usuario) {
+            // Sincronizar con el perfil guardado cuando no existe preferencia local.
+            try {
+              if (!localStorage.getItem('estadliga-tema')) {
+                const perfilRespuesta = await fetch('/api/perfil', { credentials: 'same-origin', cache: 'no-store' })
+                if (perfilRespuesta.ok) {
+                  const perfilDatos: { perfil?: { tema?: string } } = await perfilRespuesta.json()
+                  if (perfilDatos.perfil?.tema && temaValido(perfilDatos.perfil.tema)) aplicarTema(perfilDatos.perfil.tema)
+                }
+              }
+            } catch { /* no bloquear el inicio por las preferencias */ }
+          }
         }
       } catch {
         // Si no se puede comprobar, no mostrar una sesión sin verificar.
@@ -285,9 +302,6 @@ function App() {
           >
             Tienda
           </a>
-          {usuarioSesion && (
-            <a href="#/favoritos" className={esFavoritos ? 'activo' : ''} onClick={() => setMenuAbierto(false)}>Mis favoritos</a>
-          )}
           <button
             className="login-menu-movil"
             type="button"
@@ -305,12 +319,13 @@ function App() {
         </nav>
         <div className="cabecera-acciones">
           <BuscadorGlobal />
-        {usuarioSesion && <a className="enlace-favoritos-cabecera" href="#/favoritos">Mis favoritos</a>}
+          <SelectorTema />
+          {usuarioSesion && <MenuFavoritos />}
           <button
             className="boton-login"
             type="button"
             onClick={() => {
-              window.location.hash = '#/login'
+              window.location.hash = usuarioSesion ? '#/mi-cuenta' : '#/login'
             }}
           >
           {comprobandoSesion
@@ -433,6 +448,7 @@ function App() {
           />
         </a>
         <p>Proyecto educativo · Fútbol y estadísticas</p>
+        <PreferenciasCookies />
       </footer>
     </div>
   )

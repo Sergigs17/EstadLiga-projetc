@@ -25,7 +25,7 @@
 }
 .mi-cuenta .perfil-lateral { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
 .mi-cuenta .perfil-tarjeta {
-  min-width: 0; padding: 28px; background: #fff;
+  min-width: 0; padding: 28px; background: var(--papel);
   border: 1px solid #e6e7ea; border-radius: 20px;
   box-shadow: 0 8px 32px rgba(25, 30, 40, .045);
 }
@@ -57,7 +57,7 @@
 .mi-cuenta .perfil-campo select, .mi-cuenta .perfil-campo textarea {
   display: block; width: 100%; min-width: 0; padding: 13px 14px;
   border: 1px solid #d7dbe1; border-radius: 10px;
-  background: #fff; color: #222; font: inherit; font-size: 14px;
+  background: var(--papel); color: #222; font: inherit; font-size: 14px;
   transition: border-color .15s, box-shadow .15s;
 }
 .mi-cuenta .perfil-campo textarea { resize: vertical; min-height: 108px; }

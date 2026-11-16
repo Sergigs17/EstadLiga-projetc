@@ -30,7 +30,7 @@
   flex-shrink: 0;
   padding: 9px 14px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--club-acento) 12%, #fff);
+  background: color-mix(in srgb, var(--club-acento) 12%, var(--papel));
   color: var(--club-acento);
   font-size: 0.8rem;
   font-weight: 800;
@@ -53,7 +53,7 @@
   overflow-wrap: anywhere;
   border: 1px solid color-mix(in srgb, var(--club-acento) 18%, var(--linea));
   border-radius: var(--radio);
-  background: color-mix(in srgb, var(--club-acento) 6%, #fff);
+  background: color-mix(in srgb, var(--club-acento) 6%, var(--papel));
 }
 
 .estadistica-destacada span {
@@ -267,7 +267,7 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--es-acento) 22%, var(--linea));
   border-radius: var(--radio);
-  background: linear-gradient(160deg, var(--es-acento-suave), #fff 75%);
+  background: linear-gradient(160deg, var(--es-acento-suave), var(--papel) 75%);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -550,7 +550,7 @@
 }
 
 .es-barra-suave .es-barra-pista i {
-  background: linear-gradient(90deg, var(--es-acento-medio), color-mix(in srgb, var(--es-acento) 30%, #fff));
+  background: linear-gradient(90deg, var(--es-acento-medio), color-mix(in srgb, var(--es-acento) 30%, var(--papel)));
 }
 
 @keyframes es-crecer {
@@ -604,7 +604,7 @@
 }
 
 .es-embudo-paso:nth-child(2) {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--es-acento) 75%, #fff), var(--es-acento));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--es-acento) 75%, var(--papel)), var(--es-acento));
 }
 
 .es-embudo-paso:nth-child(3) {
@@ -654,7 +654,7 @@
 
 .es-ficha:hover {
   transform: translateY(-3px);
-  background: color-mix(in srgb, var(--es-acento) 20%, #fff);
+  background: color-mix(in srgb, var(--es-acento) 20%, var(--papel));
 }
 
 .es-ficha-icono {

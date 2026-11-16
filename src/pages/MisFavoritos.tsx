@@ -61,6 +61,7 @@ export default function MisFavoritos({ usuario, comprobandoSesion }: Props) {
       const actualizados = await fetch('/api/favoritos', { credentials: 'same-origin', cache: 'no-store' })
       if (!actualizados.ok) throw new Error('No se han podido actualizar los favoritos')
       setFavoritos(await actualizados.json() as Favoritos)
+      window.dispatchEvent(new Event('estadliga:favoritos-cambio'))
     } catch (err) { setError(err instanceof Error ? err.message : 'Error al guardar') }
     finally { setOcupado(null) }
   }

@@ -1,3 +1,4 @@
+import { aplicarTema, temaValido } from '../utils/apariencia'
 import { useEffect, useState, type FormEvent } from 'react'
 import './MiCuenta.css'
 
@@ -63,6 +64,7 @@ export default function MiCuenta() {
       })
       const datos: { error?: string } = await respuesta.json()
       if (!respuesta.ok) throw new Error(datos.error || 'No se pudo guardar')
+      if (temaValido(perfil.tema)) aplicarTema(perfil.tema)
       setNuevo(false)
       setExito('Tus cambios se han guardado correctamente.')
     } catch (e) { setError(e instanceof Error ? e.message : 'Error al guardar') }
@@ -156,7 +158,7 @@ export default function MiCuenta() {
           <select id="perfil-tema" value={perfil.tema} onChange={e => cambiar('tema', e.target.value)}>
             <option value="sistema">Según el dispositivo</option><option value="claro">Claro</option><option value="oscuro">Oscuro</option>
           </select>
-          <small>La preferencia se guarda; el tema global se incorporará más adelante.</small>
+          <small>Al guardar los cambios se aplicará el tema a toda EstadLiga.</small>
         </div>
 
         <label className="perfil-check"><input type="checkbox" checked={Boolean(perfil.perfil_publico)} onChange={e => cambiar('perfil_publico', e.target.checked ? 1 : 0)} /><span>Quiero que mi perfil sea público cuando se habiliten los perfiles de la comunidad.</span></label>

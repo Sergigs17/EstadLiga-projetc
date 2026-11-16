@@ -337,9 +337,9 @@ export default function Login() {
 
               <a
                 className="auth-boton auth-boton-principal"
-                href="#/inicio"
+                href="#/mi-cuenta"
               >
-                Ir al inicio
+                Ver y editar mi perfil
               </a>
 
               <button

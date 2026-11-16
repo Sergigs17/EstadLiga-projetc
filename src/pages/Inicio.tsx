@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 
 import './Inicio.css'
 
@@ -29,6 +30,25 @@ const secciones = [
 ]
 
 function Inicio() {
+  const [miEquipo, setMiEquipo] = useState<{ id: number; nombre: string } | null>(null)
+  useEffect(() => {
+    let activo = true
+    async function cargar() {
+      try {
+        const perfil = await fetch('/api/perfil', { credentials: 'same-origin', cache: 'no-store' })
+        if (!perfil.ok) return
+        const datos: { perfil?: { equipo_favorito_id?: number | null } } = await perfil.json()
+        const id = datos.perfil?.equipo_favorito_id
+        if (!id) return
+        const respuesta = await fetch('/api/equipos')
+        if (!respuesta.ok) return
+        const equipos: { id: number; nombre: string }[] = await respuesta.json()
+        if (activo) setMiEquipo(equipos.find(e => e.id === id) ?? null)
+      } catch { /* La portada pública funciona aunque falle el perfil */ }
+    }
+    void cargar()
+    return () => { activo = false }
+  }, [])
   return (
     <>
       <section className="presentacion">
@@ -64,6 +84,7 @@ function Inicio() {
         </div>
       </section>
 
+      {miEquipo && <section className="seccion-contenido mi-equipo-inicio"><span className="subtitulo">TU ESTADLIGA</span><h2>Tu equipo: {miEquipo.nombre}</h2><p>Accede a la plantilla, historia y estadísticas de tu club.</p><a className="boton-principal" href={`#/equipos/${miEquipo.id}`}>Ver mi equipo →</a></section>}
       <section className="seccion-contenido">
         <div className="titulo-seccion">
           <div>

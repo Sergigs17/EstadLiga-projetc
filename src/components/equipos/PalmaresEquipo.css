@@ -33,7 +33,7 @@
   border-radius: var(--radio);
   background: linear-gradient(
     160deg,
-    color-mix(in srgb, var(--club-acento, var(--rojo)) 8%, #fff),
+    color-mix(in srgb, var(--club-acento, var(--rojo)) 8%, var(--papel)),
     #fff 70%
   );
   color: inherit;
@@ -76,7 +76,7 @@
 
 .pal-imagen-vacia {
   border-radius: 20px;
-  background: color-mix(in srgb, var(--club-acento, var(--rojo)) 12%, #fff);
+  background: color-mix(in srgb, var(--club-acento, var(--rojo)) 12%, var(--papel));
   font-size: 2.2rem;
 }
 

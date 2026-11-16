@@ -1,0 +1,19 @@
+.menu-favoritos{position:relative;flex-shrink:0}
+.menu-favoritos-boton{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1.5px solid #d32230;border-radius:50%;color:#d32230;background:var(--papel);cursor:pointer;transition:background .2s,color .2s}
+.menu-favoritos-boton:hover,.menu-favoritos-boton.abierto{background:#d32230;color:white}
+.menu-favoritos-panel{position:absolute;right:0;top:calc(100% + 16px);z-index:100;width:min(370px,calc(100vw - 28px));max-height:min(70vh,650px);overflow:auto;padding:20px;border:1px solid #eee;border-radius:18px;background:var(--papel);box-shadow:0 18px 48px #0002;color:#171717;text-align:left}
+.menu-favoritos-titulo{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid #eee;font-size:19px}
+.menu-favoritos-titulo button{border:0;background:transparent;font-size:26px;cursor:pointer;color:#777}
+.menu-favoritos-grupo{padding:14px 0 5px}
+.menu-favoritos-grupo h3{display:flex;justify-content:space-between;margin:0 0 9px;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#777}
+.menu-favoritos-grupo h3 span{color:#d32230}
+.menu-favoritos-grupo a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;font-size:14px;font-weight:650;transition:background .2s}
+.menu-favoritos-grupo a:hover{background:#fff0f1;color:#b81d28}
+.menu-favoritos-grupo a span:nth-last-child(2){flex:1}
+.menu-favoritos-grupo a img{width:28px;height:28px;object-fit:contain}
+.menu-favoritos-jugador-icono{width:28px;text-align:center}
+.menu-favoritos-grupo a span:last-child{margin-left:auto;color:#999;font-size:22px}
+.menu-favoritos-vacio,.menu-favoritos-info{margin:8px 0 12px;color:#777;font-size:13px;line-height:1.5}
+.menu-favoritos-gestionar{display:block;margin-top:12px;padding:12px;text-align:center;border-radius:10px;background:#d32230;color:white!important;font-weight:750;font-size:13px}
+.menu-favoritos-gestionar:hover{background:#af1823}
+@media(max-width:480px){.menu-favoritos-panel{right:-56px;top:calc(100% + 14px)}}

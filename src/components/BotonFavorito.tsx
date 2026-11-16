@@ -89,6 +89,7 @@ async function enviarCambio(clase: Clase, id: number, guardado: boolean) {
   )
   if (!respuesta.ok) throw new Error('No se ha podido guardar el cambio')
   await cargarFavoritos()
+  window.dispatchEvent(new Event('estadliga:favoritos-cambio'))
 }
 
 interface BotonFavoritoProps {

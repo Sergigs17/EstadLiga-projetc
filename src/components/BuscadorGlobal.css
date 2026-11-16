@@ -172,7 +172,7 @@
   flex-shrink: 0;
   place-items: center;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--club-acento, var(--rojo)) 14%, #fff);
+  background: color-mix(in srgb, var(--club-acento, var(--rojo)) 14%, var(--papel));
   color: var(--club-acento, var(--rojo));
   font-family: var(--fuente-titulo);
   font-size: 0.8rem;

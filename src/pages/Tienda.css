@@ -7,7 +7,7 @@
   text-align: center;
   border: 1px dashed color-mix(in srgb, var(--rojo) 40%, var(--linea));
   border-radius: var(--radio-grande);
-  background: linear-gradient(160deg, var(--rojo-suave), #fff 70%);
+  background: linear-gradient(160deg, var(--rojo-suave), var(--papel) 70%);
   box-shadow: var(--sombra-suave);
 }
 
@@ -18,7 +18,7 @@
   margin: 0 auto 20px;
   place-items: center;
   border-radius: 24px;
-  background: #fff;
+  background: var(--papel);
   box-shadow: var(--sombra-suave);
   font-size: 2.6rem;
   animation: tienda-flota 3s ease-in-out infinite;

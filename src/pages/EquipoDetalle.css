@@ -98,7 +98,7 @@
   height: 150px;
   padding: 22px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--papel);
   box-shadow: var(--sombra-fuerte);
   object-fit: contain;
 }
@@ -172,7 +172,7 @@
 }
 
 .pagina-plantilla .menu-secciones-equipo button:hover {
-  background: color-mix(in srgb, var(--club-acento) 10%, #fff);
+  background: color-mix(in srgb, var(--club-acento) 10%, var(--papel));
   color: var(--club-acento);
 }
 
@@ -209,7 +209,7 @@
 .pagina-plantilla .seccion-plantilla-equipo .titulo-seccion > p {
   padding: 8px 16px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--club-acento) 12%, #fff);
+  background: color-mix(in srgb, var(--club-acento) 12%, var(--papel));
   color: var(--club-acento);
   font-size: 0.8rem;
   font-weight: 800;
@@ -247,7 +247,7 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--club-acento) 12%, #fff);
+  background: color-mix(in srgb, var(--club-acento) 12%, var(--papel));
   color: var(--club-acento);
   font-family: var(--fuente-titulo);
   font-size: 1.4rem;

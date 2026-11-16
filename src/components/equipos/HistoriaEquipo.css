@@ -43,7 +43,7 @@
   padding: 26px 24px 24px;
   border: 1px solid var(--acento-linea);
   border-radius: var(--radio-grande);
-  background: linear-gradient(165deg, var(--acento-suave), #fff 72%);
+  background: linear-gradient(165deg, var(--acento-suave), var(--papel) 72%);
 }
 
 /* El círculo del centro del campo, de adorno */
@@ -222,7 +222,7 @@
   margin-top: 11px;
   border: 3px solid var(--acento);
   border-radius: 50%;
-  background: #fff;
+  background: var(--papel);
   box-shadow: 0 0 0 5px #fff;
 }
 

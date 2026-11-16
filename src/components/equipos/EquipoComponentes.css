@@ -15,7 +15,7 @@
   overflow: hidden;
   border: 1px solid #e2eae5;
   border-radius: 20px;
-  background: linear-gradient(120deg, #f0f8f3 0%, #ffffff 75%);
+  background: linear-gradient(120deg, #f0f8f3 0%, var(--papel) 75%);
   box-shadow: 0 8px 24px rgb(15 45 30 / 5%);
 }
 
@@ -186,7 +186,7 @@
   overflow: hidden;
   border: 1px solid #e2eae5;
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--papel);
   color: inherit;
   text-decoration: none;
   transition:
@@ -409,7 +409,7 @@
   padding: 30px;
   border: 1px solid #e2eae5;
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--papel);
   box-shadow: 0 8px 24px rgb(15 45 30 / 4%);
 }
 
