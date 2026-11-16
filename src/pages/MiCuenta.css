@@ -58,7 +58,7 @@
   display: block; width: 100%; min-width: 0; padding: 13px 14px;
   border: 1px solid #d7dbe1; border-radius: 10px;
   background: var(--papel); color: #222; font: inherit; font-size: 14px;
-  transition: border-color .15s, box-shadow .15s;
+  transition: border-color .15s, background .15s;
 }
 .mi-cuenta .perfil-campo textarea { resize: vertical; min-height: 108px; }
 .mi-cuenta .perfil-campo input:focus, .mi-cuenta .perfil-campo select:focus, .mi-cuenta .perfil-campo textarea:focus {
@@ -108,4 +108,43 @@
   .mi-cuenta .perfil-campos-dobles { grid-template-columns: 1fr; }
   .mi-cuenta .perfil-formulario-encabezado h2 { font-size: 24px; }
   .mi-cuenta .perfil-acciones .boton-principal { width: 100%; }
+}
+/* AÃ±adir al FINAL de src/pages/MiCuenta.css. Usa variables del tema global. */
+.mi-cuenta { color: var(--tinta); }
+.mi-cuenta .perfil-tarjeta { background: var(--papel); color: var(--tinta); border-color: var(--linea); box-shadow: var(--sombra-suave); }
+.mi-cuenta .perfil-intro p,
+.mi-cuenta .perfil-identidad p,
+.mi-cuenta .perfil-biografia-vista,
+.mi-cuenta .perfil-dato span,
+.mi-cuenta .perfil-seguridad > p,
+.mi-cuenta .perfil-formulario-encabezado p,
+.mi-cuenta .perfil-campo small { color: var(--tinta-suave); }
+.mi-cuenta .perfil-dato strong,
+.mi-cuenta .perfil-seguridad h2,
+.mi-cuenta .perfil-identidad h2,
+.mi-cuenta .perfil-formulario-encabezado h2,
+.mi-cuenta .perfil-campo label,
+.mi-cuenta .perfil-campo legend,
+.mi-cuenta .perfil-check { color: var(--tinta); }
+.mi-cuenta .perfil-dato,
+.mi-cuenta .perfil-formulario-encabezado,
+.mi-cuenta .perfil-acciones { border-color: var(--linea); }
+.mi-cuenta .perfil-rol { background: var(--papel-calido); color: var(--tinta); border: 1px solid var(--linea); }
+.mi-cuenta .perfil-campo input:not([type=radio]):not([type=checkbox]),
+.mi-cuenta .perfil-campo select,
+.mi-cuenta .perfil-campo textarea { background: var(--papel); color: var(--tinta); border-color: var(--linea); color-scheme: inherit; }
+.mi-cuenta .perfil-campo input::placeholder,
+.mi-cuenta .perfil-campo textarea::placeholder { color: var(--tinta-suave); opacity: 1; }
+.mi-cuenta .perfil-campo select option { background: var(--papel); color: var(--tinta); }
+.mi-cuenta .perfil-avatar { background: var(--papel-calido); border-color: var(--linea); transition: border-color .15s, background .15s; }
+.mi-cuenta .perfil-avatar.elegido { background: var(--rojo-suave); border-color: var(--rojo); }
+.mi-cuenta .perfil-enlace-seguridad { color: var(--rojo-vivo); }
+.mi-cuenta .perfil-acciones .boton-principal { color: #fff; background: var(--rojo); }
+:root[data-tema="oscuro"] .mi-cuenta .perfil-error { background: #472329; color: #ffd6db; }
+:root[data-tema="oscuro"] .mi-cuenta .perfil-exito { background: #173b2a; color: #baf2cc; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema]) .mi-cuenta .perfil-error,
+  :root[data-tema="sistema"] .mi-cuenta .perfil-error { background: #472329; color: #ffd6db; }
+  :root:not([data-tema]) .mi-cuenta .perfil-exito,
+  :root[data-tema="sistema"] .mi-cuenta .perfil-exito { background: #173b2a; color: #baf2cc; }
 }
