@@ -31,6 +31,7 @@ import {
 import {
 
   crearSesion,
+  crearSesionSin2FA,
 
   cookieIniciarSesion,
 
@@ -198,7 +199,7 @@ function validarEmail(email: string): boolean {
 
     email.length <= 254 &&
 
-    /^[^\s@]+@[^\s@]+**\.**[^\s@]+$/.test(email)
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   )
 

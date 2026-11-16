@@ -1,4 +1,5 @@
 import { manejarAuth } from './auth'
+import { manejarPerfil } from './perfiles'
 import { manejarFavoritos } from './favoritos'
 import { obtenerUsuarioSesion } from './auth/sesiones'
 
@@ -698,10 +699,9 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
 
   const diasPermitidos = ["Fri", "Sat", "Sun", "Mon"];
 
-  // Solo viernes, sábado, domingo y lunes, de 12:00 a 23:00.
-  if (!diasPermitidos.includes(dia ?? "") || hora < 12 || hora > 23) {
-    return;
-  }
+  // La clasificación conserva su horario original. El calendario se comprueba
+  // cada hora para cubrir también los partidos entre semana.
+  const actualizarClasificacion = ["Fri", "Sat", "Sun", "Mon"].includes(dia ?? "") && hora >= 12 && hora <= 23;
 
   const token = env.FOOTBALL_DATA_API_TOKEN;
 
@@ -713,7 +713,8 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
   const actualizadoEn = new Date().toISOString();
   const cabeceras = { "X-Auth-Token": token };
 
-  // 1. Actualizar clasificación.
+  // 1. Actualizar clasificación solo en su ventana original.
+  if (actualizarClasificacion) {
   try {
     const respuesta = await fetch(
       "https://api.football-data.org/v4/competitions/PD/standings",
@@ -741,9 +742,33 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
   } catch (error) {
     console.error("Error actualizando la clasificación:", error);
   }
+  }
 
-  // 2. Actualizar calendario de partidos.
+  // 2. Actualizar calendario: lunes o días con partidos (una vez por hora como máximo).
+  // La clasificación sigue actualizándose cada hora, independientemente de este filtro.
   try {
+    const ahora = new Date();
+    const fechaMadrid = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).format(ahora);
+    const diaMadrid = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Madrid', weekday: 'short' }).format(ahora);
+    const guardado = await env.estadliga_db.prepare('SELECT datos_json, actualizado_en FROM partidos_cache WHERE id = 1').first<{ datos_json: string; actualizado_en: string }>();
+    const ultima = guardado?.actualizado_en ? Date.parse(guardado.actualizado_en) : 0;
+    const actualizadoHoy = Number.isFinite(ultima) && new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ultima)) === fechaMadrid;
+    const datosPrevios = guardado ? JSON.parse(guardado.datos_json) as { partidos?: Array<{ fecha?: string; estado?: string }> } : null;
+    const ayer = new Date(ahora.getTime() - 24 * 60 * 60 * 1000);
+    const fechaAyer = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).format(ayer);
+    const hayPartidoHoy = (datosPrevios?.partidos ?? []).some(p => {
+      const ms = Date.parse(p.fecha ?? '');
+      return Number.isFinite(ms) && new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms)) === fechaMadrid;
+    });
+    const hayPartidoAyerSinCerrar = (datosPrevios?.partidos ?? []).some(p => {
+      const ms = Date.parse(p.fecha ?? '');
+      return Number.isFinite(ms) && p.estado !== 'FINISHED' &&
+        new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms)) === fechaAyer;
+    });
+    const haceMasDeUnDia = !Number.isFinite(ultima) || ahora.getTime() - ultima > 24 * 60 * 60 * 1000;
+    const sincronizar = !guardado || (diaMadrid === 'Mon' && !actualizadoHoy) ||
+      hayPartidoHoy || hayPartidoAyerSinCerrar || haceMasDeUnDia;
+    if (sincronizar) {
     const respuesta = await fetch(
       "https://api.football-data.org/v4/competitions/PD/matches",
       { headers: cabeceras },
@@ -755,6 +780,7 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
 
     const datos = (await respuesta.json()) as {
       matches?: Array<{
+        id?: number;
         matchday?: number | null;
         status?: string;
         utcDate?: string;
@@ -765,12 +791,14 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
             home?: number | null;
             away?: number | null;
           };
+          halfTime?: { home?: number | null; away?: number | null };
         };
       }>;
     };
 
     const partidos = {
       partidos: (datos.matches ?? []).map((partido) => ({
+        id: partido.id ?? null,
         jornada: partido.matchday ?? null,
         estado: partido.status ?? "",
         fecha: partido.utcDate ?? "",
@@ -778,6 +806,8 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
         visitante: partido.awayTeam?.name ?? "",
         golesLocal: partido.score?.fullTime?.home ?? null,
         golesVisitante: partido.score?.fullTime?.away ?? null,
+        descansoLocal: partido.score?.halfTime?.home ?? null,
+        descansoVisitante: partido.score?.halfTime?.away ?? null,
       })),
     };
 
@@ -793,6 +823,7 @@ async function actualizarCachesFootballData(env: Env): Promise<void> {
       .run();
 
     console.log("Partidos actualizados correctamente.");
+    }
   } catch (error) {
     console.error("Error actualizando los partidos:", error);
   }
@@ -873,6 +904,9 @@ export default {
     if (respuestaAuth) {
       return respuestaAuth
     }
+
+    const respuestaPerfil = await manejarPerfil(request, env)
+    if (respuestaPerfil) return respuestaPerfil
 
     const respuestaFavoritos = await manejarFavoritos(request, env)
     if (respuestaFavoritos) return respuestaFavoritos
@@ -1021,29 +1055,34 @@ export default {
 
         const datos = (await respuesta.json()) as {
           matches?: Array<{
+            id: number
             matchday: number | null
             status: string
             utcDate: string
-            homeTeam: { id: number }
-            awayTeam: { id: number }
+            homeTeam: { id: number; name?: string }
+            awayTeam: { id: number; name?: string }
             score?: {
               fullTime?: {
                 home: number | null
                 away: number | null
               }
+              halfTime?: { home: number | null; away: number | null }
             }
           }>
         }
 
         // 3. Preparar los datos que utiliza EstadLiga.
         const partidos = (datos.matches ?? []).map((partido) => ({
+          id: partido.id,
           jornada: partido.matchday,
           estado: partido.status,
           fecha: partido.utcDate,
-          local: partido.homeTeam.id,
-          visitante: partido.awayTeam.id,
+          local: partido.homeTeam.name ?? String(partido.homeTeam.id),
+          visitante: partido.awayTeam.name ?? String(partido.awayTeam.id),
           golesLocal: partido.score?.fullTime?.home ?? null,
           golesVisitante: partido.score?.fullTime?.away ?? null,
+          descansoLocal: partido.score?.halfTime?.home ?? null,
+          descansoVisitante: partido.score?.halfTime?.away ?? null,
         }))
 
         const datosJson = JSON.stringify({ partidos })
@@ -1073,6 +1112,63 @@ export default {
           },
           { status: 502 },
         )
+      }
+    }
+
+    // Ficha histórica de un partido finalizado, almacenada en D1.
+    // No consulta Apify ni expone los tokens al navegador.
+    const rutaDetallePartido = url.pathname.match(/^\/api\/partidos\/(\d+)\/detalle$/)
+    if (rutaDetallePartido && request.method === 'GET') {
+      const partidoId = Number(rutaDetallePartido[1])
+      if (!Number.isSafeInteger(partidoId) || partidoId <= 0) {
+        return Response.json({ error: 'ID de partido no válido' }, { status: 400 })
+      }
+      try {
+        const calendario = await env.estadliga_db.prepare(
+          'SELECT datos_json FROM partidos_cache WHERE id = 1',
+        ).first<{ datos_json: string }>()
+        const lista = calendario ? JSON.parse(calendario.datos_json) as {
+          partidos?: Array<{ id?: number; estado?: string }>
+        } : null
+        const partido = (lista?.partidos ?? []).find(p => p.id === partidoId)
+        if (!partido) {
+          return Response.json({ error: 'Partido no encontrado en el calendario. Espera a la próxima sincronización.' }, { status: 404 })
+        }
+        if (partido.estado !== 'FINISHED') {
+          return Response.json({ error: 'El histórico se consulta cuando finaliza el partido' }, { status: 409 })
+        }
+        const existente = await env.estadliga_db.prepare(
+          'SELECT datos_json FROM detalles_partidos_cache WHERE partido_id = ?',
+        ).bind(partidoId).first<{ datos_json: string }>()
+        if (existente) {
+          return new Response(existente.datos_json, {
+            headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=3600' },
+          })
+        }
+        if (!env.FOOTBALL_DATA_API_TOKEN) {
+          return Response.json({ error: 'Falta configurar FOOTBALL_DATA_API_TOKEN' }, { status: 500 })
+        }
+        const respuesta = await fetch(`https://api.football-data.org/v4/matches/${partidoId}`, {
+          headers: { 'X-Auth-Token': env.FOOTBALL_DATA_API_TOKEN, Accept: 'application/json' },
+        })
+        if (!respuesta.ok) {
+          return Response.json({ error: 'No se ha podido obtener el detalle', status: respuesta.status }, { status: 502 })
+        }
+        const datos = await respuesta.json() as Record<string, unknown>
+        // Guardamos la respuesta completa: el frontend podrá mostrar los campos disponibles.
+        const datosJson = JSON.stringify({ origen: 'football-data', datos })
+        await env.estadliga_db.prepare(`
+          INSERT INTO detalles_partidos_cache (partido_id, datos_json, actualizado_en)
+          VALUES (?, ?, CURRENT_TIMESTAMP)
+          ON CONFLICT(partido_id) DO UPDATE SET datos_json = excluded.datos_json,
+            actualizado_en = CURRENT_TIMESTAMP
+        `).bind(partidoId, datosJson).run()
+        return new Response(datosJson, {
+          headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=3600' },
+        })
+      } catch (error) {
+        console.error('Error obteniendo detalle de partido:', error)
+        return Response.json({ error: 'Error consultando el histórico del partido' }, { status: 502 })
       }
     }
 

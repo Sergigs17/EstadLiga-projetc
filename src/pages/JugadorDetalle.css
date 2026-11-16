@@ -556,3 +556,7 @@
 .todas-las-metricas > .contenido-metricas {
   padding: 4px 22px 10px;
 }
+
+.jugador-detalle-identidad .favorito-ficha-jugador {
+  margin-top: 16px;
+}

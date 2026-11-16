@@ -3,6 +3,7 @@ import { crearDesafio2FA } from './desafios'
 import { consumirIntento } from './rate-limit'
 import {
   crearSesion,
+  crearSesionSin2FA,
   cookieIniciarSesion,
 } from './sesiones'
 

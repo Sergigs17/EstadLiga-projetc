@@ -1,4 +1,4 @@
-
+import BotonFavorito from '../BotonFavorito'
 import type { Equipo } from '../../pages/Equipos'
 
 interface CabeceraEquipoProps {
@@ -122,6 +122,12 @@ function CabeceraEquipo({ equipo }: CabeceraEquipoProps) {
         {equipo.estadio && <p>Estadio: {equipo.estadio}</p>}
         {equipo.ciudad && <p>Ciudad: {equipo.ciudad}</p>}
         {equipo.entrenador && <p>Entrenador: {equipo.entrenador}</p>}
+        <BotonFavorito
+          clase="equipos"
+          id={equipo.id}
+          nombre={equipo.nombre}
+          conTexto
+        />
       </div>
     </header>
   )

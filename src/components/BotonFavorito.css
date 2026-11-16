@@ -1,0 +1,95 @@
+/* Estrella de favoritos: vacía en gris, rellena en rojo cuando está guardada. */
+.boton-favorito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1.5px solid var(--linea);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--tinta-suave);
+  font: 700 0.82rem var(--fuente-texto);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+}
+.boton-favorito:hover:not(:disabled) {
+  color: var(--rojo);
+  border-color: var(--rojo);
+}
+.boton-favorito:active:not(:disabled) {
+  transform: scale(0.92);
+}
+.boton-favorito:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+.boton-favorito:focus-visible {
+  outline: 3px solid var(--rojo);
+  outline-offset: 2px;
+}
+.boton-favorito.es-favorito {
+  color: var(--rojo);
+  border-color: var(--rojo);
+  background: var(--rojo-suave);
+}
+.boton-favorito.es-favorito svg {
+  animation: estrella-pop 0.3s ease-out;
+}
+@keyframes estrella-pop {
+  50% { transform: scale(1.25) rotate(12deg); }
+}
+.boton-favorito.con-texto {
+  width: auto;
+  padding: 0 18px 0 14px;
+  white-space: nowrap;
+}
+
+/* Sobre las tarjetas de equipo */
+.tarjeta-equipo-envoltorio {
+  position: relative;
+  display: flex;
+}
+.tarjeta-equipo-envoltorio > .tarjeta-equipo {
+  flex: 1;
+  min-width: 0;
+}
+.tarjeta-equipo-envoltorio > .boton-favorito {
+  position: absolute;
+  z-index: 3;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+}
+.tarjeta-equipo-envoltorio:hover > .boton-favorito {
+  transform: translateY(-6px);
+}
+.tarjeta-equipo-envoltorio:hover > .boton-favorito:active:not(:disabled) {
+  transform: translateY(-6px) scale(0.92);
+}
+
+/* En la cabecera oscura de la ficha del equipo */
+.cabecera-plantilla .boton-favorito {
+  margin-top: 16px;
+  border-color: rgb(255 255 255 / 70%);
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+.cabecera-plantilla .boton-favorito:hover:not(:disabled) {
+  background: #fff;
+  color: var(--rojo);
+  border-color: #fff;
+}
+.cabecera-plantilla .boton-favorito.es-favorito {
+  background: #fff;
+  color: var(--rojo);
+  border-color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton-favorito.es-favorito svg { animation: none; }
+}

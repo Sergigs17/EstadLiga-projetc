@@ -85,6 +85,14 @@ export default function Login() {
     setPassword('')
     setMensaje('Has iniciado sesión correctamente.')
     window.dispatchEvent(new Event('estadliga:auth-cambio'))
+    // Después de completar Google o 2FA, ofrecer la personalización solo si falta.
+    void fetch('/api/perfil', { credentials: 'same-origin', cache: 'no-store' })
+      .then(async respuesta => {
+        if (!respuesta.ok) return
+        const datos: { perfil?: { completado?: number } | null } = await respuesta.json()
+        if (!datos.perfil?.completado) window.location.hash = '#/mi-cuenta'
+      })
+      .catch(() => { /* El acceso ya se completó: no bloquear por un fallo de perfil. */ })
   }
 
   async function leerRespuesta(

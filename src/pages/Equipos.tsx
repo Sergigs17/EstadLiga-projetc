@@ -1,4 +1,5 @@
 
+import BotonFavorito from '../components/BotonFavorito'
 import Cargando from '../components/Cargando'
 import './Equipos.css'
 
@@ -156,9 +157,9 @@ function Equipos({ equipos, cargando, error }: EquiposProps) {
             const escudo = obtenerEscudo(equipo)
 
             return (
+              <div className="tarjeta-equipo-envoltorio" key={equipo.id}>
               <a
                 className="tarjeta-equipo"
-                key={equipo.id}
                 href={`#/equipos/${equipo.id}`}
               >
                 {escudo ? (
@@ -182,6 +183,12 @@ function Equipos({ equipos, cargando, error }: EquiposProps) {
                   Ver plantilla →
                 </span>
               </a>
+              <BotonFavorito
+                clase="equipos"
+                id={equipo.id}
+                nombre={equipo.nombre}
+              />
+              </div>
             )
           })}
         </div>

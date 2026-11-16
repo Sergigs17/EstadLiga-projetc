@@ -12,5 +12,22 @@
 .favoritos-elemento button[aria-pressed="true"] { color: #9a3412; border-color: #fdba74; background: #fff7ed; }
 .favoritos-elemento button:disabled { opacity: .6; cursor: wait; }
 .favoritos-error { color: #b91c1c; }
-.enlace-favoritos-cabecera { font-weight: 600; white-space: nowrap; }
-@media(max-width: 850px) { .enlace-favoritos-cabecera { display: none; } }
+.cabecera-acciones .enlace-favoritos-cabecera {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  color: var(--tinta-suave);
+  transition: color 0.2s, background 0.2s;
+}
+.cabecera-acciones .enlace-favoritos-cabecera:hover,
+.cabecera-acciones .enlace-favoritos-cabecera.activo {
+  color: var(--rojo);
+  background: var(--rojo-suave);
+}
+.cabecera-acciones .enlace-favoritos-cabecera:focus-visible {
+  outline: 3px solid var(--rojo);
+  outline-offset: 2px;
+}

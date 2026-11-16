@@ -1,6 +1,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Cargando from '../components/Cargando'
+import BotonFavorito from '../components/BotonFavorito'
 import './JugadorDetalle.css'
 import type { Jugador } from './EquipoDetalle'
 import GraficosJugador from '../components/jugadores/GraficosJugador'
@@ -647,6 +648,14 @@ function JugadorDetalle({ jugador }: JugadorDetalleProps) {
             </span>
             {fechaNacimiento && <span>Nació el {fechaNacimiento}</span>}
           </div>
+
+          <BotonFavorito
+            className="favorito-ficha-jugador"
+            clase="jugadores"
+            id={jugador.id}
+            nombre={`${jugador.nombre} ${jugador.apellido ?? ''}`.trim()}
+            conTexto
+          />
         </div>
 
         <div className="selector-temporada">

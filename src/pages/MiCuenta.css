@@ -1,0 +1,111 @@
+/* Diseño aislado de Mi cuenta: no modifica estilos de otras páginas. */
+.mi-cuenta {
+  width: min(1180px, calc(100% - 48px));
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 44px 0 80px;
+  box-sizing: border-box;
+  color: #181818;
+}
+.mi-cuenta, .mi-cuenta * { box-sizing: border-box; }
+.mi-cuenta .perfil-intro { max-width: 820px; margin: 0 0 30px; }
+.mi-cuenta .perfil-etiqueta, .mi-cuenta .perfil-tarjeta-titulo {
+  display: inline-block; color: #c9202c; font-size: 12px; font-weight: 800;
+  letter-spacing: .11em;
+}
+.mi-cuenta .perfil-intro h1 {
+  margin: 12px 0 12px; font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.12; letter-spacing: -.04em; font-weight: 850;
+  overflow-wrap: break-word;
+}
+.mi-cuenta .perfil-intro p { margin: 0; max-width: 680px; color: #60646c; font-size: 16px; line-height: 1.65; }
+.mi-cuenta .perfil-distribucion {
+  display: grid; grid-template-columns: minmax(275px, .83fr) minmax(0, 1.55fr);
+  align-items: start; gap: 24px; width: 100%;
+}
+.mi-cuenta .perfil-lateral { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.mi-cuenta .perfil-tarjeta {
+  min-width: 0; padding: 28px; background: #fff;
+  border: 1px solid #e6e7ea; border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(25, 30, 40, .045);
+}
+.mi-cuenta .perfil-cabecera { display: flex; align-items: center; gap: 15px; margin: 22px 0 24px; }
+.mi-cuenta .perfil-avatar-grande {
+  flex: 0 0 76px; width: 76px; height: 76px; display: grid; place-items: center;
+  border-radius: 20px; background: #fff2f3; font-size: 37px;
+}
+.mi-cuenta .perfil-identidad { min-width: 0; }
+.mi-cuenta .perfil-identidad h2 { margin: 0 0 5px; font-size: 22px; line-height: 1.2; overflow-wrap: anywhere; }
+.mi-cuenta .perfil-identidad p { margin: 0 0 9px; font-size: 13px; color: #777; overflow-wrap: anywhere; }
+.mi-cuenta .perfil-rol { display: inline-block; border-radius: 99px; padding: 4px 10px; background: #f2f3f5; font-size: 12px; font-weight: 700; }
+.mi-cuenta .perfil-biografia-vista { margin: -4px 0 18px; color: #555; line-height: 1.5; overflow-wrap: anywhere; }
+.mi-cuenta .perfil-dato { display: flex; flex-direction: column; gap: 5px; padding: 15px 0; border-top: 1px solid #eee; }
+.mi-cuenta .perfil-dato span { color: #777; font-size: 12px; }
+.mi-cuenta .perfil-dato strong { font-size: 14px; overflow-wrap: anywhere; }
+.mi-cuenta .perfil-seguridad h2 { margin: 0 0 15px; font-size: 21px; }
+.mi-cuenta .perfil-seguridad > p { margin: 14px 0; color: #666; line-height: 1.55; font-size: 13px; }
+.mi-cuenta .perfil-enlace-seguridad { display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; color: #c9202c; font-weight: 750; text-decoration: none; padding: 11px 0; }
+.mi-cuenta .perfil-enlace-seguridad:hover { text-decoration: underline; }
+.mi-cuenta .perfil-formulario { display: flex; flex-direction: column; gap: 22px; margin: 0; }
+.mi-cuenta .perfil-formulario-encabezado { padding-bottom: 20px; border-bottom: 1px solid #eee; }
+.mi-cuenta .perfil-formulario-encabezado h2 { margin: 8px 0; font-size: 29px; line-height: 1.2; letter-spacing: -.025em; }
+.mi-cuenta .perfil-formulario-encabezado p { margin: 0; color: #737780; font-size: 14px; }
+.mi-cuenta .perfil-campos-dobles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.mi-cuenta .perfil-campo { display: flex; flex-direction: column; min-width: 0; gap: 9px; }
+.mi-cuenta .perfil-campo label, .mi-cuenta .perfil-campo legend { font-weight: 750; font-size: 14px; }
+.mi-cuenta .perfil-campo input:not([type=radio]):not([type=checkbox]),
+.mi-cuenta .perfil-campo select, .mi-cuenta .perfil-campo textarea {
+  display: block; width: 100%; min-width: 0; padding: 13px 14px;
+  border: 1px solid #d7dbe1; border-radius: 10px;
+  background: #fff; color: #222; font: inherit; font-size: 14px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.mi-cuenta .perfil-campo textarea { resize: vertical; min-height: 108px; }
+.mi-cuenta .perfil-campo input:focus, .mi-cuenta .perfil-campo select:focus, .mi-cuenta .perfil-campo textarea:focus {
+  outline: none; border-color: #d2222d; box-shadow: 0 0 0 3px rgba(210, 34, 45, .12);
+}
+.mi-cuenta .perfil-campo small { font-size: 12px; line-height: 1.5; color: #777; }
+.mi-cuenta .perfil-contador { align-self: flex-end; }
+.mi-cuenta .perfil-campo-avatares { border: 0; padding: 0; margin: 0; }
+.mi-cuenta .perfil-campo-avatares legend { margin-bottom: 12px; }
+.mi-cuenta .perfil-avatares { display: flex; flex-wrap: wrap; gap: 12px; }
+.mi-cuenta .perfil-avatar {
+  position: relative; display: grid; place-items: center; cursor: pointer;
+  width: 65px; height: 65px; border: 2px solid #e1e4e8;
+  border-radius: 14px; background: #fafafa; font-size: 30px;
+  transition: border-color .15s, background .15s;
+}
+.mi-cuenta .perfil-avatar.elegido { border-color: #d2222d; background: #fff0f1; }
+.mi-cuenta .perfil-avatar input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.mi-cuenta .perfil-avatar:focus-within { outline: 3px solid rgba(210, 34, 45, .4); outline-offset: 3px; }
+.mi-cuenta .perfil-check { display: flex; align-items: flex-start; gap: 12px; line-height: 1.5; font-size: 14px; cursor: pointer; }
+.mi-cuenta .perfil-check input { margin: 4px 0 0; accent-color: #d2222d; width: 17px; height: 17px; flex: 0 0 17px; }
+.mi-cuenta .perfil-acciones { border-top: 1px solid #eee; padding-top: 22px; }
+.mi-cuenta .perfil-acciones .boton-principal {
+  display: inline-flex; justify-content: center; align-items: center;
+  padding: 13px 24px; min-height: 46px; border: 0; border-radius: 10px;
+  background: #d2222d; color: #fff; font-weight: 750; font: inherit;
+  cursor: pointer;
+}
+.mi-cuenta .perfil-acciones .boton-principal:hover:not(:disabled) { background: #b61a24; }
+.mi-cuenta .perfil-acciones .boton-principal:disabled { opacity: .65; cursor: wait; }
+.mi-cuenta .perfil-mensaje, .mi-cuenta .perfil-estado { padding: 14px 18px; margin: 0 0 20px; border-radius: 10px; }
+.mi-cuenta .perfil-error { background: #fff0f0; color: #9d2020; }
+.mi-cuenta .perfil-exito { background: #edf9f0; color: #146a34; }
+@media (max-width: 900px) {
+  .mi-cuenta { width: min(100% - 36px, 740px); padding-top: 30px; }
+  .mi-cuenta .perfil-distribucion { grid-template-columns: 1fr; }
+  .mi-cuenta .perfil-lateral { display: contents; }
+  .mi-cuenta .perfil-vista-previa { order: 0; }
+  .mi-cuenta .perfil-formulario { order: 1; }
+  .mi-cuenta .perfil-seguridad { order: 2; }
+}
+@media (max-width: 600px) {
+  .mi-cuenta { width: calc(100% - 28px); padding: 24px 0 50px; }
+  .mi-cuenta .perfil-intro h1 { font-size: 34px; }
+  .mi-cuenta .perfil-intro p { font-size: 14px; }
+  .mi-cuenta .perfil-tarjeta { padding: 20px; border-radius: 16px; }
+  .mi-cuenta .perfil-campos-dobles { grid-template-columns: 1fr; }
+  .mi-cuenta .perfil-formulario-encabezado h2 { font-size: 24px; }
+  .mi-cuenta .perfil-acciones .boton-principal { width: 100%; }
+}
