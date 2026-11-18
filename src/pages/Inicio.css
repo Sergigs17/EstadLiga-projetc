@@ -123,3 +123,11 @@
 .mi-estadliga-selector-equipo.activo { border:2px solid var(--rojo); background:var(--rojo-suave); }
 .mi-estadliga-selector-equipo:focus-visible { outline:3px solid var(--rojo); outline-offset:2px; }
 @media(max-width:600px) { .mi-estadliga-selector { padding:14px; } .mi-estadliga-selector-equipo { padding:8px 10px; } }
+
+/* Legibilidad de los favoritos y escudos que no estén disponibles */
+.mi-estadliga-selector-equipo.activo { color: var(--tinta); background: var(--papel-calido); }
+.mi-estadliga-selector-equipo.activo span, .mi-estadliga-selector-equipo.activo small { color: inherit; }
+.mi-estadliga-fixture, .mi-estadliga-match-feature, .mi-estadliga-card, .mi-estadliga-player, .mi-estadliga-fixture-teams strong { color: var(--tinta); }
+.mi-estadliga-escudo-fallback { display: inline-grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; font-size: 20px; }
+.mi-estadliga-match-club .mi-estadliga-escudo-fallback { width: 76px; height: 76px; font-size: 42px; }
+.mi-estadliga-hero-team .mi-estadliga-escudo-fallback { width: 96px; height: 96px; font-size: 52px; }

@@ -2,7 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import './Partidos.css'
 
 type Partido = {
+  id?: number
   jornada: number | null
+  descansoLocal?: number | null
+  descansoVisitante?: number | null
   estado: string
   fecha: string
   local: string | number
@@ -58,6 +61,8 @@ function Partidos() {
   const [jornada, setJornada] = useState<number | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [equipoFiltro, setEquipoFiltro] = useState('')
+  const [partidoAbierto, setPartidoAbierto] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -90,8 +95,9 @@ function Partidos() {
     return proxima?.jornada ?? jornadas[jornadas.length - 1] ?? null
   }, [partidos, jornadas])
   const seleccionada = jornada ?? jornadaActual
+  const equipos = useMemo(() => [...new Set(partidos.flatMap(p => [String(p.local), String(p.visitante)]))].sort((a, b) => a.localeCompare(b, 'es')), [partidos])
   const visibles = partidos
-    .filter(p => p.jornada === seleccionada)
+    .filter(p => p.jornada === seleccionada && (!equipoFiltro || String(p.local) === equipoFiltro || String(p.visitante) === equipoFiltro))
     .sort((a, b) => Date.parse(a.fecha) - Date.parse(b.fecha))
 
   // Los partidos de la jornada, agrupados por día.
@@ -106,7 +112,7 @@ function Partidos() {
     }
     return grupos
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [partidos, seleccionada])
+  }, [partidos, seleccionada, equipoFiltro])
 
   const indice = seleccionada !== null ? jornadas.indexOf(seleccionada) : -1
   const anterior = indice > 0 ? jornadas[indice - 1] : null
@@ -196,6 +202,16 @@ function Partidos() {
             </button>
           </div>
 
+          <div className="partidos-filtros">
+            <label htmlFor="partidos-equipo-filtro">Filtrar por equipo</label>
+            <select id="partidos-equipo-filtro" value={equipoFiltro} onChange={e => setEquipoFiltro(e.target.value)}>
+              <option value="">Todos los equipos</option>
+              {equipos.map(equipo => <option key={equipo} value={equipo}>{equipo}</option>)}
+            </select>
+            <span>{visibles.length} {visibles.length === 1 ? 'encuentro' : 'encuentros'} en esta jornada</span>
+          </div>
+          {visibles.length === 0 && <p className="partidos-sin-resultados">No hay encuentros de este equipo en la jornada seleccionada.</p>}
+
           {dias.map(dia => (
             <div className="partidos-dia" key={dia.clave}>
               <h3 className="partidos-dia-titulo">
@@ -212,10 +228,12 @@ function Partidos() {
                     ? p.golesLocal! > p.golesVisitante! ? 'local'
                       : p.golesLocal! < p.golesVisitante! ? 'visitante' : 'empate'
                     : null
+                  const clave = String(p.id ?? `${p.fecha}-${p.local}-${p.visitante}`)
+                  const abierto = partidoAbierto === clave
                   return (
                     <article
                       className={`partido ${enDirecto ? 'partido-directo' : ''} ${terminado ? 'partido-final' : ''}`}
-                      key={`${p.fecha}-${p.local}-${p.visitante}-${i}`}
+                      key={`${clave}-${i}`}
                     >
                       <div className="partido-meta">
                         <strong>{Number.isNaN(fecha) ? '—' : formatoHora.format(fecha)}</strong>
@@ -243,6 +261,20 @@ function Partidos() {
                           <span className="partido-nombre">{String(p.visitante)}</span>
                         </div>
                       </div>
+                      <button className="partido-ver-detalles" type="button" aria-expanded={abierto} onClick={() => setPartidoAbierto(abierto ? null : clave)}>
+                        {abierto ? 'Ocultar detalles' : 'Ver detalles del encuentro'} <span aria-hidden="true">{abierto ? '⌃' : '⌄'}</span>
+                      </button>
+                      {abierto && <div className="partido-detalles">
+                        <h4>Información del encuentro</h4>
+                        <dl>
+                          <div><dt>Jornada</dt><dd>{p.jornada ?? 'Por determinar'}</dd></div>
+                          <div><dt>Fecha</dt><dd>{Number.isNaN(fecha) ? 'Por confirmar' : new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'full', timeStyle: 'short' }).format(fecha)}</dd></div>
+                          <div><dt>Estado</dt><dd>{enDirecto ? 'En juego' : terminado ? 'Finalizado' : p.estado === 'POSTPONED' ? 'Aplazado' : p.estado === 'CANCELLED' ? 'Cancelado' : 'Programado'}</dd></div>
+                          {p.descansoLocal != null && p.descansoVisitante != null && <div><dt>Resultado al descanso</dt><dd>{p.descansoLocal} - {p.descansoVisitante}</dd></div>}
+                          {marcador && <div><dt>Resultado</dt><dd>{p.golesLocal} - {p.golesVisitante}</dd></div>}
+                        </dl>
+                        <p>Los goleadores, alineaciones y estadísticas detalladas todavía no están disponibles en esta sección.</p>
+                      </div>}
                     </article>
                   )
                 })}

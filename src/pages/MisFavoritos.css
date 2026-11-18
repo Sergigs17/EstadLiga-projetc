@@ -1,13 +1,13 @@
 .mis-favoritos { max-width: 1050px; margin: 0 auto; padding-top: 35px; padding-bottom: 55px; }
 .favoritos-resumen { display: flex; gap: 22px; flex-wrap: wrap; margin: 20px 0; }
 .favoritos-pestanas { display: flex; gap: 12px; margin: 20px 0; }
-.favoritos-pestanas button, .favoritos-elemento button { padding: 10px 16px; border: 1px solid #bbb; border-radius: 9px; cursor: pointer; background: var(--papel); color: #222; }
+.favoritos-pestanas button, .favoritos-elemento button { padding: 10px 16px; border: 1px solid #bbb; border-radius: 9px; cursor: pointer; background: var(--papel); color: var(--tinta); }
 .favoritos-pestanas .seleccionado { background: #b91c1c; border-color: #b91c1c; color: white; }
 .favoritos-busqueda { display: flex; flex-direction: column; gap: 8px; max-width: 450px; font-weight: 600; }
 .favoritos-busqueda input { width: 100%; padding: 12px; border: 1px solid #aaa; border-radius: 8px; font: inherit; }
 .favoritos-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 12px; margin-top: 20px; }
-.favoritos-elemento { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border: 1px solid #ddd; border-radius: 12px; background: var(--papel); color: #222; }
-.favoritos-elemento small { display: block; color: #666; margin-top: 4px; }
+.favoritos-elemento { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border: 1px solid #ddd; border-radius: 12px; background: var(--papel); color: var(--tinta); }
+.favoritos-elemento small { display: block; color: var(--tinta-suave); margin-top: 4px; }
 .favoritos-elemento button { white-space: nowrap; }
 .favoritos-elemento button[aria-pressed="true"] { color: #9a3412; border-color: #fdba74; background: #fff7ed; }
 .favoritos-elemento button:disabled { opacity: .6; cursor: wait; }
@@ -31,3 +31,10 @@
   outline: 3px solid var(--rojo);
   outline-offset: 2px;
 }
+
+/* Contraste en ambos temas */
+.mis-favoritos { color: var(--tinta); }
+.favoritos-busqueda input { background: var(--papel); color: var(--tinta); border-color: var(--linea); }
+.favoritos-busqueda input::placeholder { color: var(--tinta-suave); }
+.favoritos-elemento { border-color: var(--linea); }
+.favoritos-elemento button[aria-pressed="true"] { background: var(--papel-calido); color: var(--tinta); border-color: var(--rojo); }

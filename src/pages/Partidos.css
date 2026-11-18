@@ -267,3 +267,20 @@
 /* Contraste del marcador final cuando el tema es oscuro. */
 :root[data-tema="oscuro"] .partido-final .partido-marcador { background: #303946; color: #fff; }
 :root[data-tema="oscuro"] .partido-final .partido-marcador span { color: #e2e6ec; }
+
+/* Filtros y ficha desplegable del encuentro */
+.partidos-filtros { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin:18px 0; color:var(--tinta); }
+.partidos-filtros label { font-weight:700; }
+.partidos-filtros select { max-width:100%; min-width:220px; border:1px solid var(--linea); border-radius:10px; background:var(--papel); color:var(--tinta); padding:10px 12px; font:inherit; }
+.partidos-filtros > span { margin-left:auto; color:var(--tinta-suave); font-size:.88rem; }
+.partidos-sin-resultados { padding:20px; color:var(--tinta-suave); }
+.partido-ver-detalles { display:flex; justify-content:center; align-items:center; gap:10px; width:100%; padding:12px; border:0; border-top:1px solid var(--linea); background:transparent; color:var(--tinta); cursor:pointer; font:700 .86rem var(--fuente-texto); }
+.partido-ver-detalles:hover { color:var(--rojo); }
+.partido-ver-detalles:focus-visible { outline:2px solid var(--rojo); outline-offset:-2px; }
+.partido-detalles { border-top:1px solid var(--linea); padding:18px 22px; background:var(--papel-calido); color:var(--tinta); }
+.partido-detalles h4 { margin:0 0 14px; font-size:1rem; }
+.partido-detalles dl { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin:0; }
+.partido-detalles dt { color:var(--tinta-suave); font-size:.8rem; margin-bottom:5px; }
+.partido-detalles dd { margin:0; font-weight:700; }
+.partido-detalles p { color:var(--tinta-suave); font-size:.8rem; margin:16px 0 0; }
+@media(max-width:600px) { .partidos-filtros > span { margin-left:0; width:100%; } }

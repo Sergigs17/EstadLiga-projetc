@@ -135,16 +135,53 @@ const ESCUDOS_POR_ID: Record<number, string> = {
   14:'espanyol', 15:'betis', 16:'realmadrid', 17:'realsociedad',
   18:'sevilla', 19:'valencia', 20:'villarreal',
 }
+// Football-Data puede devolver denominaciones distintas a las de D1.
+// Resolvemos primero por ID de D1 y después por alias del nombre de competición.
+const ALIAS_ESCUDOS: Record<string, string> = {
+  fcbarcelona: 'barcelona', barcelonafc: 'barcelona',
+  clubatleticodemadrid: 'atlmadrid', atleticodemadrid: 'atlmadrid', atleticomadrid: 'atlmadrid',
+  athleticclub: 'athletic', athleticclubdebilbao: 'athletic',
+  realbetisbalompie: 'betis', realbetis: 'betis',
+  rcceltadevigo: 'celta', rccelta: 'celta', celtavigo: 'celta',
+  deportivoalaves: 'alaves', deportivoalavessad: 'alaves',
+  elchecf: 'elche', getafecf: 'getafe', levanteud: 'levante',
+  malagacf: 'malaga', caosasuna: 'osasuna', clubatleticoosasuna: 'osasuna',
+  realracingclub: 'racingsantander', realracingclubdesantander: 'racingsantander',
+  racingsantander: 'racingsantander', racingdesantander: 'racingsantander',
+  rcdeportivo: 'deportivocoruna', rcdeportivolacoruna: 'deportivocoruna',
+  rcdeportivodelacoruna: 'deportivocoruna', deportivolacoruna: 'deportivocoruna',
+  deportivodelacoruna: 'deportivocoruna', deportivocoruna: 'deportivocoruna',
+  rcdespanyol: 'espanyol', rcdespanyoldebarcelona: 'espanyol',
+  rayovallecanodemadrid: 'rayovallecano', rayovallecano: 'rayovallecano',
+  realmadridcf: 'realmadrid', realsociedaddefutbol: 'realsociedad',
+  sevillafc: 'sevilla', valenciacf: 'valencia', villarrealcf: 'villarreal',
+}
 const escudoEquipo = (nombre: string | number, equipos: Equipo[]) => {
-  const equipoId = typeof nombre === 'number' ? nombre : equipos.find(e => coincide(nombre, e))?.id
-  if (equipoId && ESCUDOS_POR_ID[equipoId]) return `/escudos/${ESCUDOS_POR_ID[equipoId]}.png`
-  if (typeof nombre === 'number') return null
-  const clave = String(nombre).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim()
-  const local = ESCUDOS_EQUIPOS[clave]
-  if (local) return local
+  if (typeof nombre === 'number') {
+    const archivo = ESCUDOS_POR_ID[nombre]
+    return archivo ? `/escudos/${archivo}.png` : null
+  }
+  const clave = normalizar(nombre)
+  const archivoAlias = ALIAS_ESCUDOS[clave]
+  if (archivoAlias) return `/escudos/${archivoAlias}.png`
   const equipo = equipos.find(e => coincide(nombre, e))
-  if (!equipo?.escudo) return null
-  return equipo.escudo.startsWith('http') || equipo.escudo.startsWith('/') ? equipo.escudo : `/${equipo.escudo}`
+  if (equipo && ESCUDOS_POR_ID[equipo.id]) return `/escudos/${ESCUDOS_POR_ID[equipo.id]}.png`
+  const claveEspacios = String(nombre).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim()
+  if (ESCUDOS_EQUIPOS[claveEspacios]) return ESCUDOS_EQUIPOS[claveEspacios]
+  return equipo?.escudo ? (equipo.escudo.startsWith('http') || equipo.escudo.startsWith('/') ? equipo.escudo : `/${equipo.escudo}`) : null
+}
+// Si una imagen falla, dejamos un símbolo visible en vez de un hueco vacío.
+const ocultarEscudoRoto = (evento: import('react').SyntheticEvent<HTMLImageElement>) => {
+  const imagen = evento.currentTarget
+  imagen.style.display = 'none'
+  const padre = imagen.parentElement
+  if (padre && !padre.querySelector('.mi-estadliga-escudo-fallback')) {
+    const simbolo = document.createElement('span')
+    simbolo.className = 'mi-estadliga-escudo-fallback'
+    simbolo.textContent = '⚽'
+    simbolo.setAttribute('aria-label', 'Escudo no disponible')
+    padre.insertBefore(simbolo, imagen)
+  }
 }
 const fechaPartido = (fecha: string) => {
   const ms = Date.parse(fecha)
@@ -260,7 +297,7 @@ function Inicio() {
             <div className="mi-estadliga-selector-titulo"><strong>Mis equipos favoritos</strong><span>Selecciona uno para ver sus datos</span></div>
             <div className="mi-estadliga-selector-lista">
               {equiposSeguidos.map(e => <button type="button" key={e.id} className={`mi-estadliga-selector-equipo ${equipoActivo?.id === e.id ? 'activo' : ''}`} aria-pressed={equipoActivo?.id === e.id} onClick={() => setEquipoSeleccionadoId(e.id)}>
-                {escudoEquipo(e.id,equipos) && <img src={escudoEquipo(e.id,equipos)!} alt="" onError={ev => { ev.currentTarget.style.display = 'none' }} />}
+                {escudoEquipo(e.id,equipos) && <img src={escudoEquipo(e.id,equipos)!} alt="" onError={ocultarEscudoRoto} />}
                 <span>{e.nombre}</span>{miEquipo?.id === e.id && <small>Principal</small>}
               </button>)}
             </div>
@@ -270,7 +307,7 @@ function Inicio() {
               <span className="mi-estadliga-eyebrow">MI EQUIPO PRINCIPAL · LALIGA 2026/27</span>
               {equipoActivo ? <>
                 <div className="mi-estadliga-hero-team">
-                  {escudoEquipo(equipoActivo.id, equipos) && <img src={escudoEquipo(equipoActivo.id, equipos)!} alt={`Escudo de ${equipoActivo.nombre}`} onError={e => { e.currentTarget.style.display = 'none' }} />}
+                  {escudoEquipo(equipoActivo.id, equipos) && <img src={escudoEquipo(equipoActivo.id, equipos)!} alt={`Escudo de ${equipoActivo.nombre}`} onError={ocultarEscudoRoto} />}
                   <div><h3>{equipoActivo.nombre}</h3><span>Tu pasión, todos sus números.</span></div>
                 </div>
                 <div className="mi-estadliga-kpis">
@@ -287,9 +324,9 @@ function Inicio() {
           {proximoPrincipal ? <div className="mi-estadliga-match-feature">
             <div className="mi-estadliga-match-meta"><span>PRÓXIMO PARTIDO</span><strong>{fechaPartido(proximoPrincipal.fecha)}</strong></div>
             <div className="mi-estadliga-match-versus">
-              <div className="mi-estadliga-match-club">{escudoEquipo(proximoPrincipal.local,equipos) && <img src={escudoEquipo(proximoPrincipal.local,equipos)!} alt="" onError={e => { e.currentTarget.style.display = 'none' }} />}<strong>{nombrePartido(proximoPrincipal.local,equipos)}</strong></div>
+              <div className="mi-estadliga-match-club">{escudoEquipo(proximoPrincipal.local,equipos) && <img src={escudoEquipo(proximoPrincipal.local,equipos)!} alt="" onError={ocultarEscudoRoto} />}<strong>{nombrePartido(proximoPrincipal.local,equipos)}</strong></div>
               <div className="mi-estadliga-vs"><strong>VS</strong><small>LaLiga</small></div>
-              <div className="mi-estadliga-match-club">{escudoEquipo(proximoPrincipal.visitante,equipos) && <img src={escudoEquipo(proximoPrincipal.visitante,equipos)!} alt="" onError={e => { e.currentTarget.style.display = 'none' }} />}<strong>{nombrePartido(proximoPrincipal.visitante,equipos)}</strong></div>
+              <div className="mi-estadliga-match-club">{escudoEquipo(proximoPrincipal.visitante,equipos) && <img src={escudoEquipo(proximoPrincipal.visitante,equipos)!} alt="" onError={ocultarEscudoRoto} />}<strong>{nombrePartido(proximoPrincipal.visitante,equipos)}</strong></div>
             </div>
           </div> : <div className="mi-estadliga-empty">{equipoActivo ? 'No hay próximos encuentros disponibles.' : 'Elige un equipo principal para destacar su próximo encuentro.'}</div>}
           <div className="mi-estadliga-section-heading"><div><span className="mi-estadliga-rotulo">TUS EQUIPOS</span><h3>Próximos partidos</h3></div></div>
@@ -297,9 +334,9 @@ function Inicio() {
             {proximos.length ? proximos.map((p,i) => <div className="mi-estadliga-fixture" key={`${p.fecha}-${i}`}>
               <span className="mi-estadliga-fixture-date">{fechaPartido(p.fecha)}</span>
               <div className="mi-estadliga-fixture-teams">
-                {escudoEquipo(p.local,equipos) && <img src={escudoEquipo(p.local,equipos)!} alt="" onError={e => { e.currentTarget.style.display = 'none' }} />}
+                {escudoEquipo(p.local,equipos) && <img src={escudoEquipo(p.local,equipos)!} alt="" onError={ocultarEscudoRoto} />}
                 <strong>{nombrePartido(p.local,equipos)}</strong><span className="mi-estadliga-fixture-vs">vs</span><strong>{nombrePartido(p.visitante,equipos)}</strong>
-                {escudoEquipo(p.visitante,equipos) && <img src={escudoEquipo(p.visitante,equipos)!} alt="" onError={e => { e.currentTarget.style.display = 'none' }} />}
+                {escudoEquipo(p.visitante,equipos) && <img src={escudoEquipo(p.visitante,equipos)!} alt="" onError={ocultarEscudoRoto} />}
               </div>
             </div>) : <div className="mi-estadliga-empty">No hay próximos partidos de tus equipos favoritos.</div>}
           </div>
