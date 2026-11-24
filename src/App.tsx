@@ -11,6 +11,7 @@ import Jugadores from './pages/Jugadores'
 import JugadorDetalle from './pages/JugadorDetalle'
 import Clasificacion from './pages/Clasificacion'
 import Partidos from './pages/Partidos'
+import PartidoDetalle from './pages/PartidoDetalle'
 import Quiniela from './pages/Quiniela'
 import Tienda from './pages/Tienda'
 import BuscadorGlobal from './components/BuscadorGlobal'
@@ -21,7 +22,7 @@ import Seguridad from './pages/Seguridad'
 import MenuFavoritos from './components/MenuFavoritos'
 
 function leerRuta() {
-  return window.location.hash.replace(/^#\/?/, '') || 'inicio'
+  return window.location.hash.replace(/^#\/?/, '').split('?')[0] || 'inicio'
 }
 interface UsuarioSesion {
   id: number
@@ -32,6 +33,16 @@ interface UsuarioSesion {
 
 function App() {
   useEffect(() => { aplicarTema(leerTema(), false) }, [])
+  async function cerrarSesionCabecera() {
+    try {
+      const respuesta = await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+      if (!respuesta.ok) throw new Error('No se ha podido cerrar la sesión')
+      setUsuarioSesion(null)
+      window.dispatchEvent(new Event('estadliga:auth-cambio'))
+      window.location.hash = '#/login'
+    } catch { window.alert('No se ha podido cerrar la sesión. Vuelve a intentarlo.') }
+  }
+
   const [equipos, setEquipos] = useState<Equipo[]>([])
   const [jugadores, setJugadores] = useState<Jugador[]>([])
   const [jugadorDetalle, setJugadorDetalle] = useState<Jugador | null>(null)
@@ -229,6 +240,8 @@ function App() {
   const esJugadores = pagina === 'jugadores'
   const esClasificacion = pagina === 'clasificacion'
   const esPartidos = pagina === 'partidos'
+  const esDetallePartido = /^partidos\/\d+$/.test(pagina)
+  const idDetallePartido = esDetallePartido ? Number(pagina.split('/')[1]) : null
   const esQuiniela = pagina === 'quiniela'
   const esTienda = pagina === 'tienda'
   const esFavoritos = pagina === 'favoritos'
@@ -316,11 +329,13 @@ function App() {
             ? 'Comprobando...'
             : usuarioSesion?.nombre ?? 'Iniciar sesión'}
         </button>
+        {usuarioSesion && <button type="button" className="login-menu-movil" onClick={() => { setMenuAbierto(false); void cerrarSesionCabecera() }}>Cerrar sesión</button>}
         </nav>
         <div className="cabecera-acciones">
           <BuscadorGlobal />
           <SelectorTema />
           {usuarioSesion && <MenuFavoritos />}
+          {usuarioSesion && <button type="button" className="boton-cerrar-sesion" onClick={() => void cerrarSesionCabecera()} title="Cerrar sesión">Salir</button>}
           <button
             className="boton-login"
             type="button"
@@ -412,6 +427,7 @@ function App() {
         )}
         {esClasificacion && <Clasificacion />}
         {esPartidos && <Partidos />}
+        {esDetallePartido && idDetallePartido !== null && <PartidoDetalle id={idDetallePartido} />}
         {esQuiniela && <Quiniela />}
         {esTienda && <Tienda />}
         {esFavoritos && <MisFavoritos usuario={usuarioSesion} comprobandoSesion={comprobandoSesion} />}
@@ -421,6 +437,7 @@ function App() {
           !esJugadores &&
           !esFichaJugador &&
           !esClasificacion &&
+          !esDetallePartido &&
           !esPartidos &&
           !esQuiniela &&
           !esTienda &&

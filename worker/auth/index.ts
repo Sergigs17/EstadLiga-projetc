@@ -1,3 +1,4 @@
+import { solicitarRecuperacion, restablecerPassword } from './recuperacion-password'
 import { iniciarSesionGoogle } from './login-google'
 
 import {
@@ -245,6 +246,25 @@ async function tiene2FA(
 
   return configuracion?.activado === 1
 
+}
+
+async function gestionarPassword(request: Request, env: AuthEnv): Promise<Response> {
+  const usuario = await obtenerUsuarioSesion(request, env)
+  if (!usuario) return json({ error: 'Debes iniciar sesión' }, 401)
+  const datos = await leerDatos(request)
+  if (!datos) return json({ error: 'Solicitud no válida' }, 400)
+  const nueva = typeof datos.password === 'string' ? datos.password : ''
+  const anterior = typeof datos.password_actual === 'string' ? datos.password_actual : ''
+  if (!validarPassword(nueva)) return json({ error: 'La nueva contraseña debe tener entre 12 y 128 caracteres' }, 400)
+  const fila = await env.estadliga_db.prepare('SELECT password_hash FROM usuarios WHERE id = ?').bind(usuario.id).first<{password_hash:string}>()
+  if (!fila) return json({ error: 'Cuenta no encontrada' }, 404)
+  const tienePassword = fila.password_hash.startsWith('pbkdf2_sha256$')
+  if (tienePassword && !(await verificarPassword(anterior, fila.password_hash))) {
+    return json({ error: 'La contraseña actual no es correcta' }, 403)
+  }
+  const hash = await crearHashPassword(nueva)
+  await env.estadliga_db.prepare('UPDATE usuarios SET password_hash = ? WHERE id = ?').bind(hash, usuario.id).run()
+  return json({ mensaje: tienePassword ? 'Contraseña actualizada' : 'Contraseña de EstadLiga creada' })
 }
 
 async function registrar(
@@ -732,6 +752,9 @@ export async function manejarAuth(
   const rutas = [
 
     '/api/auth/registro',
+    '/api/auth/password',
+    '/api/auth/recuperar-password',
+    '/api/auth/restablecer-password',
 
     '/api/auth/login',
 
@@ -808,10 +831,14 @@ export async function manejarAuth(
     switch (url.pathname) {
 
       case '/api/auth/registro':
+        return await registrar(request, env)
 
-        return json({
-          error: 'El registro por correo está temporalmente desactivado. Utiliza Google para registrarte.',
-        }, 503)
+      case '/api/auth/recuperar-password':
+        return await solicitarRecuperacion(request, env)
+      case '/api/auth/restablecer-password':
+        return await restablecerPassword(request, env)
+      case '/api/auth/password':
+        return await gestionarPassword(request, env)
 
       case '/api/auth/login':
 

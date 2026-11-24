@@ -948,3 +948,6 @@ button {
 :root[data-tema="oscuro"] input,:root[data-tema="oscuro"] textarea,:root[data-tema="oscuro"] select{color-scheme:dark}
 @media(prefers-color-scheme:dark){:root[data-tema="sistema"] input,:root[data-tema="sistema"] textarea,:root[data-tema="sistema"] select{color-scheme:dark}}
 @media(max-width:900px){.selector-tema{font-size:0}.selector-tema select{font-size:.75rem;max-width:105px}}
+
+.boton-cerrar-sesion { border: 1px solid var(--linea); background: var(--papel); color: var(--tinta); padding: 9px 12px; border-radius: 9px; font: inherit; font-weight: 650; cursor: pointer; }
+.boton-cerrar-sesion:hover { border-color: var(--rojo); color: var(--rojo); }

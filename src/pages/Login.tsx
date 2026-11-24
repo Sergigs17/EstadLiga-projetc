@@ -20,6 +20,11 @@ interface RespuestaAuth {
 }
 
 export default function Login() {
+  const [registro, setRegistro] = useState(false)
+  const [recuperacion, setRecuperacion] = useState<'ninguna' | 'solicitar' | 'restablecer'>(() => window.location.hash.includes('recuperar=') ? 'restablecer' : 'ninguna')
+  const [tokenRecuperacion, setTokenRecuperacion] = useState(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('recuperar') ?? '')
+  const [nombreRegistro, setNombreRegistro] = useState('')
+  const [confirmacion, setConfirmacion] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mostrarPassword, setMostrarPassword] = useState(false)
@@ -121,17 +126,20 @@ export default function Login() {
 
     const emailLimpio = email.trim().toLowerCase()
 
+    if (registro && password !== confirmacion) { setError('Las contraseñas no coinciden'); return }
     setCargando(true)
 
     try {
-      const respuesta = await fetch('/api/auth/login', {
+      const respuesta = await fetch(registro ? '/api/auth/registro' : '/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ email: emailLimpio, password }),
+        body: JSON.stringify({ email: emailLimpio, password, ...(registro ? { nombre: nombreRegistro.trim() } : {}) }),
       })
 
-      completarAcceso(await leerRespuesta(respuesta))
+      const datos = await leerRespuesta(respuesta)
+      if (registro) { setMensaje(datos.mensaje || 'Cuenta creada. Revisa tu correo.'); setRegistro(false); setPassword(''); setConfirmacion('') }
+      else completarAcceso(datos)
     } catch (err) {
       setError(
         err instanceof Error
@@ -220,6 +228,22 @@ export default function Login() {
     } finally {
       setCargando(false)
     }
+  }
+
+  async function enviarRecuperacion(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    setCargando(true); setError(''); setMensaje('')
+    try {
+      if (recuperacion === 'restablecer' && password !== confirmacion) throw new Error('Las contraseñas no coinciden.')
+      const respuesta = await fetch(recuperacion === 'solicitar' ? '/api/auth/recuperar-password' : '/api/auth/restablecer-password', {
+        method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(recuperacion === 'solicitar' ? { email: email.trim().toLowerCase() } : { token: tokenRecuperacion, password }),
+      })
+      const datos = await leerRespuesta(respuesta)
+      setMensaje(datos.mensaje ?? 'Solicitud procesada.')
+      if (recuperacion === 'restablecer') { setRecuperacion('ninguna'); setPassword(''); setConfirmacion(''); setTokenRecuperacion(''); window.location.hash = '#/login' }
+    } catch (err) { setError(err instanceof Error ? err.message : 'No se ha podido completar la solicitud.') }
+    finally { setCargando(false) }
   }
 
   async function cerrarSesion() {
@@ -353,6 +377,18 @@ export default function Login() {
                   : 'Cerrar sesión'}
               </button>
             </div>
+          ) : recuperacion !== 'ninguna' ? (
+            <form className="auth-formulario" onSubmit={enviarRecuperacion}>
+              <h3>{recuperacion === 'solicitar' ? 'Recuperar contraseña' : 'Crear nueva contraseña'}</h3>
+              {recuperacion === 'solicitar' ? (
+                <div className="auth-campo"><label htmlFor="recuperar-email">Correo electrónico</label><input id="recuperar-email" type="email" required maxLength={254} autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} /></div>
+              ) : (<>
+                <div className="auth-campo"><label htmlFor="recuperar-password">Nueva contraseña (mínimo 12 caracteres)</label><input id="recuperar-password" type="password" minLength={12} maxLength={128} required autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} /></div>
+                <div className="auth-campo"><label htmlFor="recuperar-confirmar">Repetir contraseña</label><input id="recuperar-confirmar" type="password" minLength={12} maxLength={128} required autoComplete="new-password" value={confirmacion} onChange={e => setConfirmacion(e.target.value)} /></div>
+              </>)}
+              <button className="auth-boton auth-boton-principal" type="submit" disabled={cargando}>{cargando ? 'Procesando...' : recuperacion === 'solicitar' ? 'Enviar enlace' : 'Cambiar contraseña'}</button>
+              <button className="auth-enlace-boton" type="button" onClick={() => {setRecuperacion('ninguna');setError('');setMensaje('');window.location.hash='#/login'}}>Volver a iniciar sesión</button>
+            </form>
           ) : desafio2FA ? (
             <form
               className="auth-formulario"
@@ -428,15 +464,16 @@ export default function Login() {
             </form>
           ) : (
             <>
-              <p className="auth-ayuda">
-                ¿Todavía no tienes cuenta? Puedes crearla con Google.
-                El registro por correo estará disponible próximamente.
-              </p>
+              <div className="auth-pestanas">
+                <button type="button" className={'auth-pestana' + (!registro ? ' activa' : '')} onClick={() => {setRegistro(false);setError('');setMensaje('')}}>Iniciar sesión</button>
+                <button type="button" className={'auth-pestana' + (registro ? ' activa' : '')} onClick={() => {setRegistro(true);setError('');setMensaje('')}}>Registrarse</button>
+              </div>
 
               <form
                 className="auth-formulario"
                 onSubmit={enviarFormulario}
               >
+                {registro && <div className="auth-campo"><label htmlFor="auth-nombre">Nombre</label><input id="auth-nombre" required minLength={3} maxLength={50} value={nombreRegistro} onChange={e => setNombreRegistro(e.target.value)} autoComplete="name" /></div>}
                 <div className="auth-campo">
                   <label htmlFor="auth-email">
                     Correo electrónico
@@ -467,7 +504,7 @@ export default function Login() {
                     type={
                       mostrarPassword ? 'text' : 'password'
                     }
-                    autoComplete="current-password"
+                    autoComplete={registro ? "new-password" : "current-password"}
                     maxLength={128}
                     required
                     value={password}
@@ -479,6 +516,7 @@ export default function Login() {
                   />
                 </div>
 
+                {registro && <div className="auth-campo"><label htmlFor="auth-confirmar">Confirmar contraseña</label><input id="auth-confirmar" type={mostrarPassword ? 'text' : 'password'} required minLength={12} maxLength={128} autoComplete="new-password" value={confirmacion} onChange={e => setConfirmacion(e.target.value)} /></div>}
                 <label className="auth-checkbox">
                   <input
                     type="checkbox"
@@ -500,9 +538,11 @@ export default function Login() {
                 >
                   {cargando
                     ? 'Procesando...'
-                    : 'Iniciar sesión'}
+                    : registro ? 'Crear cuenta' : 'Iniciar sesión'}
                 </button>
               </form>
+
+              {!registro && <button className="auth-enlace-boton" type="button" onClick={() => { setRecuperacion('solicitar'); setError(''); setMensaje('') }}>¿Has olvidado tu contraseña?</button>}
 
               <div className="auth-separador">
                 <span>O accede o crea tu cuenta con</span>

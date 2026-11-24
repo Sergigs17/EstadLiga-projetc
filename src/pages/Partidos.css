@@ -284,3 +284,6 @@
 .partido-detalles dd { margin:0; font-weight:700; }
 .partido-detalles p { color:var(--tinta-suave); font-size:.8rem; margin:16px 0 0; }
 @media(max-width:600px) { .partidos-filtros > span { margin-left:0; width:100%; } }
+
+.partido-pagina-detalle{display:block;text-align:center;padding:14px;color:var(--rojo);font-weight:800;text-decoration:none;border-top:1px solid var(--linea)}
+.partido-pagina-detalle:hover{text-decoration:underline}

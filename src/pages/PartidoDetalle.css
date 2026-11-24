@@ -1,0 +1,29 @@
+.pagina-detalle-partido{max-width:1100px;margin:0 auto;padding-bottom:40px;color:var(--tinta)}
+.detalle-volver{display:inline-block;margin:0 0 20px;color:var(--rojo);font-weight:700;text-decoration:none}
+.detalle-partido-cabecera,.detalle-partido-panel{background:var(--papel);border:1px solid var(--linea);border-radius:16px;padding:24px}
+.detalle-partido-subtitulo{text-align:center;color:var(--tinta-suave);font-size:.85rem;margin:0 0 18px}
+.detalle-partido-cabecera>.detalle-partido-subtitulo:last-child{margin:18px 0 0}
+.detalle-partido-marcador{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+.detalle-partido-equipo{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;font-size:1.15rem}
+.detalle-partido-equipo img{width:72px;height:72px;object-fit:contain}
+.detalle-partido-resultado{text-align:center;display:flex;flex-direction:column;gap:8px;white-space:nowrap}
+.detalle-partido-resultado strong{font-size:2.6rem;line-height:1.2}
+.detalle-partido-resultado span{font-size:.9rem;color:var(--tinta-suave)}
+.detalle-partido-aviso{padding:12px 16px;background:var(--papel-calido);border-radius:10px;color:var(--tinta-suave)}
+.detalle-partido-pestanas{display:flex;gap:8px;overflow-x:auto;margin:20px 0}
+.detalle-partido-pestanas button{padding:12px 16px;white-space:nowrap;border:1px solid var(--linea);border-radius:10px;background:var(--papel);color:var(--tinta);font:inherit;cursor:pointer}
+.detalle-partido-pestanas button[aria-pressed=true]{background:var(--rojo);border-color:var(--rojo);color:#fff;font-weight:700}
+.detalle-partido-panel h2{font-size:1.25rem;margin:0 0 22px}
+.detalle-partido-panel h3{font-size:1rem}
+.detalle-eventos{list-style:none;margin:0;padding:0}
+.detalle-eventos li{display:flex;gap:22px;padding:14px 0;border-bottom:1px solid var(--linea)}
+.detalle-eventos time{font-weight:800;color:var(--rojo);min-width:48px}
+.detalle-eventos p{margin:4px 0}.detalle-eventos small{color:var(--tinta-suave)}
+.detalle-estadistica{display:grid;grid-template-columns:1fr 2fr 1fr;text-align:center;padding:12px;border-bottom:1px solid var(--linea)}
+.detalle-estadistica span{color:var(--tinta-suave)}
+.detalle-columnas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.detalle-columnas>section{min-width:0}
+.detalle-jugadores-lista{padding:0;list-style:none}.detalle-jugadores-lista li{padding:9px 0;border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:10px}.detalle-jugadores-lista li>span{font-weight:700;color:var(--rojo);min-width:25px}.detalle-jugadores-lista small{margin-left:auto;color:var(--tinta-suave)}
+.detalle-tabla-scroll{overflow-x:auto}.detalle-tabla-scroll table{width:100%;border-collapse:collapse;font-size:.83rem}.detalle-tabla-scroll th,.detalle-tabla-scroll td{padding:10px 6px;text-align:left;border-bottom:1px solid var(--linea)}
+.detalle-partido-fuente{color:var(--tinta-suave);font-size:.8rem;margin-top:16px}
+@media(max-width:650px){.detalle-partido-cabecera,.detalle-partido-panel{padding:16px}.detalle-partido-marcador{gap:8px}.detalle-partido-equipo{font-size:.85rem}.detalle-partido-equipo img{width:48px;height:48px}.detalle-partido-resultado strong{font-size:1.8rem}.detalle-columnas{grid-template-columns:1fr}}

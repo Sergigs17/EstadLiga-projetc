@@ -14,6 +14,66 @@ type Partido = {
   golesVisitante: number | null
 }
 type Respuesta = { partidos: Partido[] }
+type EventoDirecto = {
+  time?: { elapsed?: number; extra?: number | null }
+  team?: { name?: string }
+  player?: { name?: string }
+  assist?: { name?: string }
+  type?: string
+  detail?: string
+}
+type PartidoDirecto = {
+  fixture: { id: number; date: string; status: { short: string; elapsed?: number | null } }
+  teams: { home: { name: string }; away: { name: string } }
+  goals: { home: number | null; away: number | null }
+  events?: EventoDirecto[]
+  actualizado_en?: string
+}
+type RespuestaDirecto = { ok: boolean; partidos: PartidoDirecto[] }
+
+const estadosApiDirecto = new Set(['1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE', 'INT'])
+const aliasEquipos: Record<string, string> = {
+  'sevilla': 'sevilla', 'real betis': 'betis', 'betis': 'betis',
+  'atletico madrid': 'atlmadrid', 'atletico de madrid': 'atlmadrid',
+  'athletic bilbao': 'athletic', 'athletic club': 'athletic',
+  'barcelona': 'barcelona', 'fc barcelona': 'barcelona',
+  'real madrid': 'realmadrid', 'real madrid cf': 'realmadrid',
+  'deportivo alaves': 'alaves', 'alaves': 'alaves',
+  'racing santander': 'racingsantander', 'racing de santander': 'racingsantander',
+  'racing': 'racingsantander', 'real racing club': 'racingsantander',
+  'deportivo la coruna': 'deportivocoruna', 'rc deportivo': 'deportivocoruna',
+  'rc deportivo de la coruna': 'deportivocoruna',
+  'espanyol': 'espanyol', 'rcd espanyol': 'espanyol',
+  'celta vigo': 'celta', 'celta de vigo': 'celta', 'rc celta de vigo': 'celta',
+  'rayo vallecano': 'rayovallecano', 'real sociedad': 'realsociedad',
+  'osasuna': 'osasuna', 'ca osasuna': 'osasuna',
+  'villarreal': 'villarreal', 'villarreal cf': 'villarreal',
+  'valencia': 'valencia', 'valencia cf': 'valencia',
+  'getafe': 'getafe', 'getafe cf': 'getafe',
+  'levante': 'levante', 'levante ud': 'levante',
+  'elche': 'elche', 'elche cf': 'elche',
+  'malaga': 'malaga', 'malaga cf': 'malaga',
+}
+function claveEquipo(nombre: string | number) {
+  const clave = normalizar(String(nombre))
+  return aliasEquipos[clave] ?? ESCUDOS[clave] ?? clave
+}
+function buscarDirecto(partido: Partido, directos: PartidoDirecto[]) {
+  const fecha = Date.parse(partido.fecha)
+  if (!Number.isFinite(fecha)) return undefined
+  return directos.find(d =>
+    Math.abs(Date.parse(d.fixture.date) - fecha) <= 2 * 60 * 60 * 1000 &&
+    claveEquipo(partido.local) === claveEquipo(d.teams.home.name) &&
+    claveEquipo(partido.visitante) === claveEquipo(d.teams.away.name)
+  )
+}
+function descripcionEvento(evento: EventoDirecto) {
+  if (evento.type === 'Goal') return '⚽ Gol'
+  if (evento.type === 'Card') return evento.detail?.toLowerCase().includes('red') ? '🟥 Tarjeta roja' : '🟨 Tarjeta amarilla'
+  if (evento.type === 'subst') return '🔄 Sustitución'
+  return evento.detail || evento.type || 'Evento'
+}
+
 
 const formatoHora = new Intl.DateTimeFormat('es-ES', {
   timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit'
@@ -58,6 +118,7 @@ function EscudoEquipo({ nombre }: { nombre: string | number }) {
 
 function Partidos() {
   const [partidos, setPartidos] = useState<Partido[]>([])
+  const [directos, setDirectos] = useState<PartidoDirecto[]>([])
   const [jornada, setJornada] = useState<number | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -80,6 +141,23 @@ function Partidos() {
       })
       .finally(() => { if (!controller.signal.aborted) setCargando(false) })
     return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    let activo = true
+    const consultar = async () => {
+      try {
+        const response = await fetch('/api/partidos/directo', { cache: 'no-store' })
+        if (!response.ok) return
+        const datos = await response.json() as RespuestaDirecto
+        if (activo && datos.ok && Array.isArray(datos.partidos)) setDirectos(datos.partidos)
+      } catch (error) {
+        console.warn('No se pudo actualizar el directo:', error)
+      }
+    }
+    void consultar()
+    const intervalo = window.setInterval(() => { void consultar() }, 60_000)
+    return () => { activo = false; window.clearInterval(intervalo) }
   }, [])
 
   const jornadas = useMemo(() =>
@@ -220,13 +298,18 @@ function Partidos() {
               </h3>
               <div className="partidos-lista">
                 {dia.partidos.map((p, i) => {
-                  const enDirecto = estadosDirecto.has(p.estado)
-                  const terminado = estadosFinales.has(p.estado)
-                  const marcador = p.golesLocal !== null && p.golesVisitante !== null
+                  const api = buscarDirecto(p, directos)
+                  const apiActivo = api && estadosApiDirecto.has(api.fixture.status.short)
+                  const enDirecto = Boolean(apiActivo) || estadosDirecto.has(p.estado)
+                  const terminado = !enDirecto && estadosFinales.has(p.estado)
+                  const golesLocal = apiActivo && api?.goals.home != null ? api.goals.home : p.golesLocal
+                  const golesVisitante = apiActivo && api?.goals.away != null ? api.goals.away : p.golesVisitante
+                  const marcador = golesLocal !== null && golesVisitante !== null
+                  const minuto = apiActivo ? api?.fixture.status.elapsed : null
                   const fecha = Date.parse(p.fecha)
                   const gana = terminado && marcador
-                    ? p.golesLocal! > p.golesVisitante! ? 'local'
-                      : p.golesLocal! < p.golesVisitante! ? 'visitante' : 'empate'
+                    ? golesLocal! > golesVisitante! ? 'local'
+                      : golesLocal! < golesVisitante! ? 'visitante' : 'empate'
                     : null
                   const clave = String(p.id ?? `${p.fecha}-${p.local}-${p.visitante}`)
                   const abierto = partidoAbierto === clave
@@ -239,7 +322,7 @@ function Partidos() {
                         <strong>{Number.isNaN(fecha) ? '—' : formatoHora.format(fecha)}</strong>
                         <span className={`partido-estado ${enDirecto ? 'en-directo' : ''}`}>
                           {enDirecto && <i aria-hidden="true" />}
-                          {enDirecto ? 'En juego' : terminado ? 'Finalizado' : p.estado === 'POSTPONED' ? 'Aplazado' : 'Programado'}
+                          {enDirecto ? (minuto != null ? `${minuto}′ · En directo` : 'En directo') : terminado ? 'Finalizado' : p.estado === 'POSTPONED' ? 'Aplazado' : 'Programado'}
                         </span>
                       </div>
                       <div className="partido-cruce">
@@ -247,10 +330,10 @@ function Partidos() {
                           <span className="partido-nombre">{String(p.local)}</span>
                           <EscudoEquipo nombre={p.local} />
                         </div>
-                        <div className="partido-marcador" aria-label={marcador ? `${p.golesLocal} a ${p.golesVisitante}` : 'Aún sin jugar'}>
+                        <div className="partido-marcador" aria-label={marcador ? `${golesLocal} a ${golesVisitante}` : 'Aún sin jugar'}>
                           {marcador ? (
                             <>
-                              <b>{p.golesLocal}</b><span>-</span><b>{p.golesVisitante}</b>
+                              <b>{golesLocal}</b><span>-</span><b>{golesVisitante}</b>
                             </>
                           ) : (
                             <em>vs</em>
@@ -261,6 +344,7 @@ function Partidos() {
                           <span className="partido-nombre">{String(p.visitante)}</span>
                         </div>
                       </div>
+                      {p.id != null && <a className="partido-pagina-detalle" href={`#/partidos/${p.id}`}>Ver ficha completa del partido →</a>}
                       <button className="partido-ver-detalles" type="button" aria-expanded={abierto} onClick={() => setPartidoAbierto(abierto ? null : clave)}>
                         {abierto ? 'Ocultar detalles' : 'Ver detalles del encuentro'} <span aria-hidden="true">{abierto ? '⌃' : '⌄'}</span>
                       </button>
@@ -271,9 +355,23 @@ function Partidos() {
                           <div><dt>Fecha</dt><dd>{Number.isNaN(fecha) ? 'Por confirmar' : new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'full', timeStyle: 'short' }).format(fecha)}</dd></div>
                           <div><dt>Estado</dt><dd>{enDirecto ? 'En juego' : terminado ? 'Finalizado' : p.estado === 'POSTPONED' ? 'Aplazado' : p.estado === 'CANCELLED' ? 'Cancelado' : 'Programado'}</dd></div>
                           {p.descansoLocal != null && p.descansoVisitante != null && <div><dt>Resultado al descanso</dt><dd>{p.descansoLocal} - {p.descansoVisitante}</dd></div>}
-                          {marcador && <div><dt>Resultado</dt><dd>{p.golesLocal} - {p.golesVisitante}</dd></div>}
+                          {marcador && <div><dt>Resultado</dt><dd>{golesLocal} - {golesVisitante}</dd></div>}
                         </dl>
-                        <p>Los goleadores, alineaciones y estadísticas detalladas todavía no están disponibles en esta sección.</p>
+                        {api && Array.isArray(api.events) && api.events.length > 0 && (
+                          <div className="partidos-eventos">
+                            <h4>Eventos del partido</h4>
+                            <ol>
+                              {api.events.map((evento, indiceEvento) => (
+                                <li key={`${api.fixture.id}-${indiceEvento}`}>
+                                  <span className="partidos-evento-minuto">{evento.time?.elapsed ?? '—'}′{evento.time?.extra ? `+${evento.time.extra}` : ''}</span>
+                                  <span><strong>{descripcionEvento(evento)}</strong> · {evento.player?.name ?? 'Jugador sin identificar'}{evento.team?.name ? ` (${evento.team.name})` : ''}</span>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                        {!api && <p>Los eventos detallados todavía no están disponibles para este encuentro.</p>}
+                        {api && <p>Las alineaciones y estadísticas ampliadas se incorporarán próximamente.</p>}
                       </div>}
                     </article>
                   )
@@ -281,7 +379,7 @@ function Partidos() {
               </div>
             </div>
           ))}
-          <p className="partidos-aviso">Los resultados y estados proceden de Football-Data.org y pueden actualizarse con retraso. El directo de Apify se añadirá en la siguiente fase.</p>
+          <p className="partidos-aviso">Calendario y resultados finales: Football-Data.org. Marcadores y eventos en directo: API-Football, cuando estén disponibles. Los datos pueden actualizarse con retraso.</p>
         </>
       )}
     </section>

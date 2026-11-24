@@ -5,6 +5,8 @@ interface RateLimitEnv {
 export type TipoRateLimit =
   | 'login'
   | 'registro'
+  | 'recuperacion_password'
+  | 'restablecer_password'
   | '2fa_preparar'
   | '2fa_activar'
   | '2fa_verificar'
@@ -16,6 +18,8 @@ const CONFIGURACION = {
     maxIntentos: 5,
     ventanaSegundos: 15 * 60,
   },
+  recuperacion_password: { maxIntentos: 3, ventanaSegundos: 60 * 60 },
+  restablecer_password: { maxIntentos: 5, ventanaSegundos: 15 * 60 },
   registro: {
     maxIntentos: 3,
     ventanaSegundos: 60 * 60,

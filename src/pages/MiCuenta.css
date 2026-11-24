@@ -148,3 +148,8 @@
   :root:not([data-tema]) .mi-cuenta .perfil-exito,
   :root[data-tema="sistema"] .mi-cuenta .perfil-exito { background: #173b2a; color: #baf2cc; }
 }
+.perfil-cambiar-password {display:flex;flex-direction:column;gap:12px;margin:18px 0;padding-top:18px;border-top:1px solid var(--linea)}
+.perfil-cambiar-password h3 {margin:0;color:var(--tinta)}
+.perfil-cambiar-password p {color:var(--tinta-suave);font-size:.85rem}
+.perfil-cambiar-password label {display:flex;flex-direction:column;gap:5px;color:var(--tinta);font-size:.85rem}
+.perfil-cambiar-password input {width:100%;min-width:0;padding:10px;border:1px solid var(--linea);border-radius:9px;background:var(--papel);color:var(--tinta)}

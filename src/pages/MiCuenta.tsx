@@ -17,6 +17,10 @@ export default function MiCuenta() {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
   const [nuevo, setNuevo] = useState(false)
+  const [passwordActual, setPasswordActual] = useState('')
+  const [passwordNueva, setPasswordNueva] = useState('')
+  const [passwordRepetida, setPasswordRepetida] = useState('')
+  const [guardandoPassword, setGuardandoPassword] = useState(false)
 
   useEffect(() => {
     let activo = true
@@ -71,6 +75,19 @@ export default function MiCuenta() {
     finally { setGuardando(false) }
   }
 
+  async function guardarPassword(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    if (passwordNueva !== passwordRepetida) { setError('Las contraseñas nuevas no coinciden'); return }
+    setError(''); setExito(''); setGuardandoPassword(true)
+    try {
+      const respuesta = await fetch('/api/auth/password', { method: 'POST', credentials: 'same-origin', headers: {'Content-Type':'application/json'}, body: JSON.stringify({password_actual:passwordActual,password:passwordNueva}) })
+      const datos: {error?:string;mensaje?:string} = await respuesta.json()
+      if (!respuesta.ok) throw new Error(datos.error || 'No se pudo cambiar la contraseña')
+      setPasswordActual('');setPasswordNueva('');setPasswordRepetida('');setExito(datos.mensaje || 'Contraseña guardada')
+    } catch(e) {setError(e instanceof Error ? e.message : 'Error al cambiar contraseña')}
+    finally {setGuardandoPassword(false)}
+  }
+
   const equipoFavorito = equipos.find(e => e.id === perfil?.equipo_favorito_id)
 
   return <section className="seccion-contenido mi-cuenta">
@@ -106,6 +123,14 @@ export default function MiCuenta() {
           <div className="perfil-dato"><span>Correo</span><strong className="perfil-email">{usuario.email}</strong></div>
           <div className="perfil-dato"><span>Verificación</span><strong>{usuario.email_verificado ? 'Correo verificado' : 'Pendiente'}</strong></div>
           <p>Tu acceso con Google y la verificación en dos pasos se gestionan por separado.</p>
+          <form className="perfil-cambiar-password" onSubmit={guardarPassword}>
+            <h3>Contraseña de EstadLiga</h3>
+            <p>Si entraste con Google y nunca creaste una contraseña, deja vacío el campo actual. Si ya tienes una, introdúcela para cambiarla.</p>
+            <label>Contraseña actual <input type="password" autoComplete="current-password" value={passwordActual} onChange={e => setPasswordActual(e.target.value)} /></label>
+            <label>Nueva contraseña <input type="password" required minLength={12} maxLength={128} autoComplete="new-password" value={passwordNueva} onChange={e => setPasswordNueva(e.target.value)} /></label>
+            <label>Repetir contraseña <input type="password" required minLength={12} maxLength={128} autoComplete="new-password" value={passwordRepetida} onChange={e => setPasswordRepetida(e.target.value)} /></label>
+            <button type="submit" className="boton-principal" disabled={guardandoPassword}>{guardandoPassword ? 'Guardando...' : 'Guardar contraseña'}</button>
+          </form>
           <a className="perfil-enlace-seguridad" href="#/mi-cuenta/seguridad">Configurar seguridad <span aria-hidden="true">→</span></a>
         </div>
       </aside>

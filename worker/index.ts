@@ -1,7 +1,9 @@
+import { servirDetallePartido } from './detallePartidos'
 import { manejarAuth } from './auth'
 import { manejarPerfil } from './perfiles'
 import { manejarFavoritos } from './favoritos'
 import { obtenerUsuarioSesion } from './auth/sesiones'
+import { comprobarYActualizarDirecto } from './apiFootball'
 
 
 interface Env {
@@ -12,6 +14,7 @@ interface Env {
   estadliga_imagenes: R2Bucket
   APIFY_TOKEN: string
   FOOTBALL_DATA_API_TOKEN: string
+  API_FOOTBALL_KEY: string
   TOTP_ENCRYPTION_KEY: string
 }
 
@@ -999,6 +1002,48 @@ export default {
             detalle: error instanceof Error ? error.message : String(error),
           },
           { status: 502 },
+        )
+      }
+    }
+
+    // Detalle individual: caché D1 y consultas externas limitadas.
+    const rutaInformacionPartido = url.pathname.match(/^\/api\/partidos\/(\d+)\/informacion$/)
+    if (rutaInformacionPartido && request.method === 'GET') {
+      return servirDetallePartido(request, env, Number(rutaInformacionPartido[1]))
+    }
+
+    // GET /api/partidos/directo: datos almacenados, sin gastar cuota externa.
+    if (url.pathname === '/api/partidos/directo' && request.method === 'GET') {
+      try {
+        const resultado = await env.estadliga_db.prepare(`
+          SELECT fixture_id, fecha, estado, actualizado_en, datos_json
+          FROM api_football_partidos
+          WHERE league_id = 140
+            AND julianday(fecha) >= julianday('now', '-1 day')
+          ORDER BY fecha ASC
+          LIMIT 30
+        `).all<{
+          fixture_id: number
+          fecha: string | null
+          estado: string | null
+          actualizado_en: string
+          datos_json: string
+        }>()
+
+        const partidos = (resultado.results ?? []).map((fila) => ({
+          ...JSON.parse(fila.datos_json),
+          actualizado_en: fila.actualizado_en,
+        }))
+
+        return Response.json(
+          { ok: true, total: partidos.length, partidos },
+          { headers: { 'Cache-Control': 'public, max-age=60' } },
+        )
+      } catch (error) {
+        console.error('Error consultando partidos en directo:', error)
+        return Response.json(
+          { ok: false, error: 'No se pudieron obtener los partidos' },
+          { status: 500 },
         )
       }
     }
@@ -2429,7 +2474,7 @@ export default {
       }
     }
 
-   // En producción, Cloudflare sirve los archivos del frontend.
+    // En producción, Cloudflare sirve los archivos del frontend.
     if (env.ASSETS) {
       return env.ASSETS.fetch(request)
     }
@@ -2441,23 +2486,36 @@ export default {
     )
   },
 
-   async scheduled(
+  async scheduled(
     controller: ScheduledController,
     env: Env,
     ctx: ExecutionContext,
   ): Promise<void> {
+
+    // Cada 5 minutos:
+    // 1. Mantener las estadísticas existentes.
+    // 2. Actualizar partidos en directo con API-Football.
     if (controller.cron === "*/5 * * * *") {
       ctx.waitUntil(
         actualizarEstadisticasSemanales(
           env,
           new Date(controller.scheduledTime),
         ),
-      );
-      return;
+      )
+
+      ctx.waitUntil(
+        comprobarYActualizarDirecto(env),
+      )
+
+      return
     }
 
+    // Cada hora:
+    // Mantener calendario y clasificación de Football-Data.
     if (controller.cron === "0 * * * *") {
-      ctx.waitUntil(actualizarCachesFootballData(env));
+      ctx.waitUntil(
+        actualizarCachesFootballData(env),
+      )
     }
   },
 }
